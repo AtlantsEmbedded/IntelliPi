@@ -105,17 +105,17 @@ void wait_on_checkpoint(struct Scheckpoints* pcheckpoints, int checkpoints_id, i
 	/*wait until the toll is paid*/
 	while(!tmp_done_waiting)
 	{
-		/*acquire the spinlock*/
-		if(!pthread_spin_trylock(&(pcheckpoints->spinlock[checkpoints_id])))
+		/*acquire the spinlock (do not try to lock, if not enough opening available, that's redundant, but earns a bit of performance)*/
+		if(pcheckpoints->opening[checkpoints_id] >= Tool && !pthread_spin_trylock(&(pcheckpoints->spinlock[checkpoints_id])))
 		{
 
-			/*if there is enough opening*/
+			/*reconfirm that there is enough opening*/
 			if(pcheckpoints->opening[checkpoints_id] >= Tool)
 			{
 				/*pay the toll*/
+				pcheckpoints->opening[checkpoints_id] -= Tool;
 				/*done waiting*/
 				tmp_done_waiting = 1;
-				pcheckpoints->opening[checkpoints_id] -= Tool;
 			}
 			/*free the lock*/
 			pthread_spin_unlock(&(pcheckpoints->spinlock[checkpoints_id]));
@@ -137,16 +137,17 @@ void open_checkpoint(struct Scheckpoints* pcheckpoints, int checkpoints_id, int 
 	if(lock)
 	{
 		/*get the lock*/
-		while(pthread_spin_lock(&(pcheckpoints->spinlock[checkpoints_id]))){}
-	}
-	
+		pthread_spin_lock(&(pcheckpoints->spinlock[checkpoints_id]));
+		
 		/*give the checkpoint some opening*/
 		pcheckpoints->opening[checkpoints_id] += Opening;
 	
-	if(lock)
-	{
 		/*free the lock*/
 		pthread_spin_unlock(&(pcheckpoints->spinlock[checkpoints_id]));
 	}
-	sched_yield();
+	else
+	{
+		/*give the checkpoint some opening*/
+		pcheckpoints->opening[checkpoints_id] += Opening;
+	}
 }

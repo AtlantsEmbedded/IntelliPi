@@ -31,7 +31,9 @@
 #include <errno.h>
 #include "SpinCheckpoint.h"
 
-#define NB_WORK_THREADS 4
+#define NB_WORK_THREADS 1 /*min=1, max=4*/
+#define NB_MASTER_THREADS 1 /*do not change*/
+#define WORK_THREADS_OFFSET 1
 #define VERBOSITY 1
 
 /*Layer IDs*/
