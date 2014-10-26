@@ -106,7 +106,7 @@ void wait_on_checkpoint(struct Scheckpoints* pcheckpoints, int checkpoints_id, i
 	while(!tmp_done_waiting)
 	{
 		/*acquire the spinlock*/
-		if(!pthread_spin_lock(&(pcheckpoints->spinlock[checkpoints_id])))
+		if(!pthread_spin_trylock(&(pcheckpoints->spinlock[checkpoints_id])))
 		{
 
 			/*if there is enough opening*/
@@ -131,13 +131,22 @@ void wait_on_checkpoint(struct Scheckpoints* pcheckpoints, int checkpoints_id, i
 }
 
 /*this call is blocking until the opening has been given*/
-void open_checkpoint(struct Scheckpoints* pcheckpoints, int checkpoints_id, int Opening)
+void open_checkpoint(struct Scheckpoints* pcheckpoints, int checkpoints_id, int Opening, char lock)
 {
-	/*get the lock*/
-	while(pthread_spin_lock(&(pcheckpoints->spinlock[checkpoints_id]))){}
+
+	if(lock)
+	{
+		/*get the lock*/
+		while(pthread_spin_lock(&(pcheckpoints->spinlock[checkpoints_id]))){}
+	}
+	
 		/*give the checkpoint some opening*/
 		pcheckpoints->opening[checkpoints_id] += Opening;
-	/*free the lock*/
-	pthread_spin_unlock(&(pcheckpoints->spinlock[checkpoints_id]));
+	
+	if(lock)
+	{
+		/*free the lock*/
+		pthread_spin_unlock(&(pcheckpoints->spinlock[checkpoints_id]));
+	}
 	sched_yield();
 }
