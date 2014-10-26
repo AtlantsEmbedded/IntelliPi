@@ -20,6 +20,7 @@
 // Frédéric Simard, 2014
 //
 
+#define NB_CHECKPOINTS 5
 
 #include "Network.h"
 enum CheckPointNames
@@ -73,7 +74,7 @@ struct SWorkerThreadInitParams
 struct SMasterThreadParams
 {
 	pthread_t WorkerThreads[NB_WORK_THREADS]; /*thread handles*/
-	struct SWorkerThreadInitParams WorkerThreadParams[NB_WORK_THREADS]; /*thread params handles*/
+	struct SWorkerThreadInitParams WorkerThreadParams[NB_WORK_THREADS+NB_MASTER_THREADS]; /*worker and master thread workload params*/
 	
 	struct Scheckpoints* pCheckpoints; /*checkpoints used for synchronization*/
 };
@@ -222,9 +223,10 @@ int InitParProc(struct SNNetwork* pNNetwork)
 {
 	int ii=0;
 	struct sched_param scheduler_params;
+	pthread_attr_t attr;
 	
 	/*initialize the check points used for the synchronization*/
-	pNNetwork->MasterThreadParams.pCheckpoints = init_checkpoints(5);
+	pNNetwork->MasterThreadParams.pCheckpoints = init_checkpoints(NB_CHECKPOINTS);
 	if(!pNNetwork->MasterThreadParams.pCheckpoints)
 	{
 		printf("could not init checkpoints");
@@ -240,11 +242,12 @@ int InitParProc(struct SNNetwork* pNNetwork)
 	
 	printf("init thread");
 		
+#if 0
 	/*change scheduling policy*/
 	/*and increase process priority*/
 	/*For this, the program needs to be launched in super user mode*/
 	sched_getparam(getpid(), &scheduler_params);
-	scheduler_params.sched_priority = 99;
+	scheduler_params.sched_priority = THREADS_SCHED_PRIORITY;
 	if(sched_setscheduler(getpid(),SCHED_RR,&scheduler_params))
 	{
 		int errsv = errno;
@@ -260,21 +263,27 @@ int InitParProc(struct SNNetwork* pNNetwork)
 		
 		}
 	}
+#endif
+	
+	/*Init threads attribute*/
+	pthread_attr_init(&attr);
+	/*set them as detached*/
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 	
 	/*init the pool of threads*/
 	for(ii = 0; ii < NB_WORK_THREADS; ii++)
     {
     	
         if(pthread_create(&(pNNetwork->MasterThreadParams.WorkerThreads[ii]), 
-        				  NULL, 
+        				  &attr, 
         				  &WorkerThread, 
-        				  (void*)&(pNNetwork->MasterThreadParams.WorkerThreadParams[ii])))
+        				  (void*)&(pNNetwork->MasterThreadParams.WorkerThreadParams[ii+WORK_THREADS_OFFSET])))
         {
             printf("Could not create thread %d\n", ii);
             return -1;
         }
     }
-    
+    pthread_attr_destroy(&attr);
 	return 0;
 }
 
@@ -289,12 +298,12 @@ int InitWorkerParams(struct SNNetwork* pNNetwork)
 	
 	/*Divide the hidden neurons evenly, and take into account case for which the*/
 	/*division doesn't round down to 0*/
-	int NbOfHidNeuronsPerThread = pNNetwork->OwnProp.NbOfNeurons[Hidden]/NB_WORK_THREADS;
-	int ExtraHidNeurons = pNNetwork->OwnProp.NbOfNeurons[Hidden]%NB_WORK_THREADS;
+	int NbOfHidNeuronsPerThread = pNNetwork->OwnProp.NbOfNeurons[Hidden]/(NB_WORK_THREADS+NB_MASTER_THREADS);
+	int ExtraHidNeurons = pNNetwork->OwnProp.NbOfNeurons[Hidden]%(NB_WORK_THREADS+NB_MASTER_THREADS);
 	
 	/*Same with output neurons*/
-	int NbOfOutNeuronsPerThread = pNNetwork->OwnProp.NbOfNeurons[Output]/NB_WORK_THREADS;
-	int ExtraOutNeurons = pNNetwork->OwnProp.NbOfNeurons[Output]%NB_WORK_THREADS;
+	int NbOfOutNeuronsPerThread = pNNetwork->OwnProp.NbOfNeurons[Output]/(NB_WORK_THREADS+NB_MASTER_THREADS);
+	int ExtraOutNeurons = pNNetwork->OwnProp.NbOfNeurons[Output]%(NB_WORK_THREADS+NB_MASTER_THREADS);
 	
 	/*compute memory offsets for hidden and output neurons*/
 	/*these will be used to give direct access to the threads*/
@@ -315,8 +324,9 @@ int InitWorkerParams(struct SNNetwork* pNNetwork)
 	printf("OutputWeightsThreadOffset: %d\n",OutputWeightsThreadOffset);
 #endif
 
-	/*for each thread*/
-	for(ii = 0; ii < NB_WORK_THREADS; ii++)
+
+	/*Define the workload for the master (ii==1) and worker (ii>1) threads*/
+	for(ii = 0; ii < (NB_WORK_THREADS+NB_MASTER_THREADS); ii++)
 	{
 		
 		/*initialize variables value*/
@@ -375,8 +385,7 @@ int InitWorkerParams(struct SNNetwork* pNNetwork)
 									 (pNNetwork->OwnProp.NbOfNeurons[Input]+1);
 		OutputWeightsThreadOffset += pNNetwork->MasterThreadParams.WorkerThreadParams[ii].NbNeuronsToCompute[Output]*
 									 (pNNetwork->OwnProp.NbOfNeurons[Hidden]+1);
-									 
-							
+									 			
 	}
 
 	
@@ -389,7 +398,7 @@ void TerminateParProc(struct SNNetwork* pNNetwork)
 	int ii=0;
 
 	/*Set threads to not alive and post an idle job*/
-	for(ii = 0; ii < NB_WORK_THREADS; ii++)
+	for(ii = 0; ii < (NB_WORK_THREADS+NB_MASTER_THREADS); ii++)
 	{
 		pNNetwork->MasterThreadParams.WorkerThreadParams[ii].IsAlive = 0;
 		pNNetwork->MasterThreadParams.WorkerThreadParams[ii].TypeOfJobToDo = Idle;
@@ -423,17 +432,12 @@ void* WorkerThread(void * params)
 	int NeuronPointer = 0;
 	
 	char tmp_done_waiting = 0;
-	
-	/*increase thread priority*/
-	struct sched_param scheduler_params;
-	sched_getparam(pthread_self(), &scheduler_params);
-	scheduler_params.sched_priority = 99;
-	sched_setparam(pthread_self(), &scheduler_params);
-		
+	pthread_detach(pthread_self());
+
 	/*While alive*/
 	while(ThreadParams->IsAlive)
 	{
-    	
+#if 1	   	
 		wait_on_checkpoint(ThreadParams->pCheckpoints, check_start_job, 1);
 		    	
     	/*Check for job to do*/
@@ -441,7 +445,7 @@ void* WorkerThread(void * params)
 		{
 			/*The first type of job is the forward pass*/
 			case ForwardProp:
-			
+		
 				/*Compute hidden layer*/
 				WeightPointer = 0;
 				NeuronPointer = 0;
@@ -464,7 +468,7 @@ void* WorkerThread(void * params)
 				}
 	
 				/*Resync*/
-				open_checkpoint(ThreadParams->pCheckpoints, check_done_one, 1,1);
+				open_checkpoint(ThreadParams->pCheckpoints, check_done_one, 1, 1);
 				wait_on_checkpoint(ThreadParams->pCheckpoints, check_go_two, 1);
 
 				/*reset offset counter*/
@@ -512,6 +516,7 @@ void* WorkerThread(void * params)
 			break;
 			
 		}
+#endif
 	}
 	
 	
@@ -548,24 +553,64 @@ void ComputeNetwork(struct SNNetwork* pNNetwork)
 
 
 	int ii=0;
-	char tmp_done_waiting = 0;
+	
+	struct SWorkerThreadInitParams ThreadParams = pNNetwork->MasterThreadParams.WorkerThreadParams[0];
 	
 	/*Post a forward pass job*/
-	for(ii = 0; ii < NB_WORK_THREADS; ii++)
+	for(ii = 0; ii < (NB_WORK_THREADS+NB_MASTER_THREADS); ii++)
 	{
 		pNNetwork->MasterThreadParams.WorkerThreadParams[ii].TypeOfJobToDo = ForwardProp;
 	}
 	
-	
 	/*start the job*/
 	open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_start_job, NB_WORK_THREADS,0);
+	
+	/*For all hidden unit allocated to this thread*/
+	for(i=0;i<ThreadParams.NbNeuronsToCompute[Hidden];i++)
+	{
+		/*sum inputs from input layer*/
+		InputSum = 0;
+		for(j=0;j<pNNetwork->OwnProp.NbOfNeurons[Input];j++)
+		{
+			InputSum += ThreadParams.HiddenWeights[WeightPointer++]*ThreadParams.AllInputActivity[j];
+		}
+		/*plus the connection to the bias*/
+		InputSum += ThreadParams.HiddenWeights[WeightPointer++]*pNNetwork->OwnProp.HiddenLayerBias;
+
+		/*sigmoid non-nonlinearity*/
+		ThreadParams.ToComputeHiddenActivity[NeuronPointer++] = SigmoidFunction(InputSum);
+		
+	}
+	
 	/*wait till first layer is finished*/
 	wait_on_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_done_one, NB_WORK_THREADS);
 	open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_go_two, NB_WORK_THREADS,0);
+	
+	/*reset offset counter*/
+	WeightPointer = 0;
+
+	NeuronPointer = 0;
+
+	/*Compute output layer*/
+	/*For all output layer*/
+	for(i=0;i<ThreadParams.NbNeuronsToCompute[Output];i++)
+	{
+		/*sum all inputs*/
+		InputSum = 0;
+		for(j=0;j<pNNetwork->OwnProp.NbOfNeurons[Hidden];j++)
+		{
+			InputSum += ThreadParams.OutputWeights[WeightPointer++]*ThreadParams.AllHiddenActivity[j];
+		}
+		InputSum += ThreadParams.OutputWeights[WeightPointer++]*pNNetwork->OwnProp.OutputLayerBias;
+
+		/*sigmoid non-nonlinearity*/
+		ThreadParams.ToComputeOutputActivity[NeuronPointer++] = SigmoidFunction(InputSum);
+	}
+	
 	wait_on_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_done_two, NB_WORK_THREADS);
 	
-	//open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_finish_job, NB_WORK_THREADS);
 	
+	//open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_finish_job, NB_WORK_THREADS);
 
 #else
 /*That's the sequential solution*/
@@ -611,6 +656,7 @@ void ComputeNetwork(struct SNNetwork* pNNetwork)
 #endif
 
 }
+
 
 
 /*Back propagation of error algorithm*/
