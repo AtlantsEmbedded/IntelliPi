@@ -53,6 +53,6 @@ struct Scheckpoints* init_checkpoints(int nb_of_checkpoints);
 void kill_checkpoints(struct Scheckpoints* pcheckpoints);
 
 void wait_on_checkpoint(struct Scheckpoints* pcheckpoints, int checkpoints_id, int Tool);
-void open_checkpoint(struct Scheckpoints* pcheckpointsm, int checkpoints_id, int Opening);
+void open_checkpoint(struct Scheckpoints* pcheckpointsm, int checkpoints_id, int Opening, char lock);
 
 #endif

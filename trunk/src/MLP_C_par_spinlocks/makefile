@@ -4,14 +4,14 @@
 # Frédéric Simard, 2014
 
 # compile with gcc
-CC        = gcc -O2 -march=core2
+CC        = gcc -O3 -fomit-frame-pointer -finline-functions -foptimize-register-move -ftree-loop-ivcanon -freorder-blocks-and-partition
 
 # need flags for POSIX thread, math and real-time
 LDFLAGS   = -lpthread -lm -lrt
 # name of the program
 PROGRAM   = MLP_C.exe
 # files of the program
-SRCS      = main.c Network.c Wrapper.c ticket_barrier.c SpinCheckpoint.c
+SRCS      = main.c Network.c Wrapper.c SpinCheckpoint.c
 OBJS      = $(SRCS:.c=.o)
 
 #

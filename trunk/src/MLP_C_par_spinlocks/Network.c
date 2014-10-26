@@ -395,7 +395,7 @@ void TerminateParProc(struct SNNetwork* pNNetwork)
 		pNNetwork->MasterThreadParams.WorkerThreadParams[ii].TypeOfJobToDo = Idle;
 	}
 	
-	open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_start_job, NB_WORK_THREADS);
+	open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_start_job, NB_WORK_THREADS,0);
 }
 
 /*worker thread*/
@@ -464,7 +464,7 @@ void* WorkerThread(void * params)
 				}
 	
 				/*Resync*/
-				open_checkpoint(ThreadParams->pCheckpoints, check_done_one, 1);
+				open_checkpoint(ThreadParams->pCheckpoints, check_done_one, 1,1);
 				wait_on_checkpoint(ThreadParams->pCheckpoints, check_go_two, 1);
 
 				/*reset offset counter*/
@@ -487,7 +487,7 @@ void* WorkerThread(void * params)
 					ToComputeOutputActivity[NeuronPointer++] = SigmoidFunction(InputSum);
 				}
 
-				open_checkpoint(ThreadParams->pCheckpoints, check_done_two, 1);
+				open_checkpoint(ThreadParams->pCheckpoints, check_done_two, 1,1);
 				//wait_on_checkpoint(ThreadParams->pCheckpoints, check_finish_job, 1);
 
 			break;
@@ -558,10 +558,10 @@ void ComputeNetwork(struct SNNetwork* pNNetwork)
 	
 	
 	/*start the job*/
-	open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_start_job, NB_WORK_THREADS);
+	open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_start_job, NB_WORK_THREADS,0);
 	/*wait till first layer is finished*/
 	wait_on_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_done_one, NB_WORK_THREADS);
-	open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_go_two, NB_WORK_THREADS);
+	open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_go_two, NB_WORK_THREADS,0);
 	wait_on_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_done_two, NB_WORK_THREADS);
 	
 	//open_checkpoint(pNNetwork->MasterThreadParams.pCheckpoints, check_finish_job, NB_WORK_THREADS);
