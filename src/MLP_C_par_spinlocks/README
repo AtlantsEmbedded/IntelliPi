@@ -1,0 +1,9 @@
+
+Build using makefile.
+
+./autogen.sh
+./configure --help
+
+To run:
+cd src/
+./MLP...
