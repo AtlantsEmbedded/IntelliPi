@@ -1,9 +1,10 @@
 
 Build using makefile.
 
-./autogen.sh
-./configure --help
+autoreconf --install;
+./configure
+make
 
 To run:
-cd src/
-./MLP...
+
+$ sudo nice --20 ./src/MLP_C.exe
