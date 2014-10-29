@@ -14,9 +14,9 @@
 int main(void)
 {
 	
-	int ii=0;
-	int jj=0;
-	int kk=0;
+	register int ii=0;
+	register int jj=0;
+	register int kk=0;
 	int TrainingLenght = 1000;
 	
 	float Input[48];
