@@ -2,7 +2,7 @@
 # MLP sequential, makefile
 #
 
-CC        = gcc -O2
+CC        = gcc -O3 -fomit-frame-pointer -finline-functions -foptimize-register-move -ftree-loop-ivcanon -freorder-blocks-and-partition
 
 #
 
