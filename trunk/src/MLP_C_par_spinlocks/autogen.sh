@@ -1,6 +1,5 @@
 #!/bin/sh
-#! /bin/sh
 
 aclocal \
-&& automake --add-missing \
-&& autoreconf --install
+&& autoreconf --install \
+&& automake --add-missing
