@@ -7,4 +7,4 @@ make
 
 To run:
 
-$ sudo nice --20 ./src/MLP_C.exe
+$ sudo nice --20 ./src/MLP_spinlocks_ex
