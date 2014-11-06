@@ -1,8 +1,8 @@
 
 Build using makefile.
 
-autoreconf --install;
-./configure
+autoreconf --install; or autogen.sh
+./configure 
 make
 
 To run:
