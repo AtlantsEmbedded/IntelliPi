@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 /** Layer IDs */
 enum TypeOfNeuron
@@ -54,7 +55,7 @@ void ComputeNetwork(struct SNNetwork* pNNetwork);
 
 void BackPropError(struct SNNetwork *pNNetwork, float *DesiredOutput, float *WeightUpdate);
 
-void ApplyWeightUpdate(struct SNNetwork *pNNetwork, float *WeightUpdate)
+void ApplyWeightUpdate(struct SNNetwork *pNNetwork, float *WeightUpdate);
 
 void GetOutput(struct SNNetwork* pNNetwork, float* OutputActivity);
 

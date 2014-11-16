@@ -99,10 +99,12 @@ struct SNNetwork *InitNetwork(struct SNNetworkProp InitProp)
  */ 
 int CopyWeights(struct SNNetwork *pNNetwork_dest, const struct SNNetwork *pNNetwork_src)
 {
+	printf("%i %i\n",pNNetwork_src->OwnProp.TotNumberOfWeights, pNNetwork_dest->OwnProp.TotNumberOfWeights);
+	
 	/*Verifies that both networks have the same number of weights*/
-	if pNNetwork_src->OwnProp.TotNumberOfWeights != pNNetwork_dest->OwnProp.TotNumberOfWeights
+	if(pNNetwork_src->OwnProp.TotNumberOfWeights != pNNetwork_dest->OwnProp.TotNumberOfWeights)
 		return 0;
-
+	
 	/*copy the weights and return*/
 	memcpy(pNNetwork_dest->Weights,pNNetwork_src->Weights,sizeof(float)*pNNetwork_src->OwnProp.TotNumberOfWeights);
 	return 1;
@@ -246,7 +248,7 @@ void BackPropError(struct SNNetwork *pNNetwork, float *DesiredOutput, float *Wei
 	/*precompute the offsets */
 	int HidToOutWeightOffset =
 	    OwnProp.NbOfNeurons[Hidden] * OwnProp.NbOfNeurons[Input] + OwnProp.NbOfNeurons[Hidden];
-	float *HidToOutLayerWeights = &(Weights[HidToOutWeightOffset]);
+	float *HidToOutLayerWeights = &(pNNetwork->Weights[HidToOutWeightOffset]);
 	int JumpOffset = OwnProp.NbOfNeurons[Hidden] + 1;
 
 	/* 

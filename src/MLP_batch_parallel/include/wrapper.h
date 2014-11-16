@@ -9,7 +9,8 @@
 #define NB_OF_NEURONS 48
 #define MAX_LINE_SIZE 1000
 
-struct SWrapperProp {
+struct SWrapperProp 
+{
 
 	char FileName[200];
 	int NbOfTrials;
