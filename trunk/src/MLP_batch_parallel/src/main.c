@@ -20,6 +20,7 @@
 
 #include <include/network.h>
 #include <include/wrapper.h>
+#include <include/parallelbatch.h>
 
 #define TRAINDATASET_NAME "data/TrainDataSet"
 #define TESTDATASET_NAME "data/TestDataSet"
@@ -43,7 +44,7 @@ int main(int argc, char **argv[])
 	float Input[48]; /*buffer for network inputs*/
 	float TrialSolution[8]; /*buffer for trial solution*/
 	float NetworkOutput[8]; /*buffer for network output*/
-	float MeanSquareError - 0; /*measured mean square error (temp)*/
+	float MeanSquareError = 0; /*measured mean square error (temp)*/
 	int NbOfWeights = 0; /*temporary variable containing the number of weights of the network*/
 	float* WeightsUpdate; /*Buffer for weights update*/
 
@@ -91,6 +92,7 @@ int main(int argc, char **argv[])
 	
 	/*create a buffer to keep track of weights update*/
 	NbOfWeights = NetworkInitProp.NbOfNeurons[0]*NetworkInitProp.NbOfNeurons[1]+
+				  NetworkInitProp.NbOfNeurons[1]+NetworkInitProp.NbOfNeurons[2]+
 				  NetworkInitProp.NbOfNeurons[1]*NetworkInitProp.NbOfNeurons[2];
 
 	/* Open file to be used to record score results */
