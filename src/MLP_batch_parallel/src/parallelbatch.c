@@ -9,7 +9,7 @@
 
 #include <include/parallelbatch.h>
 
-void *worker_thread(void *params);
+void *worker_thread(void *params); /*thread prototype*/
 
 /**
  * init_thread_pool(struct pool_init_struct)
@@ -46,19 +46,21 @@ struct Sthread_pool *init_thread_pool(struct Spool_init_struct pool_init_struct)
 	/*Init the thread params*/
 	for(ii=0;ii<(NB_WORK_THREADS + NB_MASTER_THREADS);ii++){
 		pthread_pool->thread_params[ii].is_alive = 1;
-		pthread_pool->thread_params[ii].nb_iterations = pool_init_struct.nb_iterations;
-
-		pthread_pool->thread_params[ii].ptrain_dataset = pool_init_struct.ptrain_dataset;
+		pthread_pool->thread_params[ii].nb_iterations = pool_init_struct.nb_iterations; /*nb of iteration to be executed*/
+		pthread_pool->thread_params[ii].ptrain_dataset = pool_init_struct.ptrain_dataset; /*pointer to the training dataset*/
 		
+		/*pointer to the trunk NNetwork (shouldn't be modified ever)*/
 		pthread_pool->thread_params[ii].pnnetwork_trunk_copy = pool_init_struct.pnnetwork_trunk_copy;
-		pthread_pool->thread_params[ii].network_init_prop = pool_init_struct.network_init_prop;
-		pthread_pool->thread_params[ii].pnnetwork_own_copy = InitNetwork(pool_init_struct.network_init_prop);
+		/*network initialization properties*/ 
+		pthread_pool->thread_params[ii].network_init_prop = pool_init_struct.network_init_prop; 
+		/*init a copy of the network for local computations*/
+		pthread_pool->thread_params[ii].pnnetwork_own_copy = InitNetwork(pool_init_struct.network_init_prop); 
 
-
+		/*nb of weights in the network*/
 		pthread_pool->thread_params[ii].nb_weights = pool_init_struct.nb_weights;
+		/*a buffer in which weights updates are stored by the worker and read by the master*/
 		pthread_pool->thread_params[ii].weight_update = (float*)malloc(sizeof(float)*pool_init_struct.nb_weights);
 	
-		
 		/*If we are above the master thread offset, we create worker threads*/
 		if(ii>=WORK_THREADS_OFFSET)
 		{
@@ -73,7 +75,6 @@ struct Sthread_pool *init_thread_pool(struct Spool_init_struct pool_init_struct)
 				printf("a worker thread couldn't be initialized\n");
 			}
 			
-			printf("check:%i\n",pthread_pool->thread_params[ii].pnnetwork_own_copy->OwnProp.TotNumberOfWeights);
 		}
 	}
 	
@@ -101,8 +102,6 @@ void exec_batch_iteration(struct Sthread_pool *pthread_pool)
 	float trial_solution[8];
 	float network_output[8];
 	
-	printf("nb_weights:%i",nb_weights);
-
 	/*Each thread computes its batch and accumulate weight on their own*/
 	/*Give the go signal*/
 	for(ii=0;ii<NB_WORK_THREADS;ii++){
@@ -152,6 +151,7 @@ void exec_batch_iteration(struct Sthread_pool *pthread_pool)
 void *worker_thread(void *params)
 {	
 	register int ii,jj=0;
+	
 	/*Make local copy of some parameters to reduce the number of pointer calls*/
 	/*and simplify the code*/
 	struct SNNetwork *ptrunk_nnetwork = ((struct Sthread_params*)params)->pnnetwork_trunk_copy;
@@ -161,14 +161,12 @@ void *worker_thread(void *params)
 	int nb_iterations = ((struct Sthread_params*)params)->nb_iterations;
 	int nb_weights = ((struct Sthread_params*)params)->nb_weights;
 	
-			
 	float input[48];
 	float trial_solution[8];
 	float network_output[8];
 	
 	/*loop in the thread*/
 	while(1){
-	
 	
 		/*wait for the go signal*/
 		sem_wait(&go_sem);
@@ -187,7 +185,7 @@ void *worker_thread(void *params)
 		
 		/*makes a copy of the trunk network*/
 		CopyWeights(pown_nnetwork, ptrunk_nnetwork);
-	
+			
 		/*loop over all trials of a single batch iteration*/
 		for (ii = 0; ii < nb_iterations; ii++) {
 
@@ -197,8 +195,7 @@ void *worker_thread(void *params)
 			ComputeNetwork(pown_nnetwork); /*propagate the network activity forward*/
 			GetOutput(pown_nnetwork, network_output); /*read the output of the network*/
 			BackPropError(pown_nnetwork, trial_solution, weight_update); /*backpropagate the error*/
-				
-			printf("%f\n",network_output[1]);
+			
 		}	
 		
 		/*barrier*/
@@ -218,12 +215,11 @@ void kill_thread_pool(struct Sthread_pool *pthread_pool)
 
 	register int ii=0;
 	
-	
 	/*free the memory utilized by the thread params*/
 	for(ii=0;ii<(NB_WORK_THREADS + NB_MASTER_THREADS);ii++){
 		pthread_pool->thread_params[ii].is_alive = 0;
 		KillNetwork(pthread_pool->thread_params[ii].pnnetwork_own_copy);
-		//free(pthread_pool->thread_params[ii].weight_update);
+		free(pthread_pool->thread_params[ii].weight_update);
 	}
 	
 	/*let the worker threads finish*/

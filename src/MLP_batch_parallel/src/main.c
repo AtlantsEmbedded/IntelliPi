@@ -44,13 +44,13 @@ int main(int argc, char **argv[])
 	float Input[48]; /*buffer for network inputs*/
 	float TrialSolution[8]; /*buffer for trial solution*/
 	float NetworkOutput[8]; /*buffer for network output*/
-	float MeanSquareError = 0; /*measured mean square error (temp)*/
+	
 	int NbOfWeights = 0; /*temporary variable containing the number of weights of the network*/
 	float* WeightsUpdate; /*Buffer for weights update*/
 
 	/*training length definition*/
-	int BatchSize = 1000; /*Size of a single batch*/
-	int NbOfBatch = 25; /*Nb of batch to be executed*/
+	int BatchSize = 100; /*Size of a single batch*/
+	int NbOfBatch = 250; /*Nb of batch to be executed*/
 
 	struct Spool_init_struct pool_init_struct;
 	struct Sthread_pool *pthread_pool;
@@ -94,10 +94,6 @@ int main(int argc, char **argv[])
 	NbOfWeights = NetworkInitProp.NbOfNeurons[0]*NetworkInitProp.NbOfNeurons[1]+
 				  NetworkInitProp.NbOfNeurons[1]+NetworkInitProp.NbOfNeurons[2]+
 				  NetworkInitProp.NbOfNeurons[1]*NetworkInitProp.NbOfNeurons[2];
-
-	/* Open file to be used to record score results */
-	//FILE *ScoreLog = NULL;
-	//ScoreLog = fopen(SCORELOG_NAME, "w");
 	
 	/*init thread pool*/
 	pool_init_struct.nb_iterations = BatchSize/(NB_WORK_THREADS+NB_MASTER_THREADS);
@@ -116,21 +112,6 @@ int main(int argc, char **argv[])
 		/*Execute batch iteration*/
 		exec_batch_iteration(pthread_pool);
 
-			/*comput and log the mean square error*/
-			//MeanSquareError = 0;
-			//for (jj = 0; jj < 8; jj++) {
-			//	MeanSquareError +=
-			//	    (TrialSolution[jj] - NetworkOutput[jj]) * (TrialSolution[jj] - NetworkOutput[jj]);
-			//}
-			//MeanSquareError /= 8; /*average over the number of output*/
-
-			/* Print results to file stream */
-			//for (jj = 0; jj < 8; jj++) {
-			//	fprintf(ScoreLog, "%f ", TrialSolution[jj]);
-			//	fprintf(ScoreLog, "%f \t", NetworkOutput[jj]);
-			//}
-			//fprintf(ScoreLog, "%f\n", MeanSquareError);
-
 		/*
 			Validation: This validate the performance of the network over a set of samples
 						not encountered during training.
@@ -141,7 +122,7 @@ int main(int argc, char **argv[])
 		int MaxResponseID = 0;  /*label identified by the network*/
 
 		/*go over the validation set*/
-		for (ii = 0; ii < 1000; ii++) {
+		for (ii = 0; ii < 200; ii++) {
 
 			/*Network iteration*/
 			GetTrial(pTestDataSet, &Input, &TrialSolution, ii); /*get a sample*/
@@ -166,11 +147,8 @@ int main(int argc, char **argv[])
 
 		}
 		/*inform user on the progression of the training*/
-		printf("TestSet Score = %.2f\n", (float)NbOfCorrectTrials / 1000);
+		printf("TestSet Score = %.2f\n", (float)NbOfCorrectTrials / 200);
 	}
-
-	/*close log file*/
-	//fclose(ScoreLog);
 
 	/* cleanup memory*/
 	KillWrapper(pTrainDataSet);

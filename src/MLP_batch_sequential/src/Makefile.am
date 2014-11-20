@@ -1,6 +1,6 @@
-bin_PROGRAMS = MLP_sequential_ex
-MLP_sequential_ex_SOURCES = main.c \
+bin_PROGRAMS = MLP_batch
+MLP_batch_SOURCES = main.c \
 				wrapper.c \
 				network.c 
 
-MLP_sequential_ex_CFLAGS = -I$(top_srcdir) $(MLP_CFLAGS)
+MLP_batch_CFLAGS = -I$(top_srcdir) $(MLP_CFLAGS)

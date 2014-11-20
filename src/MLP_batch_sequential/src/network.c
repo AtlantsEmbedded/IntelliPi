@@ -205,6 +205,7 @@ void BackPropError(struct SNNetwork *pNNetwork, float *DesiredOutput, float *Wei
 	float *OutputLayer = &(pNNetwork->NeuronsActivity[OutputLayerOffset]);
 	float *OutputDeltas = &(pNNetwork->OutputDeltas[0]);
 	float *HiddenDeltas = &(pNNetwork->HiddenDeltas[0]);
+	float *Weights = &(pNNetwork->Weights[0]);
 	struct SNNetworkProp OwnProp = pNNetwork->OwnProp;
 
 	/* 
@@ -269,6 +270,7 @@ void BackPropError(struct SNNetwork *pNNetwork, float *DesiredOutput, float *Wei
 		}
 		WeightUpdate[WeightOffset++] += OwnProp.LearningRate * OutputDeltas[i] * OwnProp.OutputLayerBias;
 	}
+	
 }
 
 
@@ -292,6 +294,8 @@ void BackPropError(struct SNNetwork *pNNetwork, float *DesiredOutput, float *Wei
 			Weights[WeightOffset] += WeightUpdate[WeightOffset];
 			WeightOffset++;
 		}
+		Weights[WeightOffset] += WeightUpdate[WeightOffset];
+		WeightOffset++;
 	}
 	
 	for (i = 0; i < OwnProp.NbOfNeurons[Output]; i++) {
@@ -299,6 +303,8 @@ void BackPropError(struct SNNetwork *pNNetwork, float *DesiredOutput, float *Wei
 			Weights[WeightOffset] += WeightUpdate[WeightOffset];
 			WeightOffset++;
 		}
+		Weights[WeightOffset] += WeightUpdate[WeightOffset];
+		WeightOffset++;
 	}
 }
 

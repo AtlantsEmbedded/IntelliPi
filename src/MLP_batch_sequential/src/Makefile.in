@@ -76,7 +76,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = MLP_sequential_ex$(EXEEXT)
+bin_PROGRAMS = MLP_batch$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -90,13 +90,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_MLP_sequential_ex_OBJECTS = MLP_sequential_ex-main.$(OBJEXT) \
-	MLP_sequential_ex-wrapper.$(OBJEXT) \
-	MLP_sequential_ex-network.$(OBJEXT)
-MLP_sequential_ex_OBJECTS = $(am_MLP_sequential_ex_OBJECTS)
-MLP_sequential_ex_LDADD = $(LDADD)
-MLP_sequential_ex_LINK = $(CCLD) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_MLP_batch_OBJECTS = MLP_batch-main.$(OBJEXT) \
+	MLP_batch-wrapper.$(OBJEXT) MLP_batch-network.$(OBJEXT)
+MLP_batch_OBJECTS = $(am_MLP_batch_OBJECTS)
+MLP_batch_LDADD = $(LDADD)
+MLP_batch_LINK = $(CCLD) $(MLP_batch_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -129,8 +128,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(MLP_sequential_ex_SOURCES)
-DIST_SOURCES = $(MLP_sequential_ex_SOURCES)
+SOURCES = $(MLP_batch_SOURCES)
+DIST_SOURCES = $(MLP_batch_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -244,11 +243,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-MLP_sequential_ex_SOURCES = main.c \
+MLP_batch_SOURCES = main.c \
 				wrapper.c \
 				network.c 
 
-MLP_sequential_ex_CFLAGS = -I$(top_srcdir) $(MLP_CFLAGS)
+MLP_batch_CFLAGS = -I$(top_srcdir) $(MLP_CFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -326,9 +325,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-MLP_sequential_ex$(EXEEXT): $(MLP_sequential_ex_OBJECTS) $(MLP_sequential_ex_DEPENDENCIES) $(EXTRA_MLP_sequential_ex_DEPENDENCIES) 
-	@rm -f MLP_sequential_ex$(EXEEXT)
-	$(AM_V_CCLD)$(MLP_sequential_ex_LINK) $(MLP_sequential_ex_OBJECTS) $(MLP_sequential_ex_LDADD) $(LIBS)
+MLP_batch$(EXEEXT): $(MLP_batch_OBJECTS) $(MLP_batch_DEPENDENCIES) $(EXTRA_MLP_batch_DEPENDENCIES) 
+	@rm -f MLP_batch$(EXEEXT)
+	$(AM_V_CCLD)$(MLP_batch_LINK) $(MLP_batch_OBJECTS) $(MLP_batch_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -336,9 +335,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLP_sequential_ex-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLP_sequential_ex-network.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLP_sequential_ex-wrapper.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLP_batch-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLP_batch-network.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLP_batch-wrapper.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -354,47 +353,47 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-MLP_sequential_ex-main.o: main.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -MT MLP_sequential_ex-main.o -MD -MP -MF $(DEPDIR)/MLP_sequential_ex-main.Tpo -c -o MLP_sequential_ex-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_sequential_ex-main.Tpo $(DEPDIR)/MLP_sequential_ex-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='main.c' object='MLP_sequential_ex-main.o' libtool=no @AMDEPBACKSLASH@
+MLP_batch-main.o: main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -MT MLP_batch-main.o -MD -MP -MF $(DEPDIR)/MLP_batch-main.Tpo -c -o MLP_batch-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_batch-main.Tpo $(DEPDIR)/MLP_batch-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='main.c' object='MLP_batch-main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -c -o MLP_sequential_ex-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -c -o MLP_batch-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
 
-MLP_sequential_ex-main.obj: main.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -MT MLP_sequential_ex-main.obj -MD -MP -MF $(DEPDIR)/MLP_sequential_ex-main.Tpo -c -o MLP_sequential_ex-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_sequential_ex-main.Tpo $(DEPDIR)/MLP_sequential_ex-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='main.c' object='MLP_sequential_ex-main.obj' libtool=no @AMDEPBACKSLASH@
+MLP_batch-main.obj: main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -MT MLP_batch-main.obj -MD -MP -MF $(DEPDIR)/MLP_batch-main.Tpo -c -o MLP_batch-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_batch-main.Tpo $(DEPDIR)/MLP_batch-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='main.c' object='MLP_batch-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -c -o MLP_sequential_ex-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -c -o MLP_batch-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
 
-MLP_sequential_ex-wrapper.o: wrapper.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -MT MLP_sequential_ex-wrapper.o -MD -MP -MF $(DEPDIR)/MLP_sequential_ex-wrapper.Tpo -c -o MLP_sequential_ex-wrapper.o `test -f 'wrapper.c' || echo '$(srcdir)/'`wrapper.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_sequential_ex-wrapper.Tpo $(DEPDIR)/MLP_sequential_ex-wrapper.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wrapper.c' object='MLP_sequential_ex-wrapper.o' libtool=no @AMDEPBACKSLASH@
+MLP_batch-wrapper.o: wrapper.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -MT MLP_batch-wrapper.o -MD -MP -MF $(DEPDIR)/MLP_batch-wrapper.Tpo -c -o MLP_batch-wrapper.o `test -f 'wrapper.c' || echo '$(srcdir)/'`wrapper.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_batch-wrapper.Tpo $(DEPDIR)/MLP_batch-wrapper.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wrapper.c' object='MLP_batch-wrapper.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -c -o MLP_sequential_ex-wrapper.o `test -f 'wrapper.c' || echo '$(srcdir)/'`wrapper.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -c -o MLP_batch-wrapper.o `test -f 'wrapper.c' || echo '$(srcdir)/'`wrapper.c
 
-MLP_sequential_ex-wrapper.obj: wrapper.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -MT MLP_sequential_ex-wrapper.obj -MD -MP -MF $(DEPDIR)/MLP_sequential_ex-wrapper.Tpo -c -o MLP_sequential_ex-wrapper.obj `if test -f 'wrapper.c'; then $(CYGPATH_W) 'wrapper.c'; else $(CYGPATH_W) '$(srcdir)/wrapper.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_sequential_ex-wrapper.Tpo $(DEPDIR)/MLP_sequential_ex-wrapper.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wrapper.c' object='MLP_sequential_ex-wrapper.obj' libtool=no @AMDEPBACKSLASH@
+MLP_batch-wrapper.obj: wrapper.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -MT MLP_batch-wrapper.obj -MD -MP -MF $(DEPDIR)/MLP_batch-wrapper.Tpo -c -o MLP_batch-wrapper.obj `if test -f 'wrapper.c'; then $(CYGPATH_W) 'wrapper.c'; else $(CYGPATH_W) '$(srcdir)/wrapper.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_batch-wrapper.Tpo $(DEPDIR)/MLP_batch-wrapper.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wrapper.c' object='MLP_batch-wrapper.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -c -o MLP_sequential_ex-wrapper.obj `if test -f 'wrapper.c'; then $(CYGPATH_W) 'wrapper.c'; else $(CYGPATH_W) '$(srcdir)/wrapper.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -c -o MLP_batch-wrapper.obj `if test -f 'wrapper.c'; then $(CYGPATH_W) 'wrapper.c'; else $(CYGPATH_W) '$(srcdir)/wrapper.c'; fi`
 
-MLP_sequential_ex-network.o: network.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -MT MLP_sequential_ex-network.o -MD -MP -MF $(DEPDIR)/MLP_sequential_ex-network.Tpo -c -o MLP_sequential_ex-network.o `test -f 'network.c' || echo '$(srcdir)/'`network.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_sequential_ex-network.Tpo $(DEPDIR)/MLP_sequential_ex-network.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='network.c' object='MLP_sequential_ex-network.o' libtool=no @AMDEPBACKSLASH@
+MLP_batch-network.o: network.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -MT MLP_batch-network.o -MD -MP -MF $(DEPDIR)/MLP_batch-network.Tpo -c -o MLP_batch-network.o `test -f 'network.c' || echo '$(srcdir)/'`network.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_batch-network.Tpo $(DEPDIR)/MLP_batch-network.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='network.c' object='MLP_batch-network.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -c -o MLP_sequential_ex-network.o `test -f 'network.c' || echo '$(srcdir)/'`network.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -c -o MLP_batch-network.o `test -f 'network.c' || echo '$(srcdir)/'`network.c
 
-MLP_sequential_ex-network.obj: network.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -MT MLP_sequential_ex-network.obj -MD -MP -MF $(DEPDIR)/MLP_sequential_ex-network.Tpo -c -o MLP_sequential_ex-network.obj `if test -f 'network.c'; then $(CYGPATH_W) 'network.c'; else $(CYGPATH_W) '$(srcdir)/network.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_sequential_ex-network.Tpo $(DEPDIR)/MLP_sequential_ex-network.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='network.c' object='MLP_sequential_ex-network.obj' libtool=no @AMDEPBACKSLASH@
+MLP_batch-network.obj: network.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -MT MLP_batch-network.obj -MD -MP -MF $(DEPDIR)/MLP_batch-network.Tpo -c -o MLP_batch-network.obj `if test -f 'network.c'; then $(CYGPATH_W) 'network.c'; else $(CYGPATH_W) '$(srcdir)/network.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/MLP_batch-network.Tpo $(DEPDIR)/MLP_batch-network.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='network.c' object='MLP_batch-network.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_sequential_ex_CFLAGS) $(CFLAGS) -c -o MLP_sequential_ex-network.obj `if test -f 'network.c'; then $(CYGPATH_W) 'network.c'; else $(CYGPATH_W) '$(srcdir)/network.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(MLP_batch_CFLAGS) $(CFLAGS) -c -o MLP_batch-network.obj `if test -f 'network.c'; then $(CYGPATH_W) 'network.c'; else $(CYGPATH_W) '$(srcdir)/network.c'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
