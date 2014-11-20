@@ -99,8 +99,6 @@ struct SNNetwork *InitNetwork(struct SNNetworkProp InitProp)
  */ 
 int CopyWeights(struct SNNetwork *pNNetwork_dest, const struct SNNetwork *pNNetwork_src)
 {
-	printf("%i %i\n",pNNetwork_src->OwnProp.TotNumberOfWeights, pNNetwork_dest->OwnProp.TotNumberOfWeights);
-	
 	/*Verifies that both networks have the same number of weights*/
 	if(pNNetwork_src->OwnProp.TotNumberOfWeights != pNNetwork_dest->OwnProp.TotNumberOfWeights)
 		return 0;
@@ -153,7 +151,7 @@ void SetInput(struct SNNetwork *pNNetwork, float *InputActivity)
  */
 void ComputeNetwork(struct SNNetwork *pNNetwork)
 {
-	int i, j = 0;
+	register int i, j = 0;
 	int WeightPointer = 0;
 	int NeuronPointer = 0;
 	int HiddenLayerOffset = 0;
@@ -202,6 +200,7 @@ void ComputeNetwork(struct SNNetwork *pNNetwork)
 		/* sigmoid non-nonlinearity */
 		NeuronsActivity[NeuronPointer++] = SigmoidFunction(InputSum);
 	}
+	
 }
 
 /** 
