@@ -1,4 +1,5 @@
 include $(TOPDIR)/rules.mk
+include $(INCLUDE_DIR)/package.mk
 
 PKG_VERSION:=2014-26-14
 PKG_SOURCE_PROTO:=git
@@ -8,6 +9,8 @@ PKG_SOURCE_VERSION:=HEAD
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)/src
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+
+
 
 define Package/libRPIGPIO
 	SECTION:=libs
