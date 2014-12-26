@@ -10,9 +10,13 @@ PKG_SOURCE_SUBDIR:=$(PKG_NAME)/src
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 define Package/libRPIGPIO
-	SECTION:=utils
-	CATEGORY:=Utilities
+	SECTION:=libs
+	CATEGORY:=Libraries
 	TITLE:=libRPIGPIO
+endef
+
+define Package/bridge/description
+	C GPIO library for the RPI
 endef
 
 define Package/libRPIGPIO/install
