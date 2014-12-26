@@ -5,6 +5,7 @@ PKG_VERSION:=0.5.8
 PKG_RELEASE:=1
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/adaFruitLCDPlate-utils-$(PKG_VERSION)
+PKG_BUILD_DEPENDS:=PACKAGE_python-smbus:python
 
 include $(INCLUDE_DIR)/package.mk
 $(call include_mk, python-package.mk)
@@ -14,7 +15,7 @@ define Package/adaFruitLCDPlate
   CATEGORY:=Languages
   TITLE:=Python ADAfruit LCD
   URL:=https://github.com/adafruit/Adafruit_Python_CharLCD
-  DEPENDS:=python
+  DEPENDS:=+PACKAGE_python-smbus:python +i2c-tools +libi2c +python
 endef
 
 define Package/adaFruitLCDPlate/description
@@ -34,6 +35,9 @@ define Package/adaFruitLCDPlate/install
 	$(CP) \
 	    $(PKG_INSTALL_DIR)$(PYTHON_PKG_DIR)/* \
 	    $(1)$(PYTHON_PKG_DIR)
+	$(INSTALL_DIR) $(1)/usr/s
+	
+	$(CP) $(PKG_INSTALL_DIR)/examples $(1)/usr/share/$(PKG_NAME)
 endef
 
 $(eval $(call BuildPackage,adaFruitLCDPlate))
