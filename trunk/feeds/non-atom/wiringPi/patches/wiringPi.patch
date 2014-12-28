@@ -1,0 +1,60 @@
+--- a/build	2014-12-28 12:30:25.026942558 -0500
++++ b/build	2014-12-28 13:00:25.707464450 -0500
+@@ -50,30 +50,30 @@
+   echo
+   echo "WiringPi Library"
+   cd wiringPi
+-  sudo make uninstall
++#  sudo make uninstall
+   if [ x$1 = "xstatic" ]; then
+     make static
+     check_make_ok
+-    sudo make install-static
++#    sudo make install-static
+   else
+     make
+     check_make_ok
+-    sudo make install
++#    sudo make install
+   fi
+   check_make_ok
+ 
+   echo
+   echo "WiringPi Devices Library"
+   cd ../devLib
+-  sudo make uninstall
++#  sudo make uninstall
+   if [ x$1 = "xstatic" ]; then
+     make static
+     check_make_ok
+-    sudo make install-static
++#    sudo make install-static
+   else
+     make
+     check_make_ok
+-    sudo make install
++#    sudo make install
+   fi
+   check_make_ok
+ 
+@@ -82,14 +82,14 @@
+   cd ../gpio
+   make
+   check_make_ok
+-  sudo make install
++#  sudo make install
+   check_make_ok
+ 
+-# echo
+-# echo "Examples"
+-# cd ../examples
+-# make
+-# cd ..
++echo
++echo "Examples"
++cd ../examples
++make
++cd ..
+ 
+ echo
+ echo All Done.
