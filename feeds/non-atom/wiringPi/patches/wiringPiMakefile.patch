@@ -1,0 +1,20 @@
+--- a/wiringPi/Makefile	2014-12-28 14:40:35.566953982 -0500
++++ b/wiringPi/Makefile	2014-12-28 15:30:10.410326133 -0500
+@@ -33,7 +33,7 @@
+ 
+ #DEBUG	= -g -O0
+ DEBUG	= -O2
+-CC	= gcc
++#CC = $(CC)
+ INCLUDE	= -I.
+ DEFS	= -D_GNU_SOURCE
+ CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Winline $(INCLUDE) -pipe -fPIC
+@@ -71,7 +71,7 @@
+ 
+ $(DYNAMIC):	$(OBJ)
+ 	@echo "[Link (Dynamic)]"
+-	@$(CC) -shared -Wl,-soname,libwiringPi.so -o libwiringPi.so.$(VERSION) -lpthread $(OBJ)
++	@$(CC) -shared -Wl,-soname,libwiringPi.so -o libwiringPi.so -lpthread $(OBJ)
+ 
+ .c.o:
+ 	@echo [Compile] $<

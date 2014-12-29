@@ -11,12 +11,15 @@ PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
+LDFLAGS:="-L../wiringPi/ -L../devLib/ -L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib"
+
 include $(INCLUDE_DIR)/package.mk
 
 define Package/wiringPi
 	SECTION:=libs
 	CATEGORY:=Libraries
 	TITLE:=wiringPi
+	DEPENDS:=+libpthread +libstdcpp +libc
 endef
 
 define Package/wiringPi/description
@@ -24,23 +27,38 @@ define Package/wiringPi/description
 endef
 
 define Build/Prepare
-	git://git.drogon.net/wiringPi $(PKG_BUILD_DIR)
+	git clone git://git.drogon.net/wiringPi $(PKG_BUILD_DIR)
 	$(call Build/Prepare/Default,)
 endef
 
 define Build/Compile
-	./build
+	$(MAKE) -C $(PKG_BUILD_DIR)/wiringPi/ \
+                LINUX="$(LINUX_DIR)" \
+                CC="$(TARGET_CC)" \
+                STAGING_DIR="$(STAGING_DIR)" \
+                LDFLAGS="$(TARGET_LDFLAGS)"
+	$(MAKE) -C $(PKG_BUILD_DIR)/devLib/ \
+                LINUX="$(LINUX_DIR)" \
+                CC="$(TARGET_CC)" \
+                STAGING_DIR="$(STAGING_DIR)" \
+                LDFLAGS="$(TARGET_LDFLAGS)"
+	$(MAKE) -C $(PKG_BUILD_DIR)/gpio/ \
+                LINUX="$(LINUX_DIR)" \
+                CC="$(TARGET_CC)" \
+                STAGING_DIR="$(STAGING_DIR)" \
+                LDFLAGS="$(TARGET_LDFLAGS) -L../wiringPi -L../devLib"
+
 endef
 
 define Package/wiringPi/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(INSTALL_DIR) $(1)/usr/include
 	$(INSTALL_DIR) $(1)/usr/bin
-	cp $(PKG_BUILD_DIR)/devLib/libwiringPiDev.so* $(1)/usr/lib/
+	cp $(PKG_BUILD_DIR)/devLib/libwiringPiDev.so $(1)/usr/lib/
 	cp $(PKG_BUILD_DIR)/devLib/*.h $(1)/usr/include/
-	cp $(PKG_BUILD_DIR)/wiringPi/libwiringPi.so* $(1)/usr/lib/
+	cp $(PKG_BUILD_DIR)/wiringPi/libwiringPi.so $(1)/usr/lib/
 	cp $(PKG_BUILD_DIR)/wiringPi/*.h $(1)/usr/include/
-	cp $(PKG_BUILD_DIR)/gpio $(1)/usr/bin/
+	cp $(PKG_BUILD_DIR)/gpio/gpio $(1)/usr/bin/
 endef
 
 define Build/InstallDev 

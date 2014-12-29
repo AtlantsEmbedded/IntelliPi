@@ -1,0 +1,15 @@
+--- a/examples/Makefile	2014-12-28 12:30:25.030942578 -0500
++++ b/examples/Makefile	2014-12-28 15:29:34.662159995 -0500
+@@ -25,11 +25,9 @@
+ 
+ #DEBUG	= -g -O0
+ DEBUG	= -O3
+-CC	= gcc
+-INCLUDE	= -I/usr/local/include
++#CC = $(CC)
+ CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
+ 
+-LDFLAGS	= -L/usr/local/lib
+ LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm
+ 
+ # Should not alter anything below this line
