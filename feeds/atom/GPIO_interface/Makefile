@@ -3,8 +3,8 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=GPIO_interface
 PKG_VERSION:=2014-26-14
 PKG_RELEASE:=1
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/fangfufu/Adafruit-RPi-LCD.git
+PKG_SOURCE_PROTO:=svn
+PKG_SOURCE_URL:=svn://svn.code.sf.net/p/atomproducts/svn/trunk/src/GPIO_interfaces
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
