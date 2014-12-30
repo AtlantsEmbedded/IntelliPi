@@ -17,6 +17,7 @@ define Package/GPIO_interface
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=GPIO_interface
+	DEPENDS:=wiringPi
 endef
 
 define Package/GPIO_interface/description
