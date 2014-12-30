@@ -10,15 +10,15 @@ MAKEFILE      = Makefile
 
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC            = $(CC)
+CXX           = $(CC)
 DEFINES       = -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-INCPATH       = -Iinclude
-LINK          = g++
-LFLAGS        = 
-LIBS          = -lwiringPi
+INCPATH       = -Iinclude $(STAGING_DIR)/include
+LINK          = $(CC)
+LFLAGS        = -L$(STAGING_DIR)/lib
+LIBS          = -lwiringPi -lwiringPiDev
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf

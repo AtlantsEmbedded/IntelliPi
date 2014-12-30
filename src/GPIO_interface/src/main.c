@@ -1,5 +1,9 @@
+#include <stdlib.h>
+#include <stdio.h>
+
 #include <wiringPi.h>
 #include <lcd.h>
+
 #include "main.h"
 
 static void waitForEnter(void)
@@ -21,7 +25,7 @@ static void waitForEnter(void)
 
 int main(int argc, char **argv)
 {
-
+	int lcd = 0;
 	mcp23017Setup(AF_BASE, 0x20);
 	lcd = lcdInit(2, 16, 4, AF_RS, AF_E, AF_DB4, AF_DB5, AF_DB6, AF_DB7, 0, 0, 0, 0);
 	
