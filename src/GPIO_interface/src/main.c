@@ -1,6 +1,6 @@
 #include <wiringPi.h>
 #include <lcd.h>
-#include "include/main.h"
+#include "main.h"
 
 static void waitForEnter(void)
 {
