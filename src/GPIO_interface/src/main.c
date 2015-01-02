@@ -35,18 +35,18 @@
 #include <lcd.h>
 #include "main.h"
 
-static const char *message = " GPIO interface                    ";
+static const char *message = " GPIO interface ";
 
 // User-Defined character test
 static unsigned char newChar[8] = {
-	0 b00100,
-	0 b00100,
-	0 b00000,
-	0 b00100,
-	0 b01110,
-	0 b11011,
-	0 b11011,
-	0 b10001,
+	0b00100,
+	0b00100,
+	0b00000,
+	0b00100,
+	0b01110,
+	0b11011,
+	0b11011,
+	0b10001,
 };
 
 // Global lcd handle:
@@ -140,7 +140,6 @@ static void adafruitLCDSetup(int colour)
 	}
 }
 
-
 /**
  * waitForEnter(void)
  * @brief waits for select to be pressed
@@ -150,17 +149,16 @@ static void waitForEnter(void)
 	printf("Press SELECT to continue: ");
 	fflush(stdout);
 
-	while (digitalRead(AF_SELECT) == HIGH){	// Wait for push
+	while (digitalRead(AF_SELECT) == HIGH) {	// Wait for push
 		delay(1);
 	}
 
-	while (digitalRead(AF_SELECT) == LOW){	// Wait for release
+	while (digitalRead(AF_SELECT) == LOW) {	// Wait for release
 		delay(1);
 	}
 
 	printf("OK\n");
 }
-
 
 /**
  * main(int argc, char *argv[])
@@ -168,7 +166,7 @@ static void waitForEnter(void)
  * @param argc
  * @param argv
  * @return 0 for success, -1 for error
- */ 
+ */
 int main(int argc, char *argv[])
 {
 	int colour = 0;
@@ -179,7 +177,7 @@ int main(int argc, char *argv[])
 	time_t tim_t;
 
 	char buf[32] = { 0 };
-	
+
 	// Check arguments
 	if (argc != 2) {
 		return usage(argv[0]);
@@ -223,7 +221,7 @@ int main(int argc, char *argv[])
 		scrollMessage(0, cols);
 
 		tim_t = time(NULL);
-		t = localtime(&tim);
+		t = localtime(&tim_t);
 
 		sprintf(buf, "%02d:%02d:%02d", t->tm_hour, t->tm_min, t->tm_sec);
 
@@ -253,7 +251,7 @@ int main(int argc, char *argv[])
 		if (digitalRead(AF_DOWN) == LOW)	// Pushed
 		{
 			colour = colour - 1;
-			if (colour == -1){
+			if (colour == -1) {
 				colour = 7;
 			}
 			setBacklightColour(colour);
