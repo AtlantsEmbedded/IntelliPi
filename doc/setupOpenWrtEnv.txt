@@ -39,7 +39,9 @@ svn co svn://svn.code.sf.net/p/atomproducts/svn/trunk/config config
 Now copy one of the configuration files as so:
 
 cp config/<whateverOne> .config
+svn export --force http://svn.code.sf.net/p/atomproducts/svn/trunk/configs/kernel_config-3.14 target/linux/brcm2708/config-3.14
 
+^ The above svn co is just for the kernel config - this will work and has things like 1wire support for w1-therm and w1-gpio
 At this point, menuconfig can be ran OR the config file con be used
 
 make menuconfig
