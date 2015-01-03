@@ -6,7 +6,7 @@ subversion flex mercurial
 
 Checkout Openwrt
 
-svn co svn://svn.openwrt.org/openwrt/trunk/ openwrt
+svn co svn://svn.openwrt.org/openwrt/trunk/ ~/openwrt
 
 Enter the openwrt directory feeds.conf.default file and edit it as follows:
 
@@ -29,16 +29,16 @@ src-svn atom http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/atom
 
 Now update feeds of openwrt:
 
-./scripts feeds update -a
-./scripts feeds install -a
+./scripts/feeds update -a
+./scripts/feeds install -a
 
 Checkout the config folder which can be used by openwrt:
 
-svn co svn://svn.code.sf.net/p/atomproducts/svn/trunk/config config
+svn co svn://svn.code.sf.net/p/atomproducts/svn/trunk/configs configs
 
 Now copy one of the configuration files as so:
 
-cp config/<whateverOne> .config
+cp configs/<whateverOne> .config
 svn export --force http://svn.code.sf.net/p/atomproducts/svn/trunk/configs/kernel_config-3.14 target/linux/brcm2708/config-3.14
 
 ^ The above svn co is just for the kernel config - this will work and has things like 1wire support for w1-therm and w1-gpio
