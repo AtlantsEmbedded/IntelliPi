@@ -1,27 +1,11 @@
-/*
- * lcd-adafruit.c:
- *	Text-based LCD driver test code
+/**
+ * @file lcd-adafruit.c:
+ * @brief Text-based LCD driver test code
  *	This is designed to drive the Adafruit RGB LCD Plate
  *	with the additional 5 buttons for the Raspberry Pi
- *
- * Copyright (c) 2012-2013 Gordon Henderson.
- ***********************************************************************
- * This file is part of wiringPi:
- *	https://projects.drogon.net/raspberry-pi/wiringpi/
- *
- *    wiringPi is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    wiringPi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with wiringPi.  If not, see <http://www.gnu.org/licenses/>.
- ***********************************************************************
+ *  based loosely on Gordon Henderson's original driver code
+ * @author Gordon Henderson (original author)
+ * @author Ronnie Brash (ron.brash@gmail.com)
  */
 
 #include <stdio.h>
@@ -29,6 +13,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <stdint.h>
 
 #include <wiringPi.h>
 #include <mcp23017.h>
@@ -36,18 +21,6 @@
 #include "main.h"
 
 static const char *message = " GPIO interface ";
-
-// User-Defined character test
-static unsigned char newChar[8] = {
-	0b00100,
-	0b00100,
-	0b00000,
-	0b00100,
-	0b01110,
-	0b11011,
-	0b11011,
-	0b10001,
-};
 
 // Global lcd handle:
 
@@ -61,30 +34,8 @@ static int lcdHandle;
  */
 int usage(const char *progName)
 {
-	fprintf(stderr, "Usage: %s colour\n", progName);
+	fprintf(stderr, "Usage: %s colour (0-7 where 0 is no backlight)\n", progName);
 	return EXIT_FAILURE;
-}
-
-void scrollMessage(int line, int width)
-{
-	char buf[32];
-	static int position = 0;
-	static int timer = 0;
-
-	if (millis() < timer) {
-		return;
-	}
-
-	timer = millis() + 200;
-
-	strncpy(buf, &message[position], width);
-	buf[width] = 0;
-	lcdPosition(lcdHandle, 0, line);
-	lcdPuts(lcdHandle, buf);
-
-	if (++position == (strlen(message) - width)) {
-		position = 0;
-	}
 }
 
 /**
@@ -161,6 +112,85 @@ static void waitForEnter(void)
 }
 
 /**
+ * waitForDown(button_s *state)
+ * @brief waits for Down button to be pressed
+ * @param state
+ */
+static void waitForDown(button_s * state)
+{
+	if (digitalRead(AF_DOWN) == LOW)	// Pushed
+	{
+		printf("down was pressed\n");
+		state->colour = state->colour - 1;
+		if (state->colour == -1) {
+			state->colour = 7;
+		}
+		setBacklightColour(state->colour);
+		state->waitForRelease = TRUE;
+	}
+
+}
+
+/**
+ * waitForUp(button_s *state)
+ * @brief waits for Up button to be pressed
+ * @param state
+ */
+static void waitForUp(button_s * state)
+{
+
+	if (digitalRead(AF_UP) == LOW)	// Pushed
+	{
+		printf("up was pressed\n");
+		state->colour = state->colour + 1;
+		if (state->colour == 8) {
+			state->colour = 0;
+		}
+		setBacklightColour(state->colour);
+		state->waitForRelease = TRUE;
+	}
+
+}
+
+/**
+ * waitForLeft(button_s *state)
+ * @brief waits for Left button to be pressed
+ * @param state
+ */
+static void waitForLeft(button_s * state)
+{
+	if (digitalRead(AF_LEFT) == LOW)	// Pushed
+	{
+		printf("left was pressed\n");
+		state->colour = state->colour + 1;
+		if (state->colour == 8) {
+			state->colour = 0;
+		}
+		setBacklightColour(state->colour);
+		state->waitForRelease = TRUE;
+	}
+}
+
+/**
+ * waitForRight(button_s *state)
+ * @brief waits for Right button to be pressed
+ * @param state
+ */
+static void waitForRight(button_s * state)
+{
+	if (digitalRead(AF_RIGHT) == LOW)	// Pushed
+	{
+		printf("right was pressed\n");
+		state->colour = state->colour + 1;
+		if (state->colour == 8) {
+			state->colour = 0;
+		}
+		setBacklightColour(state->colour);
+		state->waitForRelease = TRUE;
+	}
+}
+
+/**
  * main(int argc, char *argv[])
  * @brief main function
  * @param argc
@@ -169,9 +199,10 @@ static void waitForEnter(void)
  */
 int main(int argc, char *argv[])
 {
-	int colour = 0;
 	int cols = 16;
-	int waitForRelease = FALSE;
+	button_s b_state = { 0 };
+	b_state.waitForRelease = FALSE;
+	b_state.colour = 1;
 
 	struct tm *t = NULL;
 	time_t tim_t;
@@ -186,39 +217,26 @@ int main(int argc, char *argv[])
 	printf("Raspberry Pi Adafruit GPIO App\n");
 	printf("==============================\n");
 
-	colour = atoi(argv[1]);
+	b_state.colour = atoi(argv[1]);
 
 	wiringPiSetupSys();
 	mcp23017Setup(AF_BASE, 0x20);
 
-	adafruitLCDSetup(colour);
+	adafruitLCDSetup(b_state.colour);
 
-	waitForEnter();
-
-	lcdPosition(lcdHandle, 0, 1);
+	lcdPosition(lcdHandle, 0, 0);
 	lcdPuts(lcdHandle, "Adafruit RGB LCD");
 
-	waitForEnter();
-
-	lcdCharDef(lcdHandle, 2, newChar);
-
-	lcdClear(lcdHandle);
-	lcdPosition(lcdHandle, 0, 0);
-	lcdPuts(lcdHandle, "User Char: ");
-	lcdPutchar(lcdHandle, 2);
-
-	lcdCursor(lcdHandle, TRUE);
-	lcdCursorBlink(lcdHandle, TRUE);
+	lcdPosition(lcdHandle, 0, 1);
+	lcdPuts(lcdHandle, "Press Sel to cont");
 
 	waitForEnter();
-
-	lcdCursor(lcdHandle, FALSE);
-	lcdCursorBlink(lcdHandle, FALSE);
 
 	lcdClear(lcdHandle);
 
 	for (;;) {
-		scrollMessage(0, cols);
+		lcdPosition(lcdHandle, 0, 0);
+		lcdPuts(lcdHandle, message);
 
 		tim_t = time(NULL);
 		t = localtime(&tim_t);
@@ -230,33 +248,19 @@ int main(int argc, char *argv[])
 
 		// Check buttons to cycle colour
 		// If Up or Down are still pushed, then skip
-		if (waitForRelease) {
-			if ((digitalRead(AF_UP) == LOW) || (digitalRead(AF_DOWN) == LOW)) {
+		if (b_state.waitForRelease) {
+			if ((digitalRead(AF_UP) == LOW) || (digitalRead(AF_DOWN) == LOW)
+			    || (digitalRead(AF_LEFT) == LOW) || (digitalRead(AF_RIGHT) == LOW)) {
 				continue;
 			} else {
-				waitForRelease = FALSE;
+				b_state.waitForRelease = FALSE;
 			}
 		}
-
-		if (digitalRead(AF_UP) == LOW)	// Pushed
-		{
-			colour = colour + 1;
-			if (colour == 8) {
-				colour = 0;
-			}
-			setBacklightColour(colour);
-			waitForRelease = TRUE;
-		}
-
-		if (digitalRead(AF_DOWN) == LOW)	// Pushed
-		{
-			colour = colour - 1;
-			if (colour == -1) {
-				colour = 7;
-			}
-			setBacklightColour(colour);
-			waitForRelease = TRUE;
-		}
+		// Check for button presses
+		waitForUp(&b_state);
+		waitForDown(&b_state);
+		waitForRight(&b_state);
+		waitForLeft(&b_state);
 
 	}
 

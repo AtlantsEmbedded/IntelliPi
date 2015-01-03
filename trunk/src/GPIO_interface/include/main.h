@@ -29,3 +29,14 @@
 #define	AF_DOWN		(AF_BASE +  2)
 #define	AF_UP		(AF_BASE +  3)
 #define	AF_LEFT		(AF_BASE +  4)
+
+typedef struct {
+	int waitForRelease;
+	int colour;
+} button_s;
+
+static void waitForUp(button_s * state);
+static void waitForDown(button_s * state);
+static void waitForLeft(button_s * state);
+static void waitForRight(button_s * state);
+
