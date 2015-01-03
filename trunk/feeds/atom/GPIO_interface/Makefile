@@ -4,7 +4,7 @@ PKG_NAME:=GPIO_interface
 PKG_VERSION:=2014-26-14
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
-PKG_SOURCE_URL:=svn://svn.code.sf.net/p/atomproducts/svn/trunk/src/GPIO_interface
+PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/GPIO_interface
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
@@ -28,6 +28,7 @@ endef
 define Package/GPIO_interface/install
 	$(INSTALL_DIR) $(1)/atom
 	$(INSTALL_DIR) $(1)/atom/bin
+	cp $(PKG_BUILD_DIR)/gpio_interface $(1)/atom/bin
 endef
 
 $(eval $(call BuildPackage,GPIO_interface))
