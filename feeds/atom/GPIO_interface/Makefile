@@ -28,7 +28,10 @@ endef
 define Package/GPIO_interface/install
 	$(INSTALL_DIR) $(1)/atom
 	$(INSTALL_DIR) $(1)/atom/bin
-	cp $(PKG_BUILD_DIR)/gpio_interface $(1)/atom/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/gpio_interface $(1)/atom/bin
+	$(INSTALL_DIR) $(1)/etc
+	$(INSTALL_DIR) $(1)/etc/init.d/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/gpio $(1)/etc/init.d/
 endef
 
 $(eval $(call BuildPackage,GPIO_interface))
