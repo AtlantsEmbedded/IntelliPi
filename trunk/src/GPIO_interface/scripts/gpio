@@ -1,0 +1,17 @@
+#!/bin/sh /etc/rc.common
+# GPIO startup script
+ 
+START=1
+STOP=2
+ 
+start() {        
+        /atom/bin/gpio_interface 1 &
+}                 
+ 
+stop() {          
+        killall gpio_interface
+}
+
+boot() {
+        /atom/bin/gpio_interface 1 &
+}
