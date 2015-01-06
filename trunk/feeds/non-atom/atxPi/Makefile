@@ -35,7 +35,7 @@ endef
 define Package/atxPi/install
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) $(1)/etc/shutdowncheck.sh
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/shutdowncheck $(1)/etc/
 	$(INSTALL_BIN) ./files/etc/init.d/atxPi $(1)/etc/init.d
 endef
 

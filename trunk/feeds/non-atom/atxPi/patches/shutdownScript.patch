@@ -1,0 +1,38 @@
+--- a/shutdowncheck	2015-01-06 14:27:20.530892518 -0500
++++ b/shutdowncheck	2015-01-06 15:01:03.040316958 -0500
+@@ -1,22 +1,24 @@
+ #!/bin/bash
+ 
+-PATH=/usr/bin:/home/pi/wiringPi/gpio
++# BCRM pin naming convention
++PIN_IN=15
++PIN_OUT=18
+ 
+ echo "ATXRaspi shutdown script starting..."
+-echo "Asserting pins (7=in,low; 8=out,high)"
++echo "Asserting pins ($PIN_IN=in,low; $PIN_OUT=out,high)"
+ 
+-gpio -g mode 7 in
+-gpio -g write 7 0
+-gpio -g mode 8 out
+-gpio -g write 8 1
++gpio -g mode $PIN_IN in
++gpio -g write $PIN_IN  0
++gpio -g mode $PIN_OUT out
++gpio -g write $PIN_OUT 1
+ 
+ while [ 1 ]; do
+-  if [ "$(/home/pi/wiringPi/gpio/gpio -g read 7)" = "1" ]; then
+-    echo "PIN7 requested a SYSTEM HALT !"
+-    sudo poweroff
++  if [ "gpio -g read $PIN_IN)" = "1" ]; then
++    echo "$PIN_IN requested a SYSTEM HALT !"
++    shutdown -h now
+     break
+   fi
+   /bin/sleep 0.5
+ done
+ 
+-exit 0
+\ No newline at end of file
++exit 0
