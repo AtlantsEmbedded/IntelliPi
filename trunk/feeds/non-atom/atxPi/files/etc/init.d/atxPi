@@ -5,13 +5,13 @@ START=1
 STOP=2
  
 start() {        
-        /etc/shutdowncheck &
+        sh /etc/shutdowncheck &
 }                 
  
 stop() {          
-        
+       echo "shutdown requires no command for atxPi"
 }
 
 boot() {
-        /etc/shutdowncheck &
+        sh /etc/shutdowncheck &
 }
