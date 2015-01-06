@@ -1,0 +1,17 @@
+#!/bin/sh /etc/rc.common
+# atxPi startup script
+ 
+START=1
+STOP=2
+ 
+start() {        
+        /etc/shutdowncheck &
+}                 
+ 
+stop() {          
+        
+}
+
+boot() {
+        /etc/shutdowncheck &
+}
