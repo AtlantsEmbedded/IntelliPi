@@ -1,63 +1,106 @@
 /**
  * @file main.c
  * @author src from https://chrisbaume.wordpress.com/2013/02/10/beer-monitoring/
+ * @author with some cleanup by Ronnie Brash (ron.brash@gmail.com)
+ * @brief Return sensor data from DHT_22 or AM2302
  */ 
 #include <wiringPi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#define MAX_TIME 85
-#define DHT11PIN 25
-#define ATTEMPTS 5
-int dht11_val[5] = { 0, 0, 0, 0, 0 };
 
-int dht11_read_val()
+#define MAX_TIME 85
+#define DHT11PIN 15		//This is a wiringPI pin, not physical or BCRM numbers
+#define ATTEMPTS 5
+
+int dht22_val[5] = { 0, 0, 0, 0, 0 };
+
+/**
+ * dht22_read_val()
+ * @return 0 if error, 1 if success 
+ */ 
+int dht22_read_val()
 {
 	uint8_t lststate = HIGH;
 	uint8_t counter = 0;
 	uint8_t j = 0, i;
-	for (i = 0; i < 5; i++)
-		dht11_val[i] = 0;
+	float farenheit = 0;
+	float t = 0;
+	float h = 0;
+	
+	for (i = 0; i < 5; i++) {
+		dht22_val[i] = 0;
+	}
+	
 	pinMode(DHT11PIN, OUTPUT);
 	digitalWrite(DHT11PIN, LOW);
+	
 	delay(18);
+	
 	digitalWrite(DHT11PIN, HIGH);
+	
 	delayMicroseconds(40);
 	pinMode(DHT11PIN, INPUT);
+	
 	for (i = 0; i < MAX_TIME; i++) {
 		counter = 0;
 		while (digitalRead(DHT11PIN) == lststate) {
 			counter++;
 			delayMicroseconds(1);
-			if (counter == 255)
+			if (counter == 255) {
 				break;
+			}
 		}
 		lststate = digitalRead(DHT11PIN);
-		if (counter == 255)
+		if (counter == 255) {
 			break;
+		}
 		// top 3 transistions are ignored
 		if ((i >= 4) && (i % 2 == 0)) {
-			dht11_val[j / 8] <<= 1;
-			if (counter > 16)
-				dht11_val[j / 8] |= 1;
+			dht22_val[j / 8] <<= 1;
+			if (counter > 16){
+				dht22_val[j / 8] |= 1;
+			}
 			j++;
 		}
 	}
-	// verify checksum and print the verified data
-	if ((j >= 40) && (dht11_val[4] == ((dht11_val[0] + dht11_val[1] + dht11_val[2] + dht11_val[3]) & 0xFF))) {
-		printf("%d.%d,%d.%d\n", dht11_val[0], dht11_val[1], dht11_val[2], dht11_val[3]);
+	
+	// Verify sensor output data
+	if ((j >= 40) && (dht22_val[4] == ((dht22_val[0] + dht22_val[1] + dht22_val[2] + dht22_val[3]) & 0xFF))) {
+		
+		h = (float)dht22_val[0] * 256 + (float)dht22_val[1];
+		h /= 10;
+		t = (float)(dht22_val[2] & 0x7F) * 256 + (float)dht22_val[3];
+		t /= 10.0;
+		
+		if ((dht22_val[2] & 0x80) != 0) {
+			t *= -1;
+		}
+		
+		fahrenheit = (1.8 * t) + 32;
+		
+		printf("Amb:%.2f Tmp:%.2f \n", h, fahrenheit);
+		
 		return 1;
-	} else
+	} else {
 		return 0;
+	}
 }
 
-int main(void)
+/**
+ * main(int argc, char **argv)
+ * @param argc
+ * @param argv
+ * @return 1 if error, 0 if success
+ */ 
+int main(int argc, char **argv)
 {
 	int attempts = ATTEMPTS;
-	if (wiringPiSetup() == -1)
+	if (wiringPiSetup() == -1) {
 		exit(1);
+	}
 	while (attempts) {
-		int success = dht11_read_val();
+		int success = dht22_read_val();
 		if (success) {
 			break;
 		}
