@@ -25,12 +25,13 @@
 -  if [ "$(/home/pi/wiringPi/gpio/gpio -g read 7)" = "1" ]; then
 -    echo "PIN7 requested a SYSTEM HALT !"
 -    sudo poweroff
-+  if [ "gpio -g read $PIN_IN)" = "1" ]; then
++  if [ "gpio -g read $PIN_IN" = "1" ]; then
 +    echo "$PIN_IN requested a SYSTEM HALT !"
 +    shutdown -h now
      break
    fi
-   /bin/sleep 0.5
+-   /bin/sleep 0.5
++   /bin/sleep 1
  done
  
 -exit 0
