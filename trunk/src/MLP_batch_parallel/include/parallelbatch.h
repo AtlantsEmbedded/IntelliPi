@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <semaphore.h>
 
 #include <include/wrapper.h>
 #include <include/network.h>
