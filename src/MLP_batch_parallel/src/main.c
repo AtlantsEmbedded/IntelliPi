@@ -97,7 +97,7 @@ int main(int argc, char **argv[])
 	
 	/*init thread pool*/
 	pool_init_struct.nb_iterations = BatchSize/(NB_WORK_THREADS+NB_MASTER_THREADS);
-	pool_init_struct.ptrain_dataset = pTrainDataSet;
+	pool_init_struct.ptrain_dataset = *pTrainDataSet;
 	pool_init_struct.pnnetwork_trunk_copy = pNetwork;
 	pool_init_struct.network_init_prop = NetworkInitProp;
 	pool_init_struct.nb_weights = NbOfWeights;
