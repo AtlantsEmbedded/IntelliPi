@@ -17,12 +17,12 @@ define Package/MLP_batch_sequential
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=MLP_batch_sequential
-	DEPENDS:=pthread rt
+	DEPENDS:=+libpthread +librt
 endef
 
 define Package/MLP_batch_sequential/description
-	Application which will act as both a server for the LCD \
-	and for button presses.
+	Application which tests MLP batch sequential processing \
+	NOTE: libm is provided by base-files
 endef
 
 define Build/Configure
