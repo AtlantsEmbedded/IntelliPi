@@ -1,10 +1,10 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=MLP_batch_sequential
+PKG_NAME:=MLP_batch_parallel
 PKG_VERSION:=2014-26-14
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
-PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/MLP_batch_sequential
+PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/MLP_batch_parallel
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
@@ -15,15 +15,15 @@ include $(INCLUDE_DIR)/package.mk
 
 PKG_FIXUP:=autoreconf
 
-define Package/MLP_batch_sequential
+define Package/MLP_batch_parallel
 	SECTION:=utils
 	CATEGORY:=Utilities
-	TITLE:=MLP_batch_sequential
+	TITLE:=MLP_batch_parallel
 	DEPENDS:=+libpthread +librt
 endef
 
-define Package/MLP_batch_sequential/description
-	Application which tests MLP batch sequential processing \
+define Package/MLP_batch_parallel/description
+	Application which tests MLP batch parallel processing \
 	NOTE: libm is provided by base-files
 endef
 
@@ -37,12 +37,12 @@ define Build/Configure
         );
 endef
 
-define Package/MLP_batch_sequential/install
+define Package/MLP_batch_parallel/install
 	$(INSTALL_DIR) $(1)/atom
-	$(INSTALL_DIR) $(1)/atom/MLP_batch_sequential/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/MLP_batch $(1)/atom/MLP_batch_sequential/
-	$(INSTALL_DIR) $(1)/atom/MLP_batch_sequential/data
-	$(CP) $(PKG_BUILD_DIR)/data/* $(1)/atom/MLP_batch_sequential/data
+	$(INSTALL_DIR) $(1)/atom/MLP_batch_parallel/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/MLP_batch $(1)/atom/MLP_batch_parallel/
+	$(INSTALL_DIR) $(1)/atom/MLP_batch_parallel/data
+	$(CP) $(PKG_BUILD_DIR)/data/* $(1)/atom/MLP_batch_parallel/data
 endef
 
-$(eval $(call BuildPackage,MLP_batch_sequential))
+$(eval $(call BuildPackage,MLP_batch_parallel))
