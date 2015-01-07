@@ -47,7 +47,7 @@ struct Sthread_pool *init_thread_pool(struct Spool_init_struct pool_init_struct)
 	for(ii=0;ii<(NB_WORK_THREADS + NB_MASTER_THREADS);ii++){
 		pthread_pool->thread_params[ii].is_alive = 1;
 		pthread_pool->thread_params[ii].nb_iterations = pool_init_struct.nb_iterations; /*nb of iteration to be executed*/
-		pthread_pool->thread_params[ii].ptrain_dataset = pool_init_struct.ptrain_dataset; /*pointer to the training dataset*/
+		pthread_pool->thread_params[ii].ptrain_dataset = &pool_init_struct.ptrain_dataset; /*pointer to the training dataset*/
 		
 		/*pointer to the trunk NNetwork (shouldn't be modified ever)*/
 		pthread_pool->thread_params[ii].pnnetwork_trunk_copy = pool_init_struct.pnnetwork_trunk_copy;
