@@ -20,8 +20,8 @@
 #include <include/wrapper.h>
     
 #define SCOREFILE_NAME "scorelog.txt"
-#define TESTDATASET_FILE "../data/TestDataSet"
-#define TRAINDATASET_FILE "../data/TrainDataSet"
+#define TESTDATASET_FILE "data/TestDataSet"
+#define TRAINDATASET_FILE "data/TrainDataSet"
     
 /// Forward declaration
 static struct timespec diff(struct timespec start, struct timespec end);
