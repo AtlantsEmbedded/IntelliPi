@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appConfig>
+	<appAttributes>
+		<name>Atom Proto</name>
+		<text>Press SEL to start</text>
+	</appAttributes>
+	<appMenu>
+		<menuItem>
+				<name>Main menu</name>
+				<text>Use ARROWS to nav</text>
+				<isRoot>true</isRoot>
+				<selectable>true</selectable>
+				<action>false</action>
+				<actionText></actionText>
+				<cancelable>false</cancelable>
+				<cancelAction></cancelAction>
+				<backable>false</backable>
+				<backMenuItem></backMenuItem>
+				<hasChildren>yes</hasChildren>
+				<finishable>false</finishable>
+				<waitForFinish>false</waitForFinish>
+				<finishMessage>false</finishMessage>
+				<children>
+					<menuItem>
+						<name>Train menu item</name>
+						<text>Train</text>
+						<isRoot>false</isRoot>
+						<selectable>true</selectable>
+						<action>./someAction</action>
+						<actionText>Training...</actionText>
+						<cancelable>false</cancelable>
+						<cancelAction>killall someAction</cancelAction>
+						<backable>true</backable>
+						<backMenuItem>parent</backMenuItem>
+						<hasChildren>no</hasChildren>
+						<finishable>false</finishable>
+						<waitForFinish>false</waitForFinish>
+						<finishMessage>false</finishMessage>
+						<children>
+						</children>
+					</menuItem>
+					<menuItem>
+						<name>Operate menu item</name>
+						<text>Operate</text>
+						<isRoot>false</isRoot>
+						<selectable>true</selectable>
+						<action>./someAction2</action>
+						<actionText>Running...</actionText>
+						<cancelable>false</cancelable>
+						<cancelAction>killall someAction2</cancelAction>
+						<backable>true</backable>
+						<backMenuItem>parent</backMenuItem>
+						<hasChildren>no</hasChildren>
+						<finishable>true</finishable>
+						<waitForFinish>true</waitForFinish>
+						<finishMessage>true</finishMessage>
+						<children>
+						</children>
+					</menuItem>
+					<menuItem>
+						<name>Diagnostic menu item</name>
+						<text>Diagnostics</text>
+						<isRoot>false</isRoot>
+						<selectable>true</selectable>
+						<action>./someAction3</action>
+						<actionText>Running diags...</actionText>
+						<cancelable>false</cancelable>
+						<cancelAction>killall someAction3</cancelAction>
+						<backable>true</backable>
+						<backMenuItem>parent</backMenuItem>
+						<hasChildren>no</hasChildren>
+						<finishable>true</finishable>
+						<waitForFinish>false</waitForFinish>
+						<finishMessage>false</finishMessage>
+						<children>
+						</children>
+					</menuItem>
+				</children>
+		</menuItem>
+	</appMenu>
+</appConfig>
