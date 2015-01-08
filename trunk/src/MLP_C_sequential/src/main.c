@@ -13,8 +13,8 @@
 #include <include/network.h>
 #include <include/wrapper.h>
 
-#define TRAINDATASET_NAME "../data/TrainDataSet"
-#define TESTDATASET_NAME "../data/TestDataSet"
+#define TRAINDATASET_NAME "data/TrainDataSet"
+#define TESTDATASET_NAME "data/TestDataSet"
 #define SCORELOG_NAME "Scorelog"
 
 /**
