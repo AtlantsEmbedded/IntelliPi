@@ -43,8 +43,8 @@ int main(int argc, char **argv[])
 	
 	t_trial this_trial;
 	
-	float signal[10] = {1,1,1,1,1,1,1,1,1,1};
-	float dwn_samp_signal[5];
+	float signal[20] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+	float dwn_samp_signal[10];
 
 	/*
 	 * Reads the training and test data files
@@ -65,10 +65,10 @@ int main(int argc, char **argv[])
 	 * Filter and Downsample test
 	 */
 	
-	filt_downsamp_signal(&signal, 10, &dwn_samp_signal);
+	filt_downsamp_signal(&signal, 20, &dwn_samp_signal);
 
 	printf("\n");
-	for(ii=0;ii<5;ii++){
+	for(ii=0;ii<10;ii++){
 		printf("%f\n",dwn_samp_signal[ii]);
 	}
 
