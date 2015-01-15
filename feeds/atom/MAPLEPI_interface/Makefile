@@ -28,7 +28,7 @@ endef
 define Package/MAPLEPI_interface/install
 	$(INSTALL_DIR) $(1)/atom
 	$(INSTALL_DIR) $(1)/atom/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/MAPLEPI_interface $(1)/atom/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/GPIO_interface $(1)/atom/bin
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/gpio $(1)/etc/init.d/
