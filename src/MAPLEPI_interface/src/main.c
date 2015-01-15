@@ -136,6 +136,8 @@ int main(int argc, char *argv[])
 		am_file = popen(AM2302_CMD, "r");
 		fgets(am_buffer, 17, am_file);
 		pclose(am_file);
+		
+		printf("AM2302 output:%s\n",am_buffer);
 
 		// Output AM2302 data onto the top row of the LCD
 		lcdPosition(lcdHandle, 0, 0);
@@ -146,6 +148,8 @@ int main(int argc, char *argv[])
 		probe_file = popen(DSPROBE_CMD, "r");
 		fgets(probe_buffer, 1024, probe_file);
 		pclose(probe_file);
+		
+		printf("DS output:%s len:%d\n",probe_buffer,len);
 
 		// Raw buffer will be a string - read until a '='
 		len = strlen(probe_buffer);
@@ -155,12 +159,14 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		printf("Found a = at:%d\n",i);
 		// Convert the temperature string to a float
 		char tmp_buffer[8] = { 0 };
-		memcpy(tmp_buffer, *probe_buffer + (len - i), len - i);
+		memcpy(tmp_buffer, *probe_buffer + i, (len - i);
 
 		float actual_temp = atof(tmp_buffer) / 1000;
 
+		printf("actual temp: %3.2f\n",actual_temp);
 		// Build the final string (obviously not efficient)
 		snprintf(bottom_buffer, 17,"c%3.2f s%3.2f", actual_temp, set_point);
 
