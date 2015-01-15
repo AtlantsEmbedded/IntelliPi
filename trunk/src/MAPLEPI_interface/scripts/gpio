@@ -3,15 +3,21 @@
  
 START=1
 STOP=2
+WIRINGPIPIN=8
  
 start() {        
+		gpio mode WIRINGPIPIN out
+		gpio write WIRINGPIPIN 1
         /atom/bin/gpio_interface 1 &
 }                 
  
 stop() {          
+		gpio write WIRINGPIPIN 0
         killall gpio_interface
 }
 
 boot() {
+		gpio mode WIRINGPIPIN out
+		gpio write WIRINGPIPIN 1
         /atom/bin/gpio_interface 1 &
 }
