@@ -129,7 +129,6 @@ int main(int argc, char *argv[])
 	char bottom_buffer[17] = "c";	//"C123.45 S123.45f"
 	int i = 0;
 	int len = 0;
-	float set_point = 0;
 
 	for (;;) {
 		// Retrieve out the AM2302 sensor data
@@ -163,7 +162,7 @@ int main(int argc, char *argv[])
 		float actual_temp = atof(tmp_buffer) / 1000;
 
 		// Build the final string (obviously not efficient)
-		vsprintf(bottom_buffer, "c%3.2f s%3.2f", actual_temp, set_point);
+		snprintf(bottom_buffer, 17,"c%3.2f s%3.2f", actual_temp, set_point);
 
 		// Output DS data onto the bottom row of the LCD
 		lcdPosition(lcdHandle, 0, 1);
