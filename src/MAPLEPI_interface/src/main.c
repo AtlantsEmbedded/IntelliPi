@@ -160,9 +160,12 @@ int main(int argc, char *argv[])
 		}
 
 		printf("Found a = at:%d\n",i);
+		
 		// Convert the temperature string to a float
 		char tmp_buffer[8] = { 0 };
 		char *buff_ptr = &probe_buffer;
+		buff_ptr +=1;
+		printf("Tmp buffer string:%s\n",buff_ptr + i);
 		memcpy(tmp_buffer, buff_ptr + i, (len - i));
 
 		float actual_temp = atof(tmp_buffer) / 1000;
