@@ -22,7 +22,7 @@
 #include "main.h"
 
 static const char *AM2302_CMD = "/usr/bin/dht22_interface";
-static const char *DSPROBE_CMD = "cat /sys/devices/w1_bus_master1/28-*/w1_slave";
+static const char *DSPROBE_CMD = "cat /sys/devices/w1_bus_master1/28-*/w1_slave | sed -n 2p";
 
 static int lcdHandle;
 
