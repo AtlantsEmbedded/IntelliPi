@@ -119,6 +119,10 @@ static void adafruitLCDSetup(int colour)
 	}
 }
 
+/**
+ * mode_button()
+ * @brief Handles mode button functionality
+ */ 
 static inline void mode_button()
 {
 	if (digitalRead(MODE_PIN) == HIGH) {
@@ -126,37 +130,49 @@ static inline void mode_button()
 	}
 
 	if (device_mode == RUNNING) {
+		setBacklightColour(RED_COLOR);
 		printf("Mode changed to NOT-RUNNING!\n");
 		device_mode = NOT_RUNNING;
 	} else {
 		printf("Mode changed to RUNNING!\n");
+		setBacklightColour(GREEN_COLOR);
 		device_mode = RUNNING;
 	}
 
 	while (digitalRead(MODE_PIN) == LOW) {	// Wait for release
-		delay(10);
+		delay(1);
 	}
 
 }
 
+/**
+ * up_temp_button()
+ * @brief Handles tmp up button functionality
+ */ 
 static inline void up_temp_button()
 {
-	if (digitalRead(UP_TMP_PIN)) {
-		set_point += 0.01;
+	if (digitalRead(UP_TMP_PIN) == HIGH) {
+		return;
 	}
 	while (digitalRead(UP_TMP_PIN) == LOW) {
-		delay(10);
+		set_point += 0.01;
+		delay(1);
 	}
 }
 
+/**
+ * down_temp_button()
+ * @brief Handles tmp down button functionality
+ */ 
 static inline void down_temp_button()
 {
-	if (digitalRead(DN_TMP_PIN)) {
-		set_point -= 0.01;
+	if (digitalRead(DN_TMP_PIN)== HIGH) {
+		return;
 	}
 
 	while (digitalRead(DN_TMP_PIN) == LOW) {
-		delay(10);
+		set_point -= 0.01;
+		delay(1);
 	}
 }
 
