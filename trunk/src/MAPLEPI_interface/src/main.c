@@ -31,6 +31,7 @@
 
 #define RED_COLOR 1
 #define GREEN_COLOR 2
+#define YELLOW_COLOR 3
 
 // Commands to retrieve information from the sensors
 static const char *AM2302_CMD = "/usr/bin/dht22_interface";
