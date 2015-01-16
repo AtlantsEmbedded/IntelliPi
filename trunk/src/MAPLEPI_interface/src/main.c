@@ -168,11 +168,11 @@ static inline void setup_buttons()
 	 * 1.) Set button as INPUT
 	 * 2.) Enable pull-up resistor on button
 	 */
-	pinMode(UP_TMP_PIN, INPUT);
-	pullUpDnControl(UP_TMP_PIN, PUD_UP);
-
-	pinMode(DN_TMP_PIN, INPUT);
-	pullUpDnControl(DN_TMP_PIN, PUD_UP);
+	//~ pinMode(UP_TMP_PIN, INPUT);
+	//~ pullUpDnControl(UP_TMP_PIN, PUD_UP);
+//~ 
+	//~ pinMode(DN_TMP_PIN, INPUT);
+	//~ pullUpDnControl(DN_TMP_PIN, PUD_UP);
 
 	pinMode(MODE_PIN, INPUT);
 	pullUpDnControl(MODE_PIN, PUD_UP);
@@ -201,9 +201,6 @@ int main(int argc, char *argv[])
 	register int len = 0;
 	float actual_temp = 0;
 
-	struct tm *t = NULL;
-	time_t tim_t;
-
 	// Check arguments
 	if (argc != 2) {
 		return usage(argv[0]);
@@ -224,14 +221,14 @@ int main(int argc, char *argv[])
 	device_mode = NOT_RUNNING;
 
 	// Initialize the user interface buttons (not on plate)
-	//setup_buttons();
+	setup_buttons();
 
 	for (;;) {
 		// Check GPIO/buttons first
 		// MODE select button (yellow)
 		mode_button();
-		up_temp_button();
-		down_temp_button();
+		//up_temp_button();
+		//down_temp_button();
 
 		// Retrieve out the AM2302 sensor data
 		FILE *am_file = NULL;
