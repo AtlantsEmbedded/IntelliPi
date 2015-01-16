@@ -154,7 +154,7 @@ static inline void down_temp_button()
 	if (digitalRead(DN_TMP_PIN)) {
 		set_point -= 0.01;
 	}
-	
+
 	while (digitalRead(DN_TMP_PIN) == LOW) {
 		delay(10);
 	}
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
 		// Retrieve out the AM2302 sensor data
 		FILE *am_file = NULL;
 		am_file = popen(AM2302_CMD, "r");
-		am_buffer = { 0 };
+
 		fgets(am_buffer, 17, am_file);
 		pclose(am_file);
 
