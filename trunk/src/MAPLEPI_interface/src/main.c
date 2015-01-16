@@ -121,8 +121,7 @@ static void adafruitLCDSetup(int colour)
 
 static inline void mode_button()
 {
-	if (digitalRead(MODE_PIN) == HIGH) {// Low is pushed
-		printf("Select is pushed\n");
+	if (digitalRead(MODE_PIN) == HIGH) {
 		return;
 	}
 
@@ -135,7 +134,6 @@ static inline void mode_button()
 	}
 
 	while (digitalRead(MODE_PIN) == LOW) {	// Wait for release
-		printf("Waiting for select to release\n");
 		delay(10);
 	}
 
@@ -146,12 +144,19 @@ static inline void up_temp_button()
 	if (digitalRead(UP_TMP_PIN)) {
 		set_point += 0.01;
 	}
+	while (digitalRead(UP_TMP_PIN) == LOW) {
+		delay(10);
+	}
 }
 
 static inline void down_temp_button()
 {
 	if (digitalRead(DN_TMP_PIN)) {
 		set_point -= 0.01;
+	}
+	
+	while (digitalRead(DN_TMP_PIN) == LOW) {
+		delay(10);
 	}
 }
 
@@ -177,11 +182,11 @@ static inline void setup_buttons()
 	 * 1.) Set button as INPUT
 	 * 2.) Enable pull-up resistor on button
 	 */
-	//~ pinMode(UP_TMP_PIN, INPUT);
-	//~ pullUpDnControl(UP_TMP_PIN, PUD_UP);
-//~ 
-	//~ pinMode(DN_TMP_PIN, INPUT);
-	//~ pullUpDnControl(DN_TMP_PIN, PUD_UP);
+	pinMode(UP_TMP_PIN, INPUT);
+	pullUpDnControl(UP_TMP_PIN, PUD_UP);
+
+	pinMode(DN_TMP_PIN, INPUT);
+	pullUpDnControl(DN_TMP_PIN, PUD_UP);
 
 	pinMode(MODE_PIN, INPUT);
 	pullUpDnControl(MODE_PIN, PUD_UP);
@@ -215,7 +220,7 @@ int main(int argc, char *argv[])
 		return usage(argv[0]);
 	}
 
-	printf("MaplePI GPIO/Monitoring App\n\n");
+	printf("\nMaplePI GPIO/Monitoring App\n\n");
 	printf("Author: Ronnie brash (ron.brash@gmail.com)\n");
 	printf("------------------------------------------\n");
 
@@ -234,14 +239,14 @@ int main(int argc, char *argv[])
 
 	for (;;) {
 		// Check GPIO/buttons first
-		// MODE select button (yellow)
 		mode_button();
-		//up_temp_button();
-		//down_temp_button();
+		up_temp_button();
+		down_temp_button();
 
 		// Retrieve out the AM2302 sensor data
 		FILE *am_file = NULL;
 		am_file = popen(AM2302_CMD, "r");
+		am_buffer = { 0 };
 		fgets(am_buffer, 17, am_file);
 		pclose(am_file);
 
@@ -292,8 +297,8 @@ int main(int argc, char *argv[])
 		lcdPuts(lcdHandle, bottom_buffer);
 
 		printf("\nDisplay will show -----------------------\n");
-		printf("%s\n", am_buffer);
-		printf("%s\n", bottom_buffer);
+		printf("%s", am_buffer);
+		printf("%s", bottom_buffer);
 		printf("-----------------------------------------\n");
 
 	}

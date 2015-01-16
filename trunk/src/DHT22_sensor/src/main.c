@@ -79,7 +79,7 @@ int dht22_read_val()
 		
 		farenheit = (1.8 * t) + 32;
 		
-		printf("Hum:%3.0f AmT:%3.0f\n", h, farenheit);
+		printf("Hum:%3.0f AmbT:%3.0f\n", h, farenheit);
 		
 		return 1;
 	} else {
