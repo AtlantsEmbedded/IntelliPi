@@ -121,8 +121,10 @@ static void adafruitLCDSetup(int colour)
 
 static inline void mode_button()
 {
-	if (digitalRead(MODE_PIN) == HIGH)	// Low is pushed
+	if (digitalRead(MODE_PIN) == HIGH) {// Low is pushed
+		printf("Select is pushed\n");
 		return;
+	}
 
 	if (device_mode == RUNNING) {
 		printf("Mode changed to NOT-RUNNING!\n");
@@ -132,8 +134,10 @@ static inline void mode_button()
 		device_mode = RUNNING;
 	}
 
-	while (digitalRead(MODE_PIN) == LOW)	// Wait for release
+	while (digitalRead(MODE_PIN) == LOW) {	// Wait for release
+		printf("Waiting for select to release\n");
 		delay(10);
+	}
 
 }
 
@@ -217,7 +221,7 @@ int main(int argc, char *argv[])
 
 	b_state.colour = atoi(argv[1]);
 
-	wiringPiSetupSys();
+	wiringPiSetup();
 	mcp23017Setup(AF_BASE, 0x20);
 
 	adafruitLCDSetup(b_state.colour);
