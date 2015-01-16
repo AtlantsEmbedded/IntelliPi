@@ -1,11 +1,16 @@
 /**
- * @file lcd-adafruit.c:
- * @brief Text-based LCD driver test code
- *	This is designed to drive the Adafruit RGB LCD Plate
- *	with the additional 5 buttons for the Raspberry Pi
- *  based loosely on Gordon Henderson's original driver code
- * @author Gordon Henderson (original author)
+ * @file main.c
  * @author Ronnie Brash (ron.brash@gmail.com)
+ * @date Jan 16, 2014
+ * 
+ * @brief LCD driver code which will be used to control
+ * a RaspberryPI (B+/A+) that monitors environmental data,
+ * drives a relay which would open an electronic solenoid,
+ * have a user settable set point and ON/OFF modes.
+ * 
+ * @note Depends on an ADAfruit LCD Plate,
+ * AM2302 sensor, a DS18B20 sensor with 1w kernel support, 
+ * a relay and several buttons driven by GPIO.
  */
 
 #include <stdio.h>
@@ -21,11 +26,34 @@
 #include <lcd.h>
 #include "main.h"
 
+#define RUNNING 1
+#define NOT_RUNNING 0
+
+#define RED_COLOR 1
+#define GREEN_COLOR 2
+
+// Commands to retrieve information from the sensors
 static const char *AM2302_CMD = "/usr/bin/dht22_interface";
 static const char *DSPROBE_CMD = "cat /sys/devices/w1_bus_master1/28-*/w1_slave | sed -n 2p";
 
-static int lcdHandle;
+static const char *OPEN_RELAY = "gpio write 0 1";
+static const char *CLOSE_RELAY = "gpio write 0 0";
 
+// Pins used (wiringPi numbers)
+const int RELAY_PIN = 0;
+const int UP_TMP_PIN = 6;
+const int DN_TMP_PIN = 13;
+const int MODE_PIN = 2;
+const int BEEPER_PIN = 12;
+
+// Default temperature to be used as a setpoint
+const float DEFAULT_SETPOINT = 150.00;
+
+// Device mode {RUNNING, NOT_RUNNING}
+static int device_mode;
+
+// LCD handle
+static int lcdHandle;
 /**
  * usage(const char *progName)
  * @brief program usage
@@ -57,16 +85,13 @@ static inline void setBacklightColour(int colour)
  * @param color
  * @brief Setup the Adafruit board by making sure the additional pins are
  *	set to the correct modes, etc.
- *********************************************************************************
  */
-
 static void adafruitLCDSetup(int colour)
 {
 	int i = 0;
 	lcdHandle = 0;
 
 	// Backlight LEDs
-
 	pinMode(AF_RED, OUTPUT);
 	pinMode(AF_GREEN, OUTPUT);
 	pinMode(AF_BLUE, OUTPUT);
@@ -91,6 +116,62 @@ static void adafruitLCDSetup(int colour)
 	}
 }
 
+static inline void mode_button()
+{
+	if (digitalRead(MODE_PIN)) {
+		if (device_mode == RUNNING) {
+			printf("Mode changed to NOT-RUNNING!\n");
+			device_mode = NOT_RUNNING;
+		} else {
+			printf("Mode changed to RUNNING!\n");
+			device_mode = RUNNING;
+		}
+	}
+}
+
+static inline void up_temp_button()
+{
+
+}
+
+static inline void down_temp_button()
+{
+
+}
+
+static inline void open_relay()
+{
+
+}
+
+static inline void close_relay()
+{
+
+}
+
+/**
+ * setup_buttons()
+ * @brief Setup buttons to be used by the external 
+ * user interface - to be manipulated by the user
+ */
+static inline void setup_buttons()
+{
+	/*
+	 * For each button:
+	 * 1.) Set button as INPUT
+	 * 2.) Enable pull-up resistor on button
+	 */
+	pinMode(UP_TMP_PIN, INPUT);
+	pullUpDnControl(UP_TMP_PIN, PUD_UP);
+
+	pinMode(DN_TMP_PIN, INPUT);
+	pullUpDnControl(DN_TMP_PIN, PUD_UP);
+
+	pinMode(MODE_PIN, INPUT);
+	pullUpDnControl(MODE_PIN, PUD_UP);
+
+}
+
 /**
  * main(int argc, char *argv[])
  * @brief main function
@@ -103,8 +184,15 @@ int main(int argc, char *argv[])
 	int cols = 16;
 	button_s b_state = { 0 };
 	b_state.waitForRelease = FALSE;
-	b_state.colour = 1;
-	float set_point = 0;
+	b_state.colour = RED_COLOR;
+	float set_point = DEFAULT_SETPOINT;
+
+	char am_buffer[17] = { 0 };
+	char probe_buffer[1024] = { 0 };
+	char bottom_buffer[17] = "c";	//"123.45-123.45 {Ou,No}"
+	register int i = 0;
+	register int len = 0;
+	float actual_temp = 0;
 
 	struct tm *t = NULL;
 	time_t tim_t;
@@ -114,8 +202,9 @@ int main(int argc, char *argv[])
 		return usage(argv[0]);
 	}
 
-	printf("MaplePI GPIO App\n");
-	printf("==============================\n");
+	printf("MaplePI GPIO/Monitoring App\n\n");
+	printf("Author: Ronnie brash (ron.brash@gmail.com)\n");
+	printf("------------------------------------------\n");
 
 	b_state.colour = atoi(argv[1]);
 
@@ -124,20 +213,24 @@ int main(int argc, char *argv[])
 
 	adafruitLCDSetup(b_state.colour);
 
-	char am_buffer[17] = { 0 };
-	char probe_buffer[1024] = { 0 };
-	char bottom_buffer[17] = "c";	//"C123.45 S123.45f"
-	int i = 0;
-	int len = 0;
+	// Set device mode to not running
+	device_mode = NOT_RUNNING;
+
+	// Initialize the user interface buttons (not on plate)
+	setup_buttons();
 
 	for (;;) {
+		// Check GPIO/buttons first
+		// MODE select button (yellow)
+		mode_button();
+
 		// Retrieve out the AM2302 sensor data
 		FILE *am_file = NULL;
 		am_file = popen(AM2302_CMD, "r");
 		fgets(am_buffer, 17, am_file);
 		pclose(am_file);
-		
-		printf("AM2302 output:%s\n",am_buffer);
+
+		printf("AM2302  output:%s\n", am_buffer);
 
 		// Output AM2302 data onto the top row of the LCD
 		lcdPosition(lcdHandle, 0, 0);
@@ -148,8 +241,8 @@ int main(int argc, char *argv[])
 		probe_file = popen(DSPROBE_CMD, "r");
 		fgets(probe_buffer, 1024, probe_file);
 		pclose(probe_file);
-		
-		printf("DS output:%s len:%d\n",probe_buffer,len);
+
+		printf("DS18B20 output:%s\n", probe_buffer);
 
 		// Raw buffer will be a string - read until a '='
 		len = strlen(probe_buffer);
@@ -159,28 +252,34 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		printf("Found a = at:%d\n",i);
-		
 		// Convert the temperature string to a float
 		char tmp_buffer[8] = { 0 };
 		char *buff_ptr = &probe_buffer;
-		buff_ptr +=1;
-		printf("Tmp buffer string:%s\n",buff_ptr + i);
+
+		// Increment buffer to remove the '=' from the string
+		buff_ptr += 1;
 		memcpy(tmp_buffer, buff_ptr + i, (len - i));
 
-		float actual_temp = atof(tmp_buffer) / 1000;
+		// Convert string to a float and divide by 1000
+		actual_temp = (1.8 * (atof(tmp_buffer) / 1000)) + 32;
 
-		printf("actual temp: %3.2f\n",actual_temp);
-		
 		// Build the final string (obviously not efficient)
-		snprintf(bottom_buffer, 17,"c%3.2f s%3.2f", actual_temp, set_point);
+		snprintf(bottom_buffer, 17, "%3.2f-%3.2f ", actual_temp, set_point);
+
+		if (device_mode == RUNNING) {
+			strcat(bottom_buffer, "Ou");
+		} else {
+			strcat(bottom_buffer, "No");
+		}
 
 		// Output DS data onto the bottom row of the LCD
 		lcdPosition(lcdHandle, 0, 1);
 		lcdPuts(lcdHandle, bottom_buffer);
 
+		printf("\nDisplay will show -----------------------\n");
 		printf("%s\n", am_buffer);
 		printf("%s\n", bottom_buffer);
+		printf("-----------------------------------------\n");
 
 	}
 
