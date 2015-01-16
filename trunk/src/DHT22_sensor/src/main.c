@@ -10,7 +10,7 @@
 #include <stdint.h>
 
 #define MAX_TIME 85
-#define DHT11PIN 15		//This is a wiringPI pin, not physical or BCRM numbers
+#define DHT11PIN 4		//This is a wiringPI pin, not physical or BCRM numbers
 #define ATTEMPTS 5
 
 int dht22_val[5] = { 0, 0, 0, 0, 0 };
