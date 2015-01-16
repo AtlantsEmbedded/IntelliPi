@@ -55,6 +55,8 @@ static int device_mode;
 
 // LCD handle
 static int lcdHandle;
+
+static float set_point;
 /**
  * usage(const char *progName)
  * @brief program usage
@@ -132,12 +134,16 @@ static inline void mode_button()
 
 static inline void up_temp_button()
 {
-
+	if (digitalRead(UP_TMP_PIN)) {
+		set_point+=0.01;
+	}
 }
 
 static inline void down_temp_button()
 {
-
+	if (digitalRead(DN_TMP_PIN)) {
+		set_point-=0.01;
+	}
 }
 
 static inline void open_relay()
@@ -186,7 +192,7 @@ int main(int argc, char *argv[])
 	button_s b_state = { 0 };
 	b_state.waitForRelease = FALSE;
 	b_state.colour = RED_COLOR;
-	float set_point = DEFAULT_SETPOINT;
+	set_point = DEFAULT_SETPOINT;
 
 	char am_buffer[17] = { 0 };
 	char probe_buffer[1024] = { 0 };
@@ -218,12 +224,14 @@ int main(int argc, char *argv[])
 	device_mode = NOT_RUNNING;
 
 	// Initialize the user interface buttons (not on plate)
-	setup_buttons();
+	//setup_buttons();
 
 	for (;;) {
 		// Check GPIO/buttons first
 		// MODE select button (yellow)
 		mode_button();
+		up_tmp_button();
+		down_tmp_button();
 
 		// Retrieve out the AM2302 sensor data
 		FILE *am_file = NULL;
