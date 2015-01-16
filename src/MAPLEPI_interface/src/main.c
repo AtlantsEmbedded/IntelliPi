@@ -230,8 +230,8 @@ int main(int argc, char *argv[])
 		// Check GPIO/buttons first
 		// MODE select button (yellow)
 		mode_button();
-		up_tmp_button();
-		down_tmp_button();
+		up_temp_button();
+		down_temp_button();
 
 		// Retrieve out the AM2302 sensor data
 		FILE *am_file = NULL;
