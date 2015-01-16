@@ -3,9 +3,14 @@
  
 START=1
 STOP=2
-WIRINGPIPIN=8
  
-start() {        
+start() { 
+		# Setup AM2302 pin for power
+		gpio mode 5 out
+		gpio write 5 1
+		# Setup DS pin for power
+		gpio mode 11 up
+		gpio write 11 1
         /atom/bin/gpio_interface 1 &
 }                 
  
@@ -14,5 +19,11 @@ stop() {
 }
 
 boot() {
+		# Setup AM2302 pin for power
+		gpio mode 5 out
+		gpio write 5 1
+		# Setup DS pin for power
+		gpio mode 11 up
+		gpio write 11 1
         /atom/bin/gpio_interface 1 &
 }
