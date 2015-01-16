@@ -1,7 +1,8 @@
-/* 
- * real-valued signal N long-FFT (C)
- *
- * This program test my specific needs for the fft. The fft implementation
+/**
+ * @file my_ffttest.c
+ * @author Frédéric Simard
+ * @date January, 2015
+ * @brief This program test my specific needs for the fft. The fft implementation
  * satisfy my requirements in all but one respect. My data points are real-valued,
  * but the fft implementation perform the operation on complex data points.
  *
@@ -38,7 +39,7 @@
  *   liability, whether in an action of contract, tort or otherwise, arising from,
  *   out of or in connection with the Software or the use or other dealings in the
  *   Software.
- */
+ */ 
 
 #include <math.h>
 #include <stdio.h>
@@ -58,9 +59,16 @@ static void *memdup(const void *src, size_t n);
 static double max_log_error = -INFINITY;
 
 
-/* Main and test functions */
-
-int main(int argc, char **argv) {
+/**
+ * main(int argc, char **argv[])
+ * 
+ * @brief this program test the fast-fourier transform for 
+ *        2*N real-valued signal, under various conditions
+ * @param argc
+ * @param argv
+ * @return 0 for success, non-zero for failure
+ */ 
+ int main(int argc, char **argv) {
 	int i;
 	int prev;
 	srand(time(NULL));
@@ -91,7 +99,13 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-
+/**
+ * test_real_valued_fft(int n)
+ * 
+ * @brief this function implements the test the fast-fourier transform for 2*N real-valued signal
+ * @param n, the length of the fft to be computed. half the length of real-valued signal processes
+ * @return none
+ */ 
 static void test_real_valued_fft(int n) {
 
 	int i,k;
@@ -235,8 +249,17 @@ static void test_real_valued_fft(int n) {
 
 
 
-/* Naive reference computation functions */
-
+/**
+ * naive_dft(const double *inreal, const double *inimag, double *outreal, double *outimag, int inverse, int n)
+ * 
+ * @brief this function implements the reference naive fourier transform, by using the true definition.
+  *       It is not optimal, but gives the correct result (this function was implemented by the original author)
+ * @param inreal, inimag, complex signal to be processed
+ * @param outreal, outimag, fourier transform of the signal
+ * @param inverse, 1 to compute inverse transform, 0 for the forward transform
+ * @param n, length of the signal
+ * @return none
+ */ 
 static void naive_dft(const double *inreal, const double *inimag, double *outreal, double *outimag, int inverse, int n) {
 	double coef = (inverse ? 2 : -2) * M_PI;
 	int k;
@@ -255,8 +278,16 @@ static void naive_dft(const double *inreal, const double *inimag, double *outrea
 }
 
 
-/* Utility functions */
-
+/**
+ * log10_rms_err(const double *xreal, const double *ximag, const double *yreal, const double *yimag, int n)
+ * 
+ * @brief this function implements the root mean square error criterion to compare two signals.
+  *       (this function was implemented by the original author)
+ * @param xreal, ximag, complex signal 1
+ * @param yreal, yimag, complex signal 2
+ * @param n, length of the signal
+ * @return the rms of the difference between the two signals
+ */ 
 static double log10_rms_err(const double *xreal, const double *ximag, const double *yreal, const double *yimag, int n) {
 	double err = 0;
 	int i;
@@ -272,6 +303,14 @@ static double log10_rms_err(const double *xreal, const double *ximag, const doub
 }
 
 
+/**
+ * random_reals(int n)
+ * 
+ * @brief this function returns a vector of real elements.
+  *       (this function was implemented by the original author)
+ * @param n, length of the signal
+ * @return 1 if success, 0 otherwise
+ */ 
 static double *random_reals(int n) {
 	double *result = malloc(n * sizeof(double));
 	int i;
@@ -280,6 +319,13 @@ static double *random_reals(int n) {
 	return result;
 }
 
+/**
+ * zero_reals(int n)
+ * 
+ * @brief this function returns a vector of 0s.
+ * @param n, length of the signal
+ * @return 1 if success, 0 otherwise
+ */ 
 static double *zero_reals(int n) {
 	double *result = malloc(n * sizeof(double));
 	int i;
@@ -289,6 +335,15 @@ static double *zero_reals(int n) {
 }
 
 
+/**
+ * memdup(int n)
+ * 
+ * @brief this function duplicates a memory array, size and values.
+  *       (this function was implemented by the original author)
+ * @param src, data to be duplicated
+ * @param n, length of the signal
+ * @return 1 if success, 0 otherwise
+ */ 
 static void *memdup(const void *src, size_t n) {
 	void *dest = malloc(n);
 	if (dest != NULL)
