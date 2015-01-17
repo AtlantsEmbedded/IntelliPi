@@ -140,7 +140,7 @@ static inline void mode_button()
 	}
 
 	while (digitalRead(MODE_PIN) == LOW) {	// Wait for release
-		delay(1);
+		delayMicroseconds(250);;
 	}
 
 }
@@ -156,7 +156,7 @@ static inline void up_temp_button()
 	}
 	while (digitalRead(UP_TMP_PIN) == LOW) {
 		set_point += 0.01;
-		delay(1);
+		delayMicroseconds(250);
 	}
 }
 
@@ -172,7 +172,7 @@ static inline void down_temp_button()
 
 	while (digitalRead(DN_TMP_PIN) == LOW) {
 		set_point -= 0.01;
-		delay(1);
+		delayMicroseconds(250);
 	}
 }
 
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
 		printf("\nDisplay will show -----------------------\n");
 		printf("%s", am_buffer);
 		printf("%s", bottom_buffer);
-		printf("-----------------------------------------\n");
+		printf("\n-----------------------------------------\n");
 
 	}
 
