@@ -48,7 +48,7 @@ const int MODE_PIN = 2;
 const int BEEPER_PIN = 12;
 
 // Default temperature to be used as a setpoint
-const float DEFAULT_SETPOINT = 150.00;
+const float DEFAULT_SETPOINT = 250.00;
 
 // Device mode {RUNNING, NOT_RUNNING}
 static int device_mode;
@@ -140,7 +140,7 @@ static inline void mode_button()
 	}
 
 	while (digitalRead(MODE_PIN) == LOW) {	// Wait for release
-		delayMicroseconds(250);;
+		delayMicroseconds(750);
 	}
 
 }
@@ -156,7 +156,7 @@ static inline void up_temp_button()
 	}
 	while (digitalRead(UP_TMP_PIN) == LOW) {
 		set_point += 0.01;
-		delayMicroseconds(250);
+		delayMicroseconds(750);
 	}
 }
 
@@ -172,7 +172,7 @@ static inline void down_temp_button()
 
 	while (digitalRead(DN_TMP_PIN) == LOW) {
 		set_point -= 0.01;
-		delayMicroseconds(250);
+		delayMicroseconds(750);
 	}
 }
 
