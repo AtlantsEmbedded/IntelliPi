@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
 		if(check_time(&cur_time) > 0) {
 			// Retrieve sensor data through pipes
 			get_am2302_data(&top_buffer);
-			get_ds_data(&bottom_buffer, &actual_temp);
+			get_ds_data(&actual_temp);
 				
 		} 
 		
