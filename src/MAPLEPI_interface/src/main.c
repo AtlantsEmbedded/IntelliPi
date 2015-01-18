@@ -315,6 +315,8 @@ static int check_time(time_t *old_time) {
 		return (1);
 	}
 	
+	time_t cur_time = time(0);
+	
 	// Compare if difference in time is greater than 0.5 second
     if ((difftime(cur_time,old_time)/1000) > 500){
 		(*old_time) = cur_time;
