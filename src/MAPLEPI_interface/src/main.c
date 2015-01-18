@@ -297,9 +297,9 @@ static inline void build_bottom_string(char *bottom_buffer, float actual_temp)
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
 	if (device_mode == RUNNING) {
-		strcat(bottom_buffer, "Ou");
+		strcat(bottom_buffer, "Oui");
 	} else {
-		strcat(bottom_buffer, "No");
+		strcat(bottom_buffer, "Non");
 	}
 
 }
@@ -376,6 +376,7 @@ int main(int argc, char *argv[])
 		
 		// Check time
 		if(check_time(&cur_time) > 0) {
+			
 			// Retrieve sensor data through pipes
 			get_am2302_data(&top_buffer);
 			get_ds_data(&actual_temp);
@@ -397,6 +398,8 @@ int main(int argc, char *argv[])
 		// Output DS data & set_point onto the bottom row of the LCD
 		lcdPosition(lcdHandle, 0, 1);
 		lcdPuts(lcdHandle, bottom_buffer);
+		
+		delay(500);
 
 		printf("\nDisplay will show -----------------------\n");
 		printf("%s", top_buffer);
