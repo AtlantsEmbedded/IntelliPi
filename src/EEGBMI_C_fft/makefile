@@ -11,7 +11,7 @@ LDFLAGS   = -lm -lrt
 # name of the program
 PROGRAM   = EEGBMI_fft.exe
 # files of the program
-SRCS      = my_ffttest.c fft.c
+SRCS      = 2_signals_1fft.c fft.c
 OBJS      = $(SRCS:.c=.o)
 
 #
