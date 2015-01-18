@@ -140,7 +140,8 @@ static inline void mode_button()
 	}
 
 	while (digitalRead(MODE_PIN) == LOW) {	// Wait for release
-		delay(1);
+		delay(10);
+		return;
 	}
 
 }
@@ -156,7 +157,8 @@ static inline void up_temp_button()
 	}
 	while (digitalRead(UP_TMP_PIN) == LOW) {
 		set_point += 0.01;
-		delay(1);
+		delay(10);
+		return;
 	}
 }
 
@@ -172,7 +174,8 @@ static inline void down_temp_button()
 
 	while (digitalRead(DN_TMP_PIN) == LOW) {
 		set_point -= 0.01;
-		delay(1);
+		delay(10);
+		return;
 	}
 }
 
@@ -227,6 +230,8 @@ static inline void setup_buttons()
 
 	pinMode(MODE_PIN, INPUT);
 	pullUpDnControl(MODE_PIN, PUD_UP);
+	
+	pinMode(RELAY_PIN, OUTPUT);
 
 }
 
@@ -294,8 +299,12 @@ static inline void get_ds_data(float *actual_temp)
  */
 static inline void build_bottom_string(char *bottom_buffer, float actual_temp)
 {
+	
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
+	// Clean up LCD
+	memset(bottom_buffer+strlen(bottom_buffer),0,3);
+	
 	if (device_mode == RUNNING) {
 		strcat(bottom_buffer, "Oui");
 	} else {
@@ -398,8 +407,6 @@ int main(int argc, char *argv[])
 		// Output DS data & set_point onto the bottom row of the LCD
 		lcdPosition(lcdHandle, 0, 1);
 		lcdPuts(lcdHandle, bottom_buffer);
-		
-		delay(500);
 
 		printf("\nDisplay will show -----------------------\n");
 		printf("%s", top_buffer);
