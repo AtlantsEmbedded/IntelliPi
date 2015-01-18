@@ -315,11 +315,8 @@ static int check_time(time_t *old_time) {
 		return (1);
 	}
 	
-	// Get the current time
-	time_t cur_time = time(0);
-	
-	// Compare if difference in time is greater than 1 second
-    if ((difftime(cur_time,old_time) > 1)){
+	// Compare if difference in time is greater than 0.5 second
+    if ((difftime(cur_time,old_time)/1000) > 500){
 		(*old_time) = cur_time;
 		return (1);
 	}
@@ -336,9 +333,7 @@ static int check_time(time_t *old_time) {
  */
 int main(int argc, char *argv[])
 {
-	int cols = SIZE_OF_LCD;
 	button_s b_state = { 0 };
-	b_state.waitForRelease = FALSE;
 	b_state.colour = RED_COLOR;
 	set_point = DEFAULT_SETPOINT;
 	float actual_temp = 0;
@@ -371,10 +366,6 @@ int main(int argc, char *argv[])
 	setup_buttons();
 
 	for (;;) {
-		// Check GPIO/buttons for input
-		mode_button();
-		up_temp_button();
-		down_temp_button();
 		
 		// Open/Close Relay
 		if(device_mode == RUNNING) {
@@ -386,6 +377,11 @@ int main(int argc, char *argv[])
 			// Retrieve sensor data through pipes
 			get_am2302_data(&top_buffer);
 			get_ds_data(&actual_temp);
+			
+			// Check GPIO/buttons for input
+			mode_button();
+			up_temp_button();
+			down_temp_button();
 				
 		} 
 		
