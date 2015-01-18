@@ -35,7 +35,7 @@
 
 #define SIZE_OF_LCD 16
 
-#define DEFAULT_SETUPOINT 255.00
+#define DEFAULT_SETPOINT 255.00
 
 // Commands to retrieve information from the sensors
 static const char *AM2302_CMD = "/usr/bin/dht22_interface";
@@ -248,12 +248,11 @@ static inline void get_am2302_data(char *top_buffer)
 }
 
 /**
- * get_ds_data(char *bottom_buffer, float *actual_temp)
+ * get_ds_data(float *actual_temp)
  * @brief Retrieves DS data
- * @param bottom_buffer
  * @param actual_temp
  */
-static inline void get_ds_data(char *bottom_buffer, float *actual_temp)
+static inline void get_ds_data(float *actual_temp)
 {
 	// Retrieve out DS probe sensor data
 	char probe_buffer[1024] = { 0 };
@@ -288,13 +287,12 @@ static inline void get_ds_data(char *bottom_buffer, float *actual_temp)
 }
 
 /**
- *  build_bottom_string(char *top_buffer, char *bottom_buffer, float actual_temp)
+ *  build_bottom_string( char *bottom_buffer, float actual_temp)
  *  @brief Builds bottom string to be displayed on LCD
- *  @param top_buffer
  *  @param bottom_buffer
  *  @param actual_temp
  */
-static inline void build_bottom_string(char *top_buffer, char *bottom_buffer, float actual_temp)
+static inline void build_bottom_string(char *bottom_buffer, float actual_temp)
 {
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
@@ -321,7 +319,7 @@ static int check_time(time_t *old_time) {
 	time_t cur_time = time(0);
 	
 	// Compare if difference in time is greater than 1 second
-    if ((cur_time - old_time) > 1) {
+    if ((difftime(cur_time,old_time) > 1)){
 		(*old_time) = cur_time;
 		return (1);
 	}
@@ -384,7 +382,7 @@ int main(int argc, char *argv[])
 		}
 		
 		// Check time
-		if(check_time(&last_time) > 0) {
+		if(check_time(&cur_time) > 0) {
 			// Retrieve sensor data through pipes
 			get_am2302_data(&top_buffer);
 			get_ds_data(&bottom_buffer, &actual_temp);
@@ -392,7 +390,7 @@ int main(int argc, char *argv[])
 		} 
 		
 		// Build the final string (obviously not efficient)
-		build_bottom_string(&top_buffer, &bottom_buffer, actual_temp);
+		build_bottom_string(&bottom_buffer, actual_temp);
 		
 		// Output AM2302 data onto the top row of the LCD
 		lcdPosition(lcdHandle, 0, 0);
