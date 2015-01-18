@@ -34,9 +34,3 @@ typedef struct {
 	int waitForRelease;
 	int colour;
 } button_s;
-
-static void waitForUp(button_s * state);
-static void waitForDown(button_s * state);
-static void waitForLeft(button_s * state);
-static void waitForRight(button_s * state);
-
