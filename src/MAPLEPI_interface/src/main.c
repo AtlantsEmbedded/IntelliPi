@@ -152,6 +152,7 @@ static inline void mode_button(button_s * state)
 static void up_temp_button(button_s * state)
 {
 	if ((digitalRead(UP_TMP_PIN) == LOW)) {
+		printf("Up button pressed\n");
 		set_point += 0.5;
 		state->waitForRelease = TRUE;
 
@@ -164,8 +165,8 @@ static void up_temp_button(button_s * state)
  */
 static void down_temp_button(button_s * state)
 {
-
 	if ((digitalRead(DN_TMP_PIN) == LOW)) {
+		printf("Down button pressed\n");
 		set_point -= 0.5;
 		state->waitForRelease = TRUE;
 	}
@@ -177,6 +178,7 @@ static void down_temp_button(button_s * state)
  */
 static void open_relay()
 {
+	printf("\topened relay\n");
 	digitalWrite(RELAY_PIN, HIGH);
 }
 
@@ -186,6 +188,7 @@ static void open_relay()
  */
 static void close_relay()
 {
+	printf("\tclosed relay\n");
 	digitalWrite(RELAY_PIN, LOW);
 }
 
@@ -321,8 +324,8 @@ static inline int check_time(time_t * old_time)
 
 	time_t cur_time = time(0);
 
-	// Compare if difference in time is greater than 1 second
-	if ((difftime(cur_time, (time_t) old_time)) > 1) {
+	// Compare if difference in time is greater than X seconds
+	if ((difftime(cur_time, (time_t) old_time)) > 2) {
 		(*old_time) = cur_time;
 		return (1);
 	}
@@ -391,9 +394,6 @@ int main(int argc, char *argv[])
 		// Build the final string (obviously not efficient)
 		build_bottom_string(&bottom_buffer, actual_temp);
 
-		// Clear LCD
-		lcdClear (lcdHandle) ;
-
 		// Output AM2302 data onto the top row of the LCD
 		lcdPosition(lcdHandle, 0, 0);
 		lcdPuts(lcdHandle, top_buffer);
@@ -416,6 +416,7 @@ int main(int argc, char *argv[])
 		if (b_state.waitForRelease) {
 			if ((digitalRead(UP_TMP_PIN) == LOW) || (digitalRead(DN_TMP_PIN) == LOW)
 			    || (digitalRead(MODE_PIN) == LOW)) {
+					printf("waiting for lease\n");
 				continue;
 			} else {
 				b_state.waitForRelease = FALSE;
