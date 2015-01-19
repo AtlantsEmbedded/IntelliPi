@@ -406,18 +406,22 @@ int main(int argc, char *argv[])
 		 * If buttons are still pushed then skip
 		 */
 		if (b_state.waitForRelease) {
-			if ((digitalRead(UP_TMP_PIN) == LOW) || (digitalRead(DN_TMP_PIN) == LOW)
-			    || (digitalRead(MODE_PIN) == LOW)) {
-				continue;
+				up_temp_button(&b_state);
+				down_temp_button(&b_state);
+				mode_button(&b_state);
+				if (b_state.waitForRelease) {
+					continue;
+				}
 			} else {
 				b_state.waitForRelease = FALSE;
 			}
 		}
 		
 		// Check GPIO/buttons for input
-		mode_button(&b_state);
+		
 		up_temp_button(&b_state);
 		down_temp_button(&b_state);
+		mode_button(&b_state);
 		
 
 	}
