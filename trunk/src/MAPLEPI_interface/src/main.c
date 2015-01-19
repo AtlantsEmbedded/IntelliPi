@@ -220,13 +220,13 @@ static inline void setup_buttons()
 	 * 2.) Enable pull-up resistor on button
 	 */
 	pinMode(UP_TMP_PIN, INPUT);
-	pullUpDnControl(UP_TMP_PIN, PUD_UP);
+	pullUpDnControl(UP_TMP_PIN, PUD_DOWN);
 
 	pinMode(DN_TMP_PIN, INPUT);
-	pullUpDnControl(DN_TMP_PIN, PUD_UP);
+	pullUpDnControl(DN_TMP_PIN, PUD_DOWN);
 
 	pinMode(MODE_PIN, INPUT);
-	pullUpDnControl(MODE_PIN, PUD_UP);
+	pullUpDnControl(MODE_PIN, PUD_DOWN);
 
 	pinMode(RELAY_PIN, OUTPUT);
 
