@@ -302,7 +302,7 @@ static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
 	if (device_mode == RUNNING) {
 		memcpy(((char *)&bottom_buffer)+12, "Oui",3);
 	} else {
-		memcpy(((char *)&ottom_buffer)+13, "No",2);
+		memcpy(((char *)&bottom_buffer)+13, "No",2);
 	}
 
 }
