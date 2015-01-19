@@ -300,9 +300,9 @@ static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
 	if (device_mode == RUNNING) {
-		memcpy(((char *)&bottom_buffer)+12, "Oui",3);
+		memcpy(((char *)&bottom_buffer) + 12, "Oui", 3);
 	} else {
-		memcpy(((char *)&bottom_buffer)+13, "No",2);
+		memcpy(((char *)&bottom_buffer) + 13, "No", 2);
 	}
 
 }
@@ -385,20 +385,19 @@ int main(int argc, char *argv[])
 			// Retrieve sensor data through pipes
 			get_am2302_data(&top_buffer);
 			get_ds_data(&actual_temp);
-			
+
 			// Output AM2302 data onto the top row of the LCD
 			lcdPosition(lcdHandle, 0, 0);
 			lcdPuts(lcdHandle, top_buffer);
 
 		}
-
 		// Build the final string (obviously not efficient)
 		build_bottom_string(&bottom_buffer, actual_temp);
 
 		// Output DS data & set_point onto the bottom row of the LCD
 		lcdPosition(lcdHandle, 0, 1);
 		lcdPuts(lcdHandle, bottom_buffer);
-	
+
 		/* 
 		 * Check buttons to change:
 		 * 1.) temperature for set point (up or down)
@@ -406,23 +405,21 @@ int main(int argc, char *argv[])
 		 * If buttons are still pushed then skip
 		 */
 		if (b_state.waitForRelease) {
-				up_temp_button(&b_state);
-				down_temp_button(&b_state);
-				mode_button(&b_state);
-				if (b_state.waitForRelease) {
-					continue;
-				}
-			} else {
-				b_state.waitForRelease = FALSE;
+			up_temp_button(&b_state);
+			down_temp_button(&b_state);
+			mode_button(&b_state);
+			if (b_state.waitForRelease) {
+				continue;
 			}
+		} else {
+			b_state.waitForRelease = FALSE;
 		}
-		
+
 		// Check GPIO/buttons for input
-		
+
 		up_temp_button(&b_state);
 		down_temp_button(&b_state);
 		mode_button(&b_state);
-		
 
 	}
 
