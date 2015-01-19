@@ -299,9 +299,6 @@ static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
 
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
-	// Clean up LCD
-	memset(bottom_buffer + strlen(bottom_buffer), 0, 3);
-
 	if (device_mode == RUNNING) {
 		strcat(bottom_buffer, "Oui");
 	} else {
@@ -314,7 +311,7 @@ static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
  * check_time(time_t old_time)
  * @brief Checks for time
  */
-static inline int check_time(time_t * old_time)
+static int check_time(time_t * old_time)
 {
 
 	// If this is the first time running, time will be 0;
@@ -401,12 +398,7 @@ int main(int argc, char *argv[])
 		// Output DS data & set_point onto the bottom row of the LCD
 		lcdPosition(lcdHandle, 0, 1);
 		lcdPuts(lcdHandle, bottom_buffer);
-
-		printf("\nDisplay will show -----------------------\n");
-		printf("%s", top_buffer);
-		printf("%s", bottom_buffer);
-		printf("\n-----------------------------------------\n");
-		
+	
 		/* 
 		 * Check buttons to change:
 		 * 1.) temperature for set point (up or down)
@@ -416,8 +408,6 @@ int main(int argc, char *argv[])
 		if (b_state.waitForRelease) {
 			if ((digitalRead(UP_TMP_PIN) == LOW) || (digitalRead(DN_TMP_PIN) == LOW)
 			    || (digitalRead(MODE_PIN) == LOW)) {
-					printf("waiting for lease\n");
-					usleep(30*1000);
 				continue;
 			} else {
 				b_state.waitForRelease = FALSE;
