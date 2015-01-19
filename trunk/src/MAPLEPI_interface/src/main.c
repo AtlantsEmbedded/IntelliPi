@@ -178,7 +178,6 @@ static void down_temp_button(button_s * state)
  */
 static void open_relay()
 {
-	printf("\topened relay\n");
 	digitalWrite(RELAY_PIN, HIGH);
 }
 
@@ -188,7 +187,6 @@ static void open_relay()
  */
 static void close_relay()
 {
-	printf("\tclosed relay\n");
 	digitalWrite(RELAY_PIN, LOW);
 }
 
@@ -278,14 +276,14 @@ static void get_ds_data(float *actual_temp)
 
 	// Convert the temperature string to a float
 	char tmp_buffer[8] = { 0 };
-	char *buff_ptr = (char *)&probe_buffer;
-
-	// Increment buffer to remove the '=' from the string
-	buff_ptr += 1;
-	memcpy(tmp_buffer, buff_ptr + i, (len - i));
+	//~ char *buff_ptr = (char *)&probe_buffer;
+//~ 
+	//~ // Increment buffer to remove the '=' from the string
+	//~ buff_ptr += 1;
+	//~ memcpy(tmp_buffer, buff_ptr + i, (len - i));
 
 	// Convert string to a float and divide by 1000
-	(*actual_temp) = (1.8 * (atof(tmp_buffer) / 1000)) + 32;
+	(*actual_temp) = (1.8 * (atof((char *)&probe_buffer + 1) / 1000)) + 32;
 }
 
 /**
@@ -300,9 +298,9 @@ static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
 	if (device_mode == RUNNING) {
-		memcpy(((char *)&bottom_buffer) + 12, "Oui", 3);
+		strcat(bottom_buffer, "Ou");
 	} else {
-		memcpy(((char *)&bottom_buffer) + 13, "No", 2);
+		strcat(bottom_buffer "No");
 	}
 
 }
@@ -370,6 +368,9 @@ int main(int argc, char *argv[])
 	// Initialize the user interface buttons (not on plate)
 	setup_buttons();
 
+	// Set priority
+	piHiPri(99);
+
 	for (;;) {
 
 		// Open/Close Relay
@@ -416,7 +417,6 @@ int main(int argc, char *argv[])
 		}
 
 		// Check GPIO/buttons for input
-
 		up_temp_button(&b_state);
 		down_temp_button(&b_state);
 		mode_button(&b_state);
