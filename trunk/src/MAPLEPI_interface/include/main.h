@@ -30,6 +30,17 @@
 #define	AF_UP		(AF_BASE +  3)
 #define	AF_LEFT		(AF_BASE +  4)
 
+#define RUNNING 1
+#define NOT_RUNNING 0
+
+#define RED_COLOR 1
+#define GREEN_COLOR 2
+#define YELLOW_COLOR 3
+
+#define SIZE_OF_LCD 16
+
+#define DEFAULT_SETPOINT 255.00
+
 typedef struct {
 	int waitForRelease;
 	int colour;

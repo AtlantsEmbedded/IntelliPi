@@ -26,17 +26,6 @@
 #include <lcd.h>
 #include "main.h"
 
-#define RUNNING 1
-#define NOT_RUNNING 0
-
-#define RED_COLOR 1
-#define GREEN_COLOR 2
-#define YELLOW_COLOR 3
-
-#define SIZE_OF_LCD 16
-
-#define DEFAULT_SETPOINT 255.00
-
 // Commands to retrieve information from the sensors
 static const char *AM2302_CMD = "/usr/bin/dht22_interface";
 static const char *DSPROBE_CMD = "cat /sys/devices/w1_bus_master1/28-*/w1_slave | sed -n 2p";
@@ -67,6 +56,17 @@ int usage(const char *progName)
 {
 	fprintf(stderr, "Usage: %s colour (0-7 where 0 is no backlight)\n", progName);
 	return EXIT_FAILURE;
+}
+
+/**
+ * print_banner()
+ * @brief Prints app banner
+ */
+static inline void print_banner()
+{
+	printf("\nMaplePI GPIO/Monitoring App\n\n");
+	printf("Author: Ronnie brash (ron.brash@gmail.com)\n");
+	printf("------------------------------------------\n");
 }
 
 /**
@@ -123,25 +123,21 @@ static void adafruitLCDSetup(int colour)
  * mode_button()
  * @brief Handles mode button functionality
  */
-static inline void mode_button()
+static inline void mode_button(button_s * state)
 {
-	if (digitalRead(MODE_PIN) == HIGH) {
-		return;
-	}
 
-	if (device_mode == RUNNING) {
-		setBacklightColour(RED_COLOR);
-		printf("Mode changed to NOT-RUNNING!\n");
-		device_mode = NOT_RUNNING;
-	} else {
-		printf("Mode changed to RUNNING!\n");
-		setBacklightColour(GREEN_COLOR);
-		device_mode = RUNNING;
-	}
+	if (digitalRead(MODE_PIN) == LOW) {	// Wait for release
+		state->waitForRelease = TRUE;
 
-	while (digitalRead(MODE_PIN) == LOW) {	// Wait for release
-		delay(10);
-		return;
+		if (device_mode == RUNNING) {
+			setBacklightColour(RED_COLOR);
+			printf("Mode changed to NOT_RUNNING!\n");
+			device_mode = NOT_RUNNING;
+		} else {
+			printf("Mode changed to RUNNING!\n");
+			setBacklightColour(GREEN_COLOR);
+			device_mode = RUNNING;
+		}
 	}
 
 }
@@ -150,15 +146,11 @@ static inline void mode_button()
  * up_temp_button()
  * @brief Handles tmp up button functionality
  */
-static inline void up_temp_button()
+static inline void up_temp_button(button_s * state)
 {
-	if (digitalRead(UP_TMP_PIN) == HIGH) {
-		return;
-	}
-	while (digitalRead(UP_TMP_PIN) == LOW) {
-		set_point += 0.01;
-		delay(10);
-		return;
+	if (digitalRead(UP_TMP_PIN) == LOW) {
+		set_point += 0.5;
+		state->waitForRelease = TRUE;
 	}
 }
 
@@ -166,24 +158,20 @@ static inline void up_temp_button()
  * down_temp_button()
  * @brief Handles tmp down button functionality
  */
-static inline void down_temp_button()
+static inline void down_temp_button(button_s * state)
 {
-	if (digitalRead(DN_TMP_PIN) == HIGH) {
-		return;
-	}
 
-	while (digitalRead(DN_TMP_PIN) == LOW) {
-		set_point -= 0.01;
-		delay(10);
-		return;
+	if (digitalRead(DN_TMP_PIN) == LOW) {
+		set_point -= 0.5;
+		state->waitForRelease = TRUE;
 	}
 }
 
 /**
  * open_relay()
  * @brief Opens relay at RELAY_PIN
- */ 
-static inline void open_relay()
+ */
+static void open_relay()
 {
 	digitalWrite(RELAY_PIN, HIGH);
 }
@@ -191,8 +179,8 @@ static inline void open_relay()
 /**
  * close_relay()
  * @brief Closes relay at RELAY_PIN
- */ 
-static inline void close_relay()
+ */
+static void close_relay()
 {
 	digitalWrite(RELAY_PIN, LOW);
 }
@@ -201,15 +189,17 @@ static inline void close_relay()
  * manage_relay(float actual_temp)
  * @brief manages relay
  * @param actual_temp
- */ 
-static inline void manage_relay(float actual_temp) {
-	
+ */
+static void manage_relay(float actual_temp)
+{
+
 	if (actual_temp >= set_point) {
 		open_relay();
 	} else {
 		close_relay();
 	}
 }
+
 /**
  * setup_buttons()
  * @brief Setup buttons to be used by the external 
@@ -230,7 +220,7 @@ static inline void setup_buttons()
 
 	pinMode(MODE_PIN, INPUT);
 	pullUpDnControl(MODE_PIN, PUD_UP);
-	
+
 	pinMode(RELAY_PIN, OUTPUT);
 
 }
@@ -240,7 +230,7 @@ static inline void setup_buttons()
  * @brief Retrieves DS data
  * @param top_buffer
  */
-static inline void get_am2302_data(char *top_buffer)
+static void get_am2302_data(char *top_buffer[])
 {
 	// Retrieve out the AM2302 sensor data
 	FILE *am_file = NULL;
@@ -257,13 +247,13 @@ static inline void get_am2302_data(char *top_buffer)
  * @brief Retrieves DS data
  * @param actual_temp
  */
-static inline void get_ds_data(float *actual_temp)
+static void get_ds_data(float *actual_temp)
 {
 	// Retrieve out DS probe sensor data
 	char probe_buffer[1024] = { 0 };
 	int len = 0;
 	int i = 0;
-	
+
 	FILE *probe_file = NULL;
 	probe_file = popen(DSPROBE_CMD, "r");
 	fgets(probe_buffer, 1024, probe_file);
@@ -281,7 +271,7 @@ static inline void get_ds_data(float *actual_temp)
 
 	// Convert the temperature string to a float
 	char tmp_buffer[8] = { 0 };
-	char *buff_ptr = &probe_buffer;
+	char *buff_ptr = (char *)&probe_buffer;
 
 	// Increment buffer to remove the '=' from the string
 	buff_ptr += 1;
@@ -297,14 +287,14 @@ static inline void get_ds_data(float *actual_temp)
  *  @param bottom_buffer
  *  @param actual_temp
  */
-static inline void build_bottom_string(char *bottom_buffer, float actual_temp)
+static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
 {
-	
+
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
 	// Clean up LCD
-	memset(bottom_buffer+strlen(bottom_buffer),0,3);
-	
+	memset(bottom_buffer + strlen(bottom_buffer), 0, 3);
+
 	if (device_mode == RUNNING) {
 		strcat(bottom_buffer, "Oui");
 	} else {
@@ -316,22 +306,23 @@ static inline void build_bottom_string(char *bottom_buffer, float actual_temp)
 /**
  * check_time(time_t old_time)
  * @brief Checks for time
- */ 
-static int check_time(time_t *old_time) {
-	
+ */
+static inline int check_time(time_t * old_time)
+{
+
 	// If this is the first time running, time will be 0;
-	if(old_time == 0) {
+	if (old_time == 0) {
 		return (1);
 	}
-	
+
 	time_t cur_time = time(0);
-	
+
 	// Compare if difference in time is greater than 0.5 second
-    if ((difftime(cur_time,old_time)/1000) > 500){
+	if ((difftime(cur_time, (time_t)old_time) / 1000) > 500) {
 		(*old_time) = cur_time;
 		return (1);
 	}
-	
+
 	return (0);
 }
 
@@ -346,26 +337,25 @@ int main(int argc, char *argv[])
 {
 	button_s b_state = { 0 };
 	b_state.colour = RED_COLOR;
+	b_state.waitForRelease = FALSE;
 	set_point = DEFAULT_SETPOINT;
 	float actual_temp = 0;
 	time_t cur_time = 0;
-	
+
 	char top_buffer[SIZE_OF_LCD] = { 0 };
 	char bottom_buffer[SIZE_OF_LCD] = { 0 };	//"123.45-123.45 {Ou,No}"
 
-	printf("\nMaplePI GPIO/Monitoring App\n\n");
-	printf("Author: Ronnie brash (ron.brash@gmail.com)\n");
-	printf("------------------------------------------\n");
+	print_banner();
 
 	// Check arguments
 	if (argc != 2) {
 		return usage(argv[0]);
 	}
-	
+
 	b_state.colour = atoi(argv[1]);
 
 	wiringPiSetup();
-	
+
 	// Setup LCD
 	mcp23017Setup(AF_BASE, 0x20);
 	adafruitLCDSetup(b_state.colour);
@@ -377,29 +367,44 @@ int main(int argc, char *argv[])
 	setup_buttons();
 
 	for (;;) {
-		
+
 		// Open/Close Relay
-		if(device_mode == RUNNING) {
+		if (device_mode == RUNNING) {
 			manage_relay(actual_temp);
 		}
-		
-		// Check time
-		if(check_time(&cur_time) > 0) {
-			
+
+		/*
+		 * Check time to reduce system calls which are polling
+		 * the sensors - set to half of a second for default
+		 */
+		if (check_time(&cur_time) > 0) {
 			// Retrieve sensor data through pipes
 			get_am2302_data(&top_buffer);
 			get_ds_data(&actual_temp);
-			
-			// Check GPIO/buttons for input
-			mode_button();
-			up_temp_button();
-			down_temp_button();
-				
-		} 
-		
+
+		}
+		// Check GPIO/buttons for input
+		mode_button(&b_state);
+		up_temp_button(&b_state);
+		down_temp_button(&b_state);
+
+		/* 
+		 * Check buttons to change:
+		 * 1.) temperature for set point (up or down)
+		 * 2.) Mode of the device (Running or NOT_RUNNING)
+		 * If buttons are still pushed then skip
+		 */
+		if (b_state.waitForRelease) {
+			if ((digitalRead(UP_TMP_PIN) == LOW) || (digitalRead(DN_TMP_PIN) == LOW)
+			    || (digitalRead(MODE_PIN) == LOW)) {
+				continue;
+			} else {
+				b_state.waitForRelease = FALSE;
+			}
+		}
 		// Build the final string (obviously not efficient)
 		build_bottom_string(&bottom_buffer, actual_temp);
-		
+
 		// Output AM2302 data onto the top row of the LCD
 		lcdPosition(lcdHandle, 0, 0);
 		lcdPuts(lcdHandle, top_buffer);
