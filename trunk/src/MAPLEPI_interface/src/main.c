@@ -202,7 +202,7 @@ static void manage_relay(float actual_temp)
 {
 
 	if (actual_temp >= set_point) {
-		int i = 0;
+
 		for (i = 0; i < 23; ++i) {
 			printf("%3d\n", i);
 			softToneWrite(BEEPER_PIN, scale[i]);
@@ -283,8 +283,16 @@ static void get_ds_data(float *actual_temp)
 		}
 	}
 
+	// Convert the temperature string to a float
+	char tmp_buffer[8] = { 0 };
+	char *buff_ptr = (char *)&probe_buffer;
+
+	// Increment buffer to remove the '=' from the string
+	buff_ptr += 1;
+	memcpy(tmp_buffer, buff_ptr + i, (len - i));
+
 	// Convert string to a float and divide by 1000
-	(*actual_temp) = (1.8 * (atof((char *)&probe_buffer + 1) / 1000)) + 32;
+	(*actual_temp) = (1.8 * (atof(tmp_buffer) / 1000)) + 32;
 }
 
 /**
