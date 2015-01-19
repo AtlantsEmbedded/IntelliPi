@@ -384,12 +384,12 @@ int main(int argc, char *argv[])
 		 * Check time to reduce system calls which are polling
 		 * the sensors - set to half of a second for default
 		 */
-		if (check_time(&cur_time) > 0) {
-			// Retrieve sensor data through pipes
-			get_am2302_data(&top_buffer);
-			get_ds_data(&actual_temp);
-
-		}
+		//~ if (check_time(&cur_time) > 0) {
+			//~ // Retrieve sensor data through pipes
+			//~ get_am2302_data(&top_buffer);
+			//~ get_ds_data(&actual_temp);
+//~ 
+		//~ }
 
 		// Build the final string (obviously not efficient)
 		build_bottom_string(&bottom_buffer, actual_temp);
