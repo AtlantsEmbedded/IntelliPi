@@ -300,7 +300,7 @@ static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
 	if (device_mode == RUNNING) {
 		strcat(bottom_buffer, "Ou");
 	} else {
-		strcat(bottom_buffer "No");
+		strcat(bottom_buffer, "No");
 	}
 
 }
