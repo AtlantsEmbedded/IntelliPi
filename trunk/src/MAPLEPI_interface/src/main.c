@@ -220,13 +220,13 @@ static inline void setup_buttons()
 	 * 2.) Enable pull-up resistor on button
 	 */
 	pinMode(UP_TMP_PIN, INPUT);
-	pullUpDnControl(UP_TMP_PIN, PUD_DOWN);
+	pullUpDnControl(UP_TMP_PIN, PUD_UP);
 
 	pinMode(DN_TMP_PIN, INPUT);
-	pullUpDnControl(DN_TMP_PIN, PUD_DOWN);
+	pullUpDnControl(DN_TMP_PIN, PUD_UP);
 
 	pinMode(MODE_PIN, INPUT);
-	pullUpDnControl(MODE_PIN, PUD_DOWN);
+	pullUpDnControl(MODE_PIN, PUD_UP);
 
 	pinMode(RELAY_PIN, OUTPUT);
 
@@ -384,12 +384,12 @@ int main(int argc, char *argv[])
 		 * Check time to reduce system calls which are polling
 		 * the sensors - set to half of a second for default
 		 */
-		//~ if (check_time(&cur_time) > 0) {
-			//~ // Retrieve sensor data through pipes
-			//~ get_am2302_data(&top_buffer);
-			//~ get_ds_data(&actual_temp);
-//~ 
-		//~ }
+		if (check_time(&cur_time) > 0) {
+			// Retrieve sensor data through pipes
+			get_am2302_data(&top_buffer);
+			get_ds_data(&actual_temp);
+
+		}
 
 		// Build the final string (obviously not efficient)
 		build_bottom_string(&bottom_buffer, actual_temp);
@@ -427,6 +427,9 @@ int main(int argc, char *argv[])
 		mode_button(&b_state);
 		up_temp_button(&b_state);
 		down_temp_button(&b_state);
+		
+		usleep(10000000);
+		
 		
 
 	}
