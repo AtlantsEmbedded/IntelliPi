@@ -26,7 +26,7 @@
 #include <lcd.h>
 #include "main.h"
 
-#defeing DELAY_PERIOD 10
+#define DELAY_PERIOD 10
 
 // Commands to retrieve information from the sensors
 static const char *AM2302_CMD = "/usr/bin/dht22_interface";
