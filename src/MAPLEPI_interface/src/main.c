@@ -300,9 +300,9 @@ static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
 	if (device_mode == RUNNING) {
-		memcpy(bottom_buffer+12, "Oui");
+		memcpy(bottom_buffer+12, "Oui",3);
 	} else {
-		memcpy(bottom_buffer+13, "No");
+		memcpy(bottom_buffer+13, "No",2);
 	}
 
 }
