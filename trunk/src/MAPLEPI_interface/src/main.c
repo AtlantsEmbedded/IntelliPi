@@ -417,6 +417,7 @@ int main(int argc, char *argv[])
 			if ((digitalRead(UP_TMP_PIN) == LOW) || (digitalRead(DN_TMP_PIN) == LOW)
 			    || (digitalRead(MODE_PIN) == LOW)) {
 					printf("waiting for lease\n");
+					usleep(30*1000);
 				continue;
 			} else {
 				b_state.waitForRelease = FALSE;
@@ -427,9 +428,6 @@ int main(int argc, char *argv[])
 		mode_button(&b_state);
 		up_temp_button(&b_state);
 		down_temp_button(&b_state);
-		
-		usleep(10*1000);
-		
 		
 
 	}
