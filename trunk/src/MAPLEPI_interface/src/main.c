@@ -246,7 +246,7 @@ static void get_am2302_data(char *top_buffer[])
 	fgets(top_buffer, SIZE_OF_LCD, am_file);
 	pclose(am_file);
 
-	printf("AM2302  output:%s\n", top_buffer);
+	//printf("AM2302  output:%s\n", top_buffer);
 }
 
 /**
@@ -266,7 +266,7 @@ static void get_ds_data(float *actual_temp)
 	fgets(probe_buffer, 1024, probe_file);
 	pclose(probe_file);
 
-	printf("DS18B20 output:%s\n", probe_buffer);
+	//printf("DS18B20 output:%s\n", probe_buffer);
 
 	// Raw buffer will be a string - read until a '='
 	len = strlen(probe_buffer);
@@ -300,9 +300,9 @@ static inline void build_bottom_string(char *bottom_buffer[], float actual_temp)
 	snprintf(bottom_buffer, SIZE_OF_LCD, "%3.2f-%3.2f ", actual_temp, set_point);
 
 	if (device_mode == RUNNING) {
-		strcat(bottom_buffer, "Oui");
+		memcpy(bottom_buffer+12, "Oui");
 	} else {
-		strcat(bottom_buffer, "Non");
+		memcpy(bottom_buffer+13, "No");
 	}
 
 }
@@ -385,15 +385,15 @@ int main(int argc, char *argv[])
 			// Retrieve sensor data through pipes
 			get_am2302_data(&top_buffer);
 			get_ds_data(&actual_temp);
+			
+			// Output AM2302 data onto the top row of the LCD
+			lcdPosition(lcdHandle, 0, 0);
+			lcdPuts(lcdHandle, top_buffer);
 
 		}
 
 		// Build the final string (obviously not efficient)
 		build_bottom_string(&bottom_buffer, actual_temp);
-
-		// Output AM2302 data onto the top row of the LCD
-		lcdPosition(lcdHandle, 0, 0);
-		lcdPuts(lcdHandle, top_buffer);
 
 		// Output DS data & set_point onto the bottom row of the LCD
 		lcdPosition(lcdHandle, 0, 1);
