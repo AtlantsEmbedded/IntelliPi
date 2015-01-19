@@ -26,6 +26,8 @@
 #include <lcd.h>
 #include "main.h"
 
+#defeing DELAY_PERIOD 10
+
 // Commands to retrieve information from the sensors
 static const char *AM2302_CMD = "/usr/bin/dht22_interface";
 static const char *DSPROBE_CMD = "cat /sys/devices/w1_bus_master1/28-*/w1_slave | sed -n 2p";
@@ -138,6 +140,7 @@ static inline void mode_button(button_s * state)
 			setBacklightColour(GREEN_COLOR);
 			device_mode = RUNNING;
 		}
+		delay(DELAY_PERIOD);
 	}
 
 }
@@ -151,6 +154,7 @@ static inline void up_temp_button(button_s * state)
 	if (digitalRead(UP_TMP_PIN) == LOW) {
 		set_point += 0.5;
 		state->waitForRelease = TRUE;
+		delay(DELAY_PERIOD);
 	}
 }
 
@@ -164,6 +168,7 @@ static inline void down_temp_button(button_s * state)
 	if (digitalRead(DN_TMP_PIN) == LOW) {
 		set_point -= 0.5;
 		state->waitForRelease = TRUE;
+		delay(DELAY_PERIOD);
 	}
 }
 
@@ -318,7 +323,7 @@ static inline int check_time(time_t * old_time)
 	time_t cur_time = time(0);
 
 	// Compare if difference in time is greater than 0.5 second
-	if ((difftime(cur_time, (time_t)old_time) / 1000) > 500) {
+	if ((difftime(cur_time, (time_t)old_time)) > 1) {
 		(*old_time) = cur_time;
 		return (1);
 	}
