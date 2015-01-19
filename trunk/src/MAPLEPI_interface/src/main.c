@@ -428,7 +428,7 @@ int main(int argc, char *argv[])
 		up_temp_button(&b_state);
 		down_temp_button(&b_state);
 		
-		usleep(100000000);
+		usleep(10*1000);
 		
 		
 
