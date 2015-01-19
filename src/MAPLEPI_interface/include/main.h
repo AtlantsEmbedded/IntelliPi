@@ -37,7 +37,7 @@
 #define GREEN_COLOR 2
 #define YELLOW_COLOR 3
 
-#define SIZE_OF_LCD 16
+#define SIZE_OF_LCD 15
 
 #define DEFAULT_SETPOINT 255.00
 
