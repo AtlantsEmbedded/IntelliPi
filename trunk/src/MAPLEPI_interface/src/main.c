@@ -25,8 +25,11 @@
 #include <mcp23017.h>
 #include <lcd.h>
 #include "main.h"
+#include <softTone.h>
 
 #define DELAY_PERIOD 10
+
+int scale[23] = { 659, 659, 0, 659, 0, 523, 659, 0, 784, 0, 0, 0, 392, 0, 0, 0, 523, 0, 0, 392, 0, 0, 330 };
 
 // Commands to retrieve information from the sensors
 static const char *AM2302_CMD = "/usr/bin/dht22_interface";
@@ -199,6 +202,12 @@ static void manage_relay(float actual_temp)
 {
 
 	if (actual_temp >= set_point) {
+
+		for (i = 0; i < 23; ++i) {
+			printf("%3d\n", i);
+			softToneWrite(BEEPER_PIN, scale[i]);
+			delay(200);
+		}
 		open_relay();
 	} else {
 		close_relay();
@@ -357,6 +366,7 @@ int main(int argc, char *argv[])
 	b_state.colour = atoi(argv[1]);
 
 	wiringPiSetup();
+	softToneCreate(BEEPER_PIN);
 
 	// Setup LCD
 	mcp23017Setup(AF_BASE, 0x20);
