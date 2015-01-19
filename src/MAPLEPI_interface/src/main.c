@@ -128,8 +128,7 @@ static void adafruitLCDSetup(int colour)
 static inline void mode_button(button_s * state)
 {
 
-	if ((state->waitForRelease == FALSE) && (digitalRead(MODE_PIN) == LOW)) {	// Wait for release
-		state->waitForRelease = TRUE;
+	if ((digitalRead(MODE_PIN) == LOW)) {	// Wait for release
 
 		if (device_mode == RUNNING) {
 			setBacklightColour(RED_COLOR);
@@ -141,6 +140,7 @@ static inline void mode_button(button_s * state)
 			device_mode = RUNNING;
 		}
 
+		state->waitForRelease = TRUE;
 	}
 
 }
@@ -149,9 +149,9 @@ static inline void mode_button(button_s * state)
  * up_temp_button()
  * @brief Handles tmp up button functionality
  */
-static inline void up_temp_button(button_s * state)
+static void up_temp_button(button_s * state)
 {
-	if ((state->waitForRelease == FALSE) && (digitalRead(UP_TMP_PIN) == LOW)) {
+	if ((digitalRead(UP_TMP_PIN) == LOW)) {
 		set_point += 0.5;
 		state->waitForRelease = TRUE;
 
@@ -162,13 +162,12 @@ static inline void up_temp_button(button_s * state)
  * down_temp_button()
  * @brief Handles tmp down button functionality
  */
-static inline void down_temp_button(button_s * state)
+static void down_temp_button(button_s * state)
 {
 
-	if ((state->waitForRelease == FALSE) && (digitalRead(DN_TMP_PIN) == LOW)) {
+	if ((digitalRead(DN_TMP_PIN) == LOW)) {
 		set_point -= 0.5;
 		state->waitForRelease = TRUE;
-
 	}
 }
 
@@ -322,7 +321,7 @@ static inline int check_time(time_t * old_time)
 
 	time_t cur_time = time(0);
 
-	// Compare if difference in time is greater than 0.5 second
+	// Compare if difference in time is greater than 1 second
 	if ((difftime(cur_time, (time_t) old_time)) > 1) {
 		(*old_time) = cur_time;
 		return (1);
@@ -388,11 +387,26 @@ int main(int argc, char *argv[])
 			get_ds_data(&actual_temp);
 
 		}
-		// Check GPIO/buttons for input
-		mode_button(&b_state);
-		up_temp_button(&b_state);
-		down_temp_button(&b_state);
 
+		// Build the final string (obviously not efficient)
+		build_bottom_string(&bottom_buffer, actual_temp);
+
+		// Clear LCD
+		lcdClear (lcdHandle) ;
+
+		// Output AM2302 data onto the top row of the LCD
+		lcdPosition(lcdHandle, 0, 0);
+		lcdPuts(lcdHandle, top_buffer);
+
+		// Output DS data & set_point onto the bottom row of the LCD
+		lcdPosition(lcdHandle, 0, 1);
+		lcdPuts(lcdHandle, bottom_buffer);
+
+		printf("\nDisplay will show -----------------------\n");
+		printf("%s", top_buffer);
+		printf("%s", bottom_buffer);
+		printf("\n-----------------------------------------\n");
+		
 		/* 
 		 * Check buttons to change:
 		 * 1.) temperature for set point (up or down)
@@ -407,21 +421,12 @@ int main(int argc, char *argv[])
 				b_state.waitForRelease = FALSE;
 			}
 		}
-		// Build the final string (obviously not efficient)
-		build_bottom_string(&bottom_buffer, actual_temp);
-
-		// Output AM2302 data onto the top row of the LCD
-		lcdPosition(lcdHandle, 0, 0);
-		lcdPuts(lcdHandle, top_buffer);
-
-		// Output DS data & set_point onto the bottom row of the LCD
-		lcdPosition(lcdHandle, 0, 1);
-		lcdPuts(lcdHandle, bottom_buffer);
-
-		printf("\nDisplay will show -----------------------\n");
-		printf("%s", top_buffer);
-		printf("%s", bottom_buffer);
-		printf("\n-----------------------------------------\n");
+		
+		// Check GPIO/buttons for input
+		mode_button(&b_state);
+		up_temp_button(&b_state);
+		down_temp_button(&b_state);
+		
 
 	}
 
