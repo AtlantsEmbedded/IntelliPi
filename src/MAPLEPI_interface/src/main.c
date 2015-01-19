@@ -128,7 +128,7 @@ static void adafruitLCDSetup(int colour)
 static inline void mode_button(button_s * state)
 {
 
-	if (digitalRead(MODE_PIN) == LOW) {	// Wait for release
+	if ((state->waitForRelease == FALSE) && (digitalRead(MODE_PIN) == LOW)) {	// Wait for release
 		state->waitForRelease = TRUE;
 
 		if (device_mode == RUNNING) {
@@ -140,7 +140,7 @@ static inline void mode_button(button_s * state)
 			setBacklightColour(GREEN_COLOR);
 			device_mode = RUNNING;
 		}
-		delay(DELAY_PERIOD);
+
 	}
 
 }
@@ -151,10 +151,10 @@ static inline void mode_button(button_s * state)
  */
 static inline void up_temp_button(button_s * state)
 {
-	if (digitalRead(UP_TMP_PIN) == LOW) {
+	if ((state->waitForRelease == FALSE) && (digitalRead(UP_TMP_PIN) == LOW)) {
 		set_point += 0.5;
 		state->waitForRelease = TRUE;
-		delay(DELAY_PERIOD);
+
 	}
 }
 
@@ -165,10 +165,10 @@ static inline void up_temp_button(button_s * state)
 static inline void down_temp_button(button_s * state)
 {
 
-	if (digitalRead(DN_TMP_PIN) == LOW) {
+	if ((state->waitForRelease == FALSE) && (digitalRead(DN_TMP_PIN) == LOW)) {
 		set_point -= 0.5;
 		state->waitForRelease = TRUE;
-		delay(DELAY_PERIOD);
+
 	}
 }
 
@@ -323,7 +323,7 @@ static inline int check_time(time_t * old_time)
 	time_t cur_time = time(0);
 
 	// Compare if difference in time is greater than 0.5 second
-	if ((difftime(cur_time, (time_t)old_time)) > 1) {
+	if ((difftime(cur_time, (time_t) old_time)) > 1) {
 		(*old_time) = cur_time;
 		return (1);
 	}
