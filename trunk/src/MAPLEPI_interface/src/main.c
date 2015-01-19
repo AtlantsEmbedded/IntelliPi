@@ -200,7 +200,7 @@ static void close_relay()
  */
 static void manage_relay(float actual_temp)
 {
-
+	int i =0;
 	if (actual_temp >= set_point) {
 
 		for (i = 0; i < 23; ++i) {
