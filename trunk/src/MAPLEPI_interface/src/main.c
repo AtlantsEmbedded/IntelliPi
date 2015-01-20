@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @date Jan SIZE_OF_LCD, 2014
+ * @date Jan 17, 2015
  * 
  * @brief LCD driver code which will be used to control
  * a RaspberryPI (B+/A+) that monitors environmental data,
@@ -10,7 +10,8 @@
  * 
  * @note Depends on an ADAfruit LCD Plate,
  * AM2302 sensor, a DS18B20 sensor with 1w kernel support, 
- * a relay and several buttons driven by GPIO.
+ * a relay which would control a relay three buttons driven 
+ * by GPIO {mode, up, down}, and a beeper (3-5 volt model)
  */
 
 #include <stdio.h>
@@ -23,11 +24,9 @@
 
 #include <wiringPi.h>
 #include <mcp23017.h>
+#include <softTone.h>
 #include <lcd.h>
 #include "main.h"
-#include <softTone.h>
-
-#define DELAY_PERIOD 10
 
 int scale[23] = { 659, 659, 0, 659, 0, 523, 659, 0, 784, 0, 0, 0, 392, 0, 0, 0, 523, 0, 0, 392, 0, 0, 330 };
 
@@ -57,7 +56,7 @@ static int lcdHandle;
  * @param progName
  * @return -1 for failure
  */
-int usage(const char *progName)
+static int usage(const char *progName)
 {
 	fprintf(stderr, "Usage: %s colour (0-7 where 0 is no backlight)\n", progName);
 	return EXIT_FAILURE;
@@ -116,7 +115,7 @@ static void adafruitLCDSetup(int colour)
 	digitalWrite(AF_RW, LOW);	// Not used with wiringPi - always in write mode
 
 	// The other control pins are initialised with lcdInit ()
-	lcdHandle = lcdInit(2, SIZE_OF_LCD, 4, AF_RS, AF_E, AF_DB4, AF_DB5, AF_DB6, AF_DB7, 0, 0, 0, 0);
+	lcdHandle = lcdInit(2, 16, 4, AF_RS, AF_E, AF_DB4, AF_DB5, AF_DB6, AF_DB7, 0, 0, 0, 0);
 
 	if (lcdHandle < 0) {
 		fprintf(stderr, "lcdInit failed\n");
@@ -156,7 +155,7 @@ static void up_temp_button(button_s * state)
 {
 	if ((digitalRead(UP_TMP_PIN) == LOW)) {
 		printf("Up button pressed\n");
-		set_point += 0.5;
+		set_point += AMOUNT_TO_CHANGE;
 		state->waitForRelease = TRUE;
 
 	}
@@ -170,7 +169,7 @@ static void down_temp_button(button_s * state)
 {
 	if ((digitalRead(DN_TMP_PIN) == LOW)) {
 		printf("Down button pressed\n");
-		set_point -= 0.5;
+		set_point -= AMOUNT_TO_CHANGE;
 		state->waitForRelease = TRUE;
 	}
 }
@@ -190,7 +189,36 @@ static void open_relay()
  */
 static void close_relay()
 {
+	// Play a tone to quickly signify we are closing the relay
+	softToneWrite(BEEPER_PIN, 659);
+	delay(200);
+	
+	// Close the relay
 	digitalWrite(RELAY_PIN, LOW);
+}
+
+/**
+ * turn_off_beeper()
+ * @brief Turn off beeper
+ */
+static void turn_off_beeper()
+{
+	softToneWrite(BEEPER_PIN, 0);
+	delay(200);
+}
+
+/**
+ * turn_on_beeper()
+ * @brief Turn on beeper and play a tune.
+ */ 
+static void turn_on_beeper()
+{
+	int i = 0;
+	for (i = 0; i < 23; ++i) {
+		softToneWrite(BEEPER_PIN, scale[i]);
+		delay(200);
+	}
+	turn_off_beeper();
 }
 
 /**
@@ -200,17 +228,13 @@ static void close_relay()
  */
 static void manage_relay(float actual_temp)
 {
-	int i =0;
+	int i = 0;
 	if (actual_temp >= set_point) {
-
-		for (i = 0; i < 23; ++i) {
-			printf("%3d\n", i);
-			softToneWrite(BEEPER_PIN, scale[i]);
-			delay(200);
-		}
+		turn_on_beeper()
 		open_relay();
 	} else {
 		close_relay();
+		turn_off_beeper();
 	}
 }
 
