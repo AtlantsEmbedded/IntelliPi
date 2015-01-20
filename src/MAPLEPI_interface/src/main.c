@@ -228,9 +228,8 @@ static void turn_on_beeper()
  */
 static void manage_relay(float actual_temp)
 {
-	int i = 0;
 	if (actual_temp >= set_point) {
-		turn_on_beeper()
+		turn_on_beeper();
 		open_relay();
 	} else {
 		close_relay();
