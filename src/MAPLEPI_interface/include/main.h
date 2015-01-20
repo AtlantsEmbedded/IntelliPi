@@ -39,9 +39,29 @@
 
 #define SIZE_OF_LCD 15
 
-#define DEFAULT_SETPOINT 255.00
+#define DEFAULT_SETPOINT 219.20
+#define AMOUNT_TO_CHANGE 0.5
 
 typedef struct {
 	int waitForRelease;
 	int colour;
 } button_s;
+
+static int usage(const char *progName);
+static inline void print_banner();
+static inline void setBacklightColour(int colour);
+static void adafruitLCDSetup(int colour);
+static inline void mode_button(button_s * state);
+static void up_temp_button(button_s * state);
+static void down_temp_button(button_s * state);
+static void open_relay();
+static void close_relay();
+static void turn_off_beeper();
+static void turn_on_beeper();
+static void manage_relay(float actual_temp);
+static inline void setup_buttons();
+static void get_am2302_data(char *top_buffer[]);
+static void get_ds_data(float *actual_temp);
+static inline void build_bottom_string(char *bottom_buffer[], float actual_temp);
+static int check_time(time_t * old_time);
+
