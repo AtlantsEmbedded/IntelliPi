@@ -39,8 +39,11 @@
 
 #define SIZE_OF_LCD 16
 
-#define DEFAULT_SETPOINT 219.20
+#define DEFAULT_SETPOINT 219.00
 #define AMOUNT_TO_CHANGE 0.5
+
+#define OPEN 1
+#define CLOSED 0
 
 typedef struct {
 	int waitForRelease;

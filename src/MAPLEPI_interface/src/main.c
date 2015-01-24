@@ -47,6 +47,9 @@ static float set_point;
 // Device mode {RUNNING, NOT_RUNNING}
 static int device_mode;
 
+// Is relay Open
+static int relay_open;
+
 // LCD handle
 static int lcdHandle;
 
@@ -181,6 +184,7 @@ static void down_temp_button(button_s * state)
 static void open_relay()
 {
 	digitalWrite(RELAY_PIN, HIGH);
+	relay_status = OPEN;
 }
 
 /**
@@ -191,6 +195,7 @@ static void close_relay()
 {	
 	// Close the relay
 	digitalWrite(RELAY_PIN, LOW);
+	relay_status = CLOSED:
 }
 
 /**
@@ -200,7 +205,6 @@ static void close_relay()
 static void turn_off_beeper()
 {
 	softToneWrite(BEEPER_PIN, 0);
-	delay(200);
 }
 
 /**
@@ -225,7 +229,9 @@ static void turn_on_beeper()
 static void manage_relay(float actual_temp)
 {
 	if (actual_temp >= set_point) {
-		turn_on_beeper();
+		if (relay_status != OPEN) {
+			turn_on_beeper();
+		}
 		open_relay();
 	} else {
 		close_relay();
@@ -393,6 +399,7 @@ int main(int argc, char *argv[])
 
 	// Set device mode to not running
 	device_mode = NOT_RUNNING;
+	relay_status = CLOSED;
 
 	// Initialize the user interface buttons (not on plate)
 	setup_buttons();
