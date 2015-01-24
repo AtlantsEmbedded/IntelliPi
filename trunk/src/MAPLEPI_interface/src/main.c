@@ -188,11 +188,7 @@ static void open_relay()
  * @brief Closes relay at RELAY_PIN
  */
 static void close_relay()
-{
-	// Play a tone to quickly signify we are closing the relay
-	softToneWrite(BEEPER_PIN, 659);
-	delay(200);
-	
+{	
 	// Close the relay
 	digitalWrite(RELAY_PIN, LOW);
 }
