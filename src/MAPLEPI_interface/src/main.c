@@ -47,8 +47,8 @@ static float set_point;
 // Device mode {RUNNING, NOT_RUNNING}
 static int device_mode;
 
-// Is relay Open
-static int relay_open;
+// Relay status
+static int relay_status;
 
 // LCD handle
 static int lcdHandle;
