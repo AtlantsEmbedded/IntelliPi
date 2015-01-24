@@ -195,7 +195,7 @@ static void close_relay()
 {	
 	// Close the relay
 	digitalWrite(RELAY_PIN, LOW);
-	relay_status = CLOSED:
+	relay_status = CLOSED;
 }
 
 /**
