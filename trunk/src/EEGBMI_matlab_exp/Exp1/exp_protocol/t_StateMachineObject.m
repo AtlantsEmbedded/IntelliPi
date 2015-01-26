@@ -69,7 +69,7 @@ classdef t_StateMachineObject < handle
         OnTime = 0;
          
         % Number of trials to be executed
-        nb_of_record_trials = 120;
+        nb_of_record_trials = 70;
         nb_of_test_trials = 0;
 
         CurMode = '';
@@ -102,7 +102,7 @@ classdef t_StateMachineObject < handle
 			StateMachineO.TaskMachineO = t_TaskMachineObject(StateMachineO.task_machine_options); 
             
             StateMachineO.LogO = t_LogObject();
-            StateMachineO.ScreenO = t_ScreenObject(0,StateMachineO.LogO);
+            %StateMachineO.ScreenO = t_ScreenObject(0,StateMachineO.LogO);
             
             StateMachineO.MuseO = t_muse_object();
         end
@@ -210,7 +210,7 @@ classdef t_StateMachineObject < handle
         
         
         function [ScreenO] = GetScreenO(StateMachineO)
-            ScreenO = StateMachineO.ScreenO;
+            %ScreenO = StateMachineO.ScreenO;
         end
         
     end
@@ -262,7 +262,7 @@ classdef t_StateMachineObject < handle
             StateMachineO.LogO.LogExpInfos(log_exp_struct);
 
             % Init the screen
-            StateMachineO.ScreenO.FireUpTheScreen(StateMachineO.TaskMachineO);
+            %StateMachineO.ScreenO.FireUpTheScreen(StateMachineO.TaskMachineO);
             
         end
         
@@ -293,7 +293,7 @@ classdef t_StateMachineObject < handle
             StateMachineO.run_mode = 0;
             
             % close the screen
-            StateMachineO.ScreenO.ShutDownTheScreen();
+            %StateMachineO.ScreenO.ShutDownTheScreen();
             
             % close the logger
             StateMachineO.LogO.CloseFile();
@@ -335,7 +335,7 @@ classdef t_StateMachineObject < handle
         %
         % ---------------------------------------------%
         function SetupTrial_ACT(StateMachineO)
-            fprintf('Setup the trial: @%.3f\n',GetSecs-StateMachineO.OnTime);
+            %fprintf('Setup the trial: @%.3f\n',GetSecs-StateMachineO.OnTime);
             
             % setup the trial to define what the task will be
 			StateMachineO.TaskMachineO.SetupNewTrial();
@@ -367,10 +367,12 @@ classdef t_StateMachineObject < handle
             switch(StateMachineO.cur_task)
                
                 case StateMachineO.TASK_1
-                    StateMachineO.ScreenO.ShowInstruction('Task: Think of nothing');
+                    %StateMachineO.ScreenO.ShowInstruction('Task: Think of nothing');
+                    fprintf('Task: Think of nothing');
                     
                 case StateMachineO.TASK_2
-                    StateMachineO.ScreenO.ShowInstruction('Task: Count (mentally) as fast as you can');
+                    %StateMachineO.ScreenO.ShowInstruction('Task: Count (mentally) as fast as you can');
+                    fprintf('Task: Count (mentally) as fast as you can');
                     
             end
             
@@ -402,12 +404,12 @@ classdef t_StateMachineObject < handle
             % beep
             sound(StateMachineO.PREPARE_SOUND_CUE);
             
-            StateMachineO.ScreenO.HideInstruction;
+            %StateMachineO.ScreenO.HideInstruction;
             
             % start muse-io recording
-            %StateMachineO.MuseO.start_recording(StateMachineO.trial_id);
+            StateMachineO.MuseO.start_recording(StateMachineO.trial_id);
             
-            StateMachineO.waittill_prepare = StateMachineO.timer_prepare/1000+GetSecs;
+            %StateMachineO.waittill_prepare = StateMachineO.timer_prepare/1000+GetSecs;
             
         end
         
@@ -416,11 +418,12 @@ classdef t_StateMachineObject < handle
             if ~StateMachineO.run_mode
                 StateMachineO.next_state = StateMachineO.IDLE;
                 return;
+            else
+                StateMachineO.next_state = StateMachineO.BUFFER;
+                return;
             end
             
             if StateMachineO.waittill_prepare < GetSecs
-                StateMachineO.next_state = StateMachineO.RECORD;
-                return;
             end
             
         end
@@ -461,6 +464,10 @@ classdef t_StateMachineObject < handle
             % update the trial count
             StateMachineO.trial_id = StateMachineO.trial_id+1;
             
+            clc;
+            
+            fprintf('Trial ID: %f',StateMachineO.trial_id);
+            
         end
         
         function Buffer_TRN(StateMachineO)
@@ -483,6 +490,10 @@ classdef t_StateMachineObject < handle
             
             % stop muse-io recording
             %StateMachineO.MuseO.stop_recording;
+            
+            if StateMachineO.trial_id > StateMachineO.nb_of_record_trials;
+                StateMachineO.ShutDownExperiment = 1;
+            end
         end
         
         function EndTrial_TRN(StateMachineO)
