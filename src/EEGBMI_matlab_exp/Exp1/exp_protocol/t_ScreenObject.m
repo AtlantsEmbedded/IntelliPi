@@ -114,10 +114,6 @@ classdef t_ScreenObject < handle
         function FireUpTheScreen(ScreenO, StimuliO)
            
 			ScreenO.StimuliO = StimuliO;
-            
-            
-            
-            
             [ScreenO.WinPtr, ScreenO.WinRect]=Screen('OpenWindow',ScreenO.ScreenNumber,ScreenO.BackGroundColor, ...
             [0 0 ScreenO.WidthPix ScreenO.HeightPix],[],ScreenO.NbOfBuffer);
             %HideCursor
