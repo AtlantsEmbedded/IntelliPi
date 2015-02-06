@@ -35,6 +35,83 @@ static void *memdup(const void *src, size_t n);
 #define SIZE_MAX ((size_t)-1)
 
 
+/**
+ * int fft_2signals(int n)
+ * 
+ * @brief this function implements the complex fast-fourier transform of 2 real-valued signal at the same time.
+ * This is achieved by packing one signal in the real domain and the other in the imaginary part.
+ * @param signal1, the first signal.
+ * @param signal2, the second signal.
+ * @param X1_real, the real part of the fft of the first signal.
+ * @param X1_imag, the imaginary part of the fft of the first signal.
+ * @param X2_real, the real part of the fft of the second signal.
+ * @param X2_imag, the imaginary part of the fft of the second signal.
+ * @param n, the length of the fft to be computed.
+ * @return none
+ */ 
+int fft_2signals(double signal_1[], double signal_2[], 
+                 double X1_real[], double X1_imag[], 
+                 double X2_real[], double X2_imag[],
+                 size_t n){
+	
+	int status;
+	register int i,k;
+	double *X_real = malloc(n * sizeof(double));
+	double *X_imag = malloc(n * sizeof(double));
+	
+	for(i=0;i<n;i++){
+		X_real[i] = signal_1[i];
+		X_imag[i] = signal_2[i];
+	}
+	
+	/*Compute the fourier transform of the two signals at once*/
+	if(!transform(X_real, X_imag, n)){
+		status = 0;
+		goto cleanup;
+	}
+	
+	/*compute the split operation to recover X1(k) and X2(k)*/
+	/* 
+	 * X1(k) = 1/2*[X(k)+X*(N-k)]
+	 * X2(k) = 1/(j2)*[X(k)-X*(N-k)]
+	 */
+	X1_real[0] = X_real[0];
+	X1_imag[0] = 0;
+
+	X2_real[0] = X_imag[0];
+	X2_imag[0] = 0;
+
+	X1_real[n/2] = X_imag[n/2];
+	X2_real[n/2] = X_imag[n/2];
+	X1_imag[n/2] = 0;
+	X2_imag[n/2] = 0;	
+	
+	for(k=1;k<n/2;k++){
+		X1_real[k] = 0.5*(X_real[k]+X_real[n-k]);
+		X2_real[k] = 0.5*(X_imag[k]+X_imag[n-k]);
+		
+		/*make use of the symmetry*/
+		X1_real[n-k] = X1_real[k];
+		X2_real[n-k] = X2_real[k];
+		
+		X1_imag[k] = 0.5*(X_imag[k]-X_imag[n-k]);
+		X2_imag[k] = -0.5*(X_real[k]-X_real[n-k]);
+		
+		/*make use of the symmetry*/
+		X1_imag[n-k] = -X1_imag[k];
+		X2_imag[n-k] = -X2_imag[k];
+	}
+	
+	status = 1;
+	
+cleanup:
+	free(X_real);
+	free(X_imag);
+	
+	return status;
+}
+
+
 int transform(double real[], double imag[], size_t n) {
 	if (n == 0)
 		return 1;

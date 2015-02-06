@@ -1,21 +1,24 @@
 /**
- * @file my_ffttest.c
+ * @file 2_signals_1fft.c
  * @author Frédéric Simard
  * @date January, 2015
- * @brief This program test my specific needs for the fft. The fft implementation
- * satisfy my requirements in all but one respect. My data points are real-valued,
- * but the fft implementation perform the operation on complex data points.
+ * @brief This program illustrate how we can compute the fft of two signals
+ * as a single fft operation. To do this, the two signals are combined together
+ * one as the real part of the signal to be ffted, and one as the imaginary part:
+ * 
+ * x(n) = x1(n)+ix2(n)
  *
- * The naive approach is to pad the imaginary part with 0s. While this result in
- * a symmetric, but correct fft, it performs the operation on a 2*N long sequence, where
- * 2*N correspond to the length of the real-valued sequence.
+ * Then we compute the fft
+ * 
+ * X(k) = fft(x(n))
+ * 
+ * And finally we need to manipulate the results to recover the fft of the two signals
  *
- * It is possible, however, to split the real-valued data to obtain a N long complex-sequence.
- * This approach greatly improve the efficiency of the operation, but require a few manipulations
- * before and after the fft to proceed this way. This program implements and test this approach.
- *
+ * X1(k) = 1/2*[X(k)+X*(N-k)]
+ * X2(k) = 1/(j2)*[X(k)-X*(N-k)]
+ * 
  * Frederic Simard, Atom Embedded, www.atomsproducts.com, 2015
- * based on: Matusiak R (2001) Implementing Fast Fourir Transform Algorithms of 
+ * based on: Matusiak R (2001) Implementing Fast Fourier Transform Algorithms of 
  * Real-Valued Sequences With the TMS320 DSP Platotform. Application Report. SPRA291
  *
  * See below for original copyrights and licensing details of the fft and convolution test library.
@@ -56,6 +59,8 @@ static double log10_rms_err(const double *xreal, const double *ximag, const doub
 static double *random_reals(int n);
 static void *memdup(const void *src, size_t n);
 static double *zero_reals(int n);
+
+static double amplitude(double real, double imag);
 
 static double max_log_error = -INFINITY;
 
@@ -122,7 +127,7 @@ static void test_2signals_fft(int n) {
 	double *X1ref_real, *X1ref_imag;
 	double *X2ref_real, *X2ref_imag;
 	
-	double *X_real, *X_imag;
+	double *signal_1_cpy, *signal_2_cpy;
 	double *X1_real, *X1_imag;
 	double *X2_real, *X2_imag;
 	
@@ -168,51 +173,31 @@ static void test_2signals_fft(int n) {
 	
 	/*form the complex signal x(n) = x1(n)+j*x2(n)*/
 	/*The same buffer is used as input/output*/
-	X_real = malloc(n * sizeof(double));
-	X_imag = malloc(n * sizeof(double));
+	signal_1_cpy = malloc(n * sizeof(double));
+	signal_2_cpy = malloc(n * sizeof(double));
 	
 	for(i=0;i<n;i++){
-		X_real[i] = signal_1[i];
-		X_imag[i] = signal_2[i];
+		signal_1_cpy[i] = signal_1[i];
+		signal_2_cpy[i] = signal_2[i];
 	}
-	
-	/*run the N-fft*/
-	transform(X_real, X_imag, n);
 	
 	X1_real = malloc(n * sizeof(double));
 	X1_imag = malloc(n * sizeof(double));
 	X2_real = malloc(n * sizeof(double));
 	X2_imag = malloc(n * sizeof(double));
 	
-	/*compute the split operation to recover X1(k) and X2(k)*/
-	X1_real[0] = X_real[0];
-	X1_imag[0] = 0;
-
-	X2_real[0] = X_imag[0];
-	X2_imag[0] = 0;
-
-	X1_real[n/2] = X_imag[n/2];
-	X2_real[n/2] = X_imag[n/2];
-	X1_imag[n/2] = 0;
-	X2_imag[n/2] = 0;	
-	
-	for(k=1;k<n/2;k++){
-		X1_real[k] = 0.5*(X_real[k]+X_real[n-k]);
-		X2_real[k] = 0.5*(X_imag[k]+X_imag[n-k]);
-		X1_real[n-k] = X1_real[k];
-		X2_real[n-k] = X2_real[k];
-		
-		X1_imag[k] = 0.5*(X_imag[k]-X_imag[n-k]);
-		X2_imag[k] = -0.5*(X_real[k]-X_real[n-k]);
-		X1_imag[n-k] = -X1_imag[k];
-		X2_imag[n-k] = -X2_imag[k];
-	}
+	fft_2signals(signal_1_cpy, signal_2_cpy, 
+                 X1_real, X1_imag, 
+                 X2_real, X2_imag,
+                 n);
+			
+	printf("X1 ref\t X1\t X2 ref\t X2\n");		
 			
 	for(k=0;k<n;k++){
-		printf("%0.4f %0.4f %0.4f %0.4f\n",sqrt(X1ref_real[k]*X1ref_real[k]+X1ref_imag[k]*X1ref_imag[k]),
-										   sqrt(X1_real[k]*X1_real[k]+X1_imag[k]*X1_imag[k]),
-										   sqrt(X2ref_real[k]*X2ref_real[k]+X2ref_imag[k]*X2ref_imag[k]),
-										   sqrt(X2_real[k]*X2_real[k]+X2_imag[k]*X2_imag[k]));
+		printf("%0.3f\t %0.3f\t %0.3f\t %0.3f\n",amplitude(X1ref_real[k],X1ref_imag[k]),
+												 amplitude(X1_real[k],X1_imag[k]),
+												 amplitude(X2ref_real[k],X2ref_imag[k]),
+												 amplitude(X2_real[k],X2_imag[k]));
 	}
 	
 	
@@ -230,8 +215,8 @@ static void test_2signals_fft(int n) {
 	free(X2ref_real);
 	free(X1ref_imag);
 	free(X2ref_imag);
-	free(X_real);
-	free(X_imag);
+	free(signal_1_cpy);
+	free(signal_2_cpy);
 
 }
 
@@ -337,4 +322,8 @@ static void *memdup(const void *src, size_t n) {
 	if (dest != NULL)
 		memcpy(dest, src, n);
 	return dest;
+}
+
+static double amplitude(double real, double imag){
+	return sqrt(real*real+imag*imag);
 }
