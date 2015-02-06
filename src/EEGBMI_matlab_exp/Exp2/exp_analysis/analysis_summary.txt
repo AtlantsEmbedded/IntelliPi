@@ -1,0 +1,32 @@
+
+
+Analysis 1
+***********************
+signal-mean(signal)
+fft
+fda, down to 1 dimension
+Naive Bayes/RBF svm
+-----------------------
+Best result ~ 64%
+***********************
+
+Analysis 2
+***********************
+signal-mean(signal)
+fft
+pca, down to 2 or 3 components
+Naive Bayes/RBF svm
+-----------------------
+Don't work well (maybe bugged)
+~ 55%
+***********************
+
+
+Analysis 3
+***********************
+Band filters
+Extract amplitude
+Naive Bayes/RBF svm
+***********************
+
+

@@ -1,0 +1,29 @@
+
+Top figure:
+
+You can see the green and read 1 dimensional clusters. 
+I artificially put them on different line. This visualization is done
+as a visual inspection of the quality of the new feature space found
+by the LDA. If the two clusters were overlapping, we would be having
+a bad feature space and you could interpret the fda as being unable to perform
+the classification. Important, this reflects the test data, not the train data.
+
+Bottom figure:
+
+This is the most interesting part. It plots the value of the feature's weighting.
+The bigger the weight, the more this specific feature contributes to forming
+the FDA feature space.
+
+Notice that in the script I sent you I generated fake data, one class having
+extra information added between 50 and 125, while the other had information
+added between 150 and 225. By looking at the weights that are significantly
+different from zero, we find these localization of information. It is then
+your job to investigate the data at these localization to determine how they
+differ one class from the other.
+
+Interpretation:
+
+This process of identifying where the information resides is called data mining, 
+and it is much hard to do with a SVM. Further, it leads you to actually explain
+how is the information encoded in the data, rather than simply concluding that
+the data are different in between the classes. 
