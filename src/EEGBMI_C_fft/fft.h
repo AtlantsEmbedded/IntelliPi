@@ -22,6 +22,19 @@
  *   Software.
  */
 
+/* 
+ * Computes the discrete Fourier transform (DFT) of 2 signals using a single fft, and return the results in a set of vectors.
+ * The results vector must have been initialized prior to the call to the function and must be of size n.
+ * The vector can have any length. This is a wrapper function. Returns 1 (true) if successful, 0 (false) otherwise (out of memory).
+ *
+ * Author: frédéric Simard, Atom Embedded 2015
+ * Base on:Matusiak R (2001) Implementing Fast Fourier Transform Algorithms of 
+ * Real-Valued Sequences With the TMS320 DSP Platotform. Application Report. SPRA291 
+ */
+int fft_2signals(double signal_1[], double signal_2[], 
+                 double X1_real[], double X1_imag[], 
+                 double X2_real[], double X2_imag[],
+                 size_t n);
 
 /* 
  * Computes the discrete Fourier transform (DFT) of the given complex vector, storing the result back into the vector.
