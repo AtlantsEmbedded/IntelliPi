@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appConfig>
+  <appAttributes>
+    <name>Atom BCI Proto</name>
+    <text>SEL to start</text>
+  </appAttributes>
+  <appMenu>
+    <menuItem>
+      <name>Use ARROWS to</name>
+      <text>navigate</text>
+      <selectable>false</selectable>
+      <actionable>false</actionable>
+      <action />
+      <actionText />
+      <cancelable>false</cancelable>
+      <cancelText />
+      <cancelAction />
+      <backable>false</backable>
+      <backMenuItem>null</backMenuItem>
+      <hasChildren>true</hasChildren>
+      <finishable>false</finishable>
+      <waitForFinish>false</waitForFinish>
+      <finishText>false</finishText>
+      <children>
+        <menuItem>
+          <name>Train network</name>
+          <text>SEL to start</text>
+          <selectable>true</selectable>
+          <actionable>true</actionable>
+          <action>./test.sh 10 send &</action>
+          <actionText>Running...</actionText>
+          <cancelable>true</cancelable>
+          <cancelAction>kill -15 `cat /tmp/test.pid`</cancelAction>
+          <cancelText>Canceling op</cancelText>
+          <backable>false</backable>
+          <backMenuItem>parent</backMenuItem>
+          <hasChildren>false</hasChildren>
+          <finishable>true</finishable>
+          <waitForFinish>true</waitForFinish>
+          <finishText>Finished!</finishText>
+          <children />
+        </menuItem>
+        <menuItem>
+          <name>Operate network</name>
+          <text>SEL to start</text>
+          <selectable>true</selectable>
+          <actionable>true</actionable>
+          <action>./test.sh 1 nothing loop &</action>
+          <actionText>Running...</actionText>
+          <cancelable>true</cancelable>
+          <cancelAction>kill -15 `cat /tmp/test.pid` </cancelAction>
+          <cancelText>Canceling op</cancelText>
+          <backable>false</backable>
+          <backMenuItem>parent</backMenuItem>
+          <hasChildren>false</hasChildren>
+          <finishable>true</finishable>
+          <waitForFinish>true</waitForFinish>
+          <finishText>Finished!</finishText>
+          <children />
+        </menuItem>
+        <menuItem>
+          <name>Diagnostics</name>
+          <text>SEL to start</text>
+          <selectable>true</selectable>
+          <actionable>true</actionable>
+          <action>./test.sh 1 send loop &</action>
+          <actionText>Running...</actionText>
+          <cancelable>true</cancelable>
+          <cancelAction>killall test.sh</cancelAction>
+          <cancelText>Canceling op</cancelText>
+          <backable>false</backable>
+          <backMenuItem>parent</backMenuItem>
+          <hasChildren>no</hasChildren>
+          <finishable>true</finishable>
+          <waitForFinish>true</waitForFinish>
+          <finishText>Finished!</finishText>
+          <children />
+        </menuItem>
+      </children>
+    </menuItem>
+  </appMenu>
+</appConfig>
