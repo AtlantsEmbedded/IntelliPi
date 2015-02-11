@@ -2,7 +2,7 @@ Install the following pre-req software:
 
 sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext \
 git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 \
-subversion flex mercurial
+subversion flex mercurial automake
 
 Checkout Openwrt
 
