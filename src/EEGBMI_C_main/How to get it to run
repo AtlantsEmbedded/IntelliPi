@@ -1,0 +1,16 @@
+
+
+#build the shared object
+
+# generate object file
+g++ -fPIC -c fft.cpp
+
+# to generate library from the object file
+g++ -shared -o libfft.so fft.o
+
+
+
+#add it to the path
+$ LD_LIBRARY_PATH=./EEGBMI_C_fft
+$ export LD_LIBRARY_PATH
+$ ./EEGBMI.exe

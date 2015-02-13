@@ -1,0 +1,31 @@
+#
+# EEG-BMI prototype, makefile
+#
+# Frédéric Simard, 2014
+
+# compile with gcc
+CC        = g++ 
+
+# need flags for math and real-time
+LDFLAGS   = -lm -lrt
+# name of the program
+PROGRAM   = EEGBMI.exe
+# files of the program
+SRCS      = main.cpp dataset.cpp
+OBJS      = $(SRCS:.c=.o)
+INC      = -I ./EEGBMI_C_fda/eigen-lib -I ./EEGBMI_C_svm -I ./EEGBMI_C_fft
+LIB  	 = -L./EEGBMI_C_fft -lfft
+
+#
+# Launch gcc
+#
+
+default: all
+
+all: $(PROGRAM) 
+
+$(PROGRAM): $(OBJS)
+	$(CC) $(OBJS) $(INC) -o $(PROGRAM) $(LDFLAGS) $(LIB) 
+
+clean:
+	/bin/rm -f $(OBJS) $(PROGRAM)
