@@ -9,25 +9,7 @@
 
 #include "dataset.h"
 
- 
-#if 0
-typedef struct Sdataset {
-	
-	/*Labels and information relative to each samples*/
-	int *labels; 
-	t_sampledata *samplesdata;
-	
-	/*nb of train and test trials*/
-	int nb_trials
-	int nb_train_trials;
-	int nb_test_trials;
-	
-	/*list of train and test trials*/
-	int list_of_train_trials;
-	int list_of_test_trials;
-
-}t_dataset;
-#endif
+void randsample(int array[], int n);
 
 
 /**
@@ -139,6 +121,15 @@ t_dataset *init_dataset(const char* path){
 				
 	}
 	
+	
+	/*compute the number of train and test trials*/
+	pdataset->nb_train_trials = ceil(TRAIN_TRIALS_PROP*pdataset->nb_trials);
+	pdataset->nb_test_trials = pdataset->nb_trials - pdataset->nb_train_trials;
+	
+	/*allocated memory for indexes lists*/
+	pdataset->list_of_train_trials = (int*)malloc(sizeof(int)*pdataset->nb_train_trials);
+	pdataset->list_of_test_trials = (int*)malloc(sizeof(int)*pdataset->nb_test_trials);
+	
 	return pdataset;
 }
 
@@ -166,6 +157,8 @@ void kill_dataset(t_dataset *pdataset){
 	}
 
 	free(pdataset->samplesdata);
+	free(pdataset->list_of_train_trials);
+	free(pdataset->list_of_test_trials);
 	free(pdataset);
 }
 
@@ -235,37 +228,120 @@ int preprocess_data(t_dataset *pdataset){
  */
 int split_train_test_sets(t_dataset *pdataset){
 
-	/*generate the train and test trial lists*/
+	int i, offset;
+	int* trial_indexes = (int*)malloc(sizeof(int)*pdataset->nb_trials);
 
+	/*randomly samples the train and test trials*/
+	randsample(trial_indexes, pdataset->nb_trials);
+	
+	/*generate the train*/
+	for(i=0;i<pdataset->nb_train_trials;i++){
+		pdataset->list_of_train_trials[i] = trial_indexes[i];
+	}
+	
+	/*and test trial lists*/
+	offset = i;
+	for(i=0;i<pdataset->nb_test_trials;i++){
+		pdataset->list_of_test_trials[i] = trial_indexes[i+offset];
+	}
+	
+	/*clean up*/
+	free(trial_indexes);
 }
-
 
 /**
  * get_train_dataset(t_dataset *pdataset, float **feature_vectors, int* labels)
  * 
- * @brief return the train dataset
+ * @brief return the ffted train dataset
  * @param pdataset, pointer to the dataset
- * @param (out)feature_vectors, feature vectors of the trials
- * @param (out)labels, labels of the trials 
- * @return the number of trials in the dataset
+ * @param (out)feature_vectors, feature vectors of the trials [size = nb_train_trials x FFTED_VECTOR_LENGTH]
+ * @param (out)labels, labels of the trials [size = nb_train_trials]
+ * @return the number of trials copied
  */
-int get_train_dataset(t_dataset *pdataset, float **feature_vectors, int* labels){
+int get_train_dataset_ffted(t_dataset *pdataset, double **feature_vectors, int* labels){
 
-	/*form an array using only train trials*/
+	int i,j,k,offset;
 
+	/*form an array of feature vectors using only train trials*/
+	for(i=0;i<pdataset->nb_train_trials;i++){
+		for(j=0;j<NB_CHANNELS;j++){
+			offset = j*TIMESERIES_LENGTH;
+			
+			for(k=0;k<TIMESERIES_LENGTH;k++){
+				feature_vectors[i][k+offset] = pdataset->samplesdata[pdataset->list_of_train_trials[i]].fft_vectors[j][k];
+			}
+		}
+		
+		/*and one for the labels*/
+		labels[i] = pdataset->labels[pdataset->list_of_train_trials[i]];
+	}
+	
+	return pdataset->nb_train_trials;
 }
 
 /**
  * get_test_dataset(t_dataset *pdataset, float **feature_vectors, int* labels)
  * 
- * @brief return the test dataset
+ * @brief return the timeseries of the test dataset 
  * @param pdataset, pointer to the dataset
- * @param (out)feature_vectors, feature vectors of the trials
- * @param (out)labels, labels of the trials
- * @return the number of trials in the dataset
+ * @param (out)feature_vectors, feature vectors of the trials [size = nb_test_trials x TIMESERIES_LENGTH*NB_CHANNELS]
+ * @param (out)labels, labels of the trials [size = nb_test_trials]
+ * @return the number of trials copied
  */
-int get_test_dataset(t_dataset *pdataset, float **feature_vectors, int* labels){
+int get_test_dataset_timeseries(t_dataset *pdataset, double **timeseries_vectors, int* labels){
 
-	/*form an array using only test trials*/
+	int i,j,k,offset;
 
+	/*form an array of timeseries using only test trials*/
+	for(i=0;i<pdataset->nb_test_trials;i++){
+		for(j=0;j<NB_CHANNELS;j++){
+			offset = j*TIMESERIES_LENGTH;
+			
+			for(k=0;k<TIMESERIES_LENGTH;k++){
+				timeseries_vectors[i][k+offset] = pdataset->samplesdata[pdataset->list_of_test_trials[i]].fft_vectors[j][k];
+			}
+		}
+		
+		/*and one for the labels*/
+		labels[i] = pdataset->labels[pdataset->list_of_test_trials[i]];
+	}
+	
+	return pdataset->nb_test_trials;
+	
+}
+
+/**
+ * get_test_dataset(t_dataset *pdataset, float **feature_vectors, int* labels)randsample(int n)
+ * 
+ * @brief return an array of n elements. The array is the series of numbers [0, n-1] randomly permutated a large number of times (n*10)
+ * @param n, size of the array and range of the indexes
+ * @param (out), array of size n, values will be set in the fonction
+ */
+void randsample(int array[], int n){
+	
+	int i;
+	int nb_permut = n*10;
+	int temp, source, dest; 
+	time_t t;
+	
+	/*seed random generator*/
+	srand((unsigned) time(&t));
+	
+	/*init the array with continuous numbers*/
+	for(i=0;i<n;i++){
+		array[i] = i;
+	}
+	
+	/*do many permutations*/
+	for(i=0;i<nb_permut;i++){
+		
+		/*pick two samples at random*/
+		source = rand() % n;
+		dest = rand() % n;
+		
+		/*permute them*/
+		temp = array[source];
+		array[source] = array[dest];
+		array[dest] = temp;
+	}
 }
