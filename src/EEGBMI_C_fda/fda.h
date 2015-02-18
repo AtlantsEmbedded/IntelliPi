@@ -6,6 +6,7 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>
+#include <Eigen/Eigenvalues>
 
 #define LABEL_A 1
 #define LABEL_B 2
@@ -16,7 +17,6 @@ typedef struct Sfda{
 	Eigen::VectorXd eigen_values;
 	int max_eigen_value_idx;
 }t_fda;
-
 
 t_fda *init_fda(double** dataset, int *labels, int nb_of_samples);
 void kill_fda(t_fda *pfda);

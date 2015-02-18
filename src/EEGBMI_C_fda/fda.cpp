@@ -4,24 +4,40 @@
 using namespace std;
 using namespace Eigen;
 
-#if 0
-typedef struct Sfda{
-	Eigen::MatrixXd eigen_vectors(NB_FEATURES, NB_FEATURES);
-	Eigen::VectorXd eigen_values(NB_FEATURES);
-	int max_eigen_value_idx;
-}t_fda;
-#endif
-
-void split_dataset(int *labels, int nb_of_samples, int* label_a_list, int* label_b_list, int* label_a_count, int* label_b_count);
-VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples);
-MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int nb_samples, VectorXd feature_means);
+int split_dataset(int *labels, int nb_of_samples, int* label_a_list, int* label_b_list, int* label_a_count, int* label_b_count);
+VectorXd compute_features_mean(double **dataset, int *idx_list, int idx_count);
+MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int idx_count, VectorXd feature_means);
 
 
 /*temporary, before building as a shared object*/
+/*will implement a test bench*/
 int main(){
+	
+	
+	/*define a small dataset: data and labels*/
+	
+	
+	
+	
+	/*compute the fda and show the results*/
+	
+	
+	
+	
+	
 	return 1;
 }
 
+/**
+ * t_fda *init_fda(double **dataset, int *labels, int nb_of_samples)
+ * 
+ * @brief this function computes the fisher discriminant analysis on a dataset. It returns the
+ * necessary information to transform further data into the fda space.
+ * @param dataset, NxF double array, where N is the number of samples and F the number of features (must match the define).
+ * @param labels, N sized integer array, contains the label associated with each samples (must match the define).
+ * @param nb_of_samples, the value of N.
+ * @return an initialized fda struct, which contains the necessary information to transform samples
+ */ 
 t_fda *init_fda(double **dataset, int *labels, int nb_of_samples){
 	
 	int i, max_idx;
@@ -85,20 +101,32 @@ t_fda *init_fda(double **dataset, int *labels, int nb_of_samples){
 	EigenSolver<MatrixXd> es(A);
 	if (es.info() != Success) abort();
 	
-	//es.eigenvectors();
-	//es.eigenvalues();
+	/*get the real valued part of the eigen values and vectors (the imaginnary part should be 0)*/
+	VectorXd eivals = es.eigenvalues().real();
+	MatrixXd eivects = es.eigenvectors().real();
 	
-	/*find the maximal eigenvalue*/
-	//max_idx = 0;
-	//max_value = es.eigenvalues()[0];
-	//for(i=1;i<NB_FEATURES;i++){
-	//	if(es.eigenvalues()[i]>max_value){
-	//		max_idx = i;
-	//		max_value = es.eigenvalues()[i];
-	//	}
-	//}
+	/*find the max eigenvalue*/
+	max_value = eivals(0);
+	max_idx = 0;
 	
-	cout << "Here's the max eigen vector\n" << es.eigenvectors().col(0) << endl;
+	for(i=1;i<NB_FEATURES;i++){
+		if(eivals(i)>max_value){
+			max_value = eivals(i);
+			max_idx = i;
+		}
+	}
+	
+	/*resize fda struct mtx and vector*/
+	pfda->eigen_vectors.resize(NB_FEATURES,NB_FEATURES);
+	pfda->eigen_values.resize(NB_FEATURES);
+	
+	/*copy the eigen vectors, eigen values and max index in the struct*/
+	pfda->eigen_vectors = eivects;
+	pfda->eigen_values = eivals;
+	pfda->max_eigen_value_idx = max_idx;
+	
+	/*output the results for reference*/
+	cout << "Here's the max eigen vector\n" << eivects.col(max_idx) << endl;
 	
 	/*clean up*/
 	free(lbl_a_list);
@@ -107,21 +135,43 @@ t_fda *init_fda(double **dataset, int *labels, int nb_of_samples){
 	return pfda;
 }
 
-
+/**
+ * kill_fda(t_fda *pfda)
+ * 
+ * @brief simple clean up function.
+ * @param pfda, the fda to be freed.
+ */ 
 void kill_fda(t_fda *pfda){
-	
+	free(pfda);
 }
 
 
-
-
-t_fda *transform_data(t_fda *pfda, double **dataset){
+/**
+ * int transform_data(t_fda *pfda, double **dataset, double **fdaed_dataset)
+ * 
+ * @brief (TO BE DONE)this function brings the data contained in the dataset into the fda defined space of representation.
+ * @param dataset, NxF double array, where N is the number of samples and F the number of features (must match the define).
+ * @param (out)fdaed_dataset, transformed data.
+ * @return 1 if success, 0 otherwise
+ */ 
+int transform_data(t_fda *pfda, double **dataset, double **fdaed_dataset){
 	
 	
 }
 
-
-void split_dataset(int *labels, int nb_of_samples, int* label_a_list, int* label_b_list, int* label_a_count, int* label_b_count){
+/**
+ * int split_dataset(int *labels, int nb_of_samples, int* label_a_list, int* label_b_list, int* label_a_count, int* label_b_count)
+ * 
+ * @brief (Private) This function builds the lists of samples belonging to each labels.
+ * @param labels, N sized integer array, contains the label associated with each samples (must match the define).
+ * @param nb_of_samples, the value of N.
+ * @param label_a_list, list of index belonging to A.
+ * @param label_b_list, list of index belonging to B.
+ * @param label_a_count, number of samples labeled A.
+ * @param label_b_count, number of samples labeled B.
+ * @return 1 if success, 0 otherwise
+ */ 
+int split_dataset(int *labels, int nb_of_samples, int* label_a_list, int* label_b_list, int* label_a_count, int* label_b_count){
 	
 	int i;
 	int temp_label_a_count = 0;
@@ -161,9 +211,20 @@ void split_dataset(int *labels, int nb_of_samples, int* label_a_list, int* label
 	/*return the counts*/
 	(*label_a_count) = temp_label_a_count;
 	(*label_b_count) = temp_label_b_count;
+	
+	return EXIT_SUCCESS;
 }
 
-VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples){
+/**
+ * VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples)
+ * 
+ * @brief (Private) This function computes the mean over all samples of a given label for each feature.
+ * @param dataset, NxF double array, where N is the number of samples and F the number of features (must match the define).
+ * @param idx_list, list of index belonging to that class.
+ * @param idx_count, the number of indexes to be considered.
+ * @return an F-sized vector containing the mean of each feature
+ */ 
+VectorXd compute_features_mean(double **dataset, int *idx_list, int idx_count){
 	
 	int i,j;
 	double temp_sum[NB_FEATURES];
@@ -175,7 +236,7 @@ VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples){
 	}
 	
 	/*compute the feature-wise sum*/
-	for(i=0;i<nb_samples;i++){
+	for(i=0;i<idx_count;i++){
 		for(j=0;j<NB_FEATURES;j++){
 			temp_sum[j] += dataset[idx_list[i]][j];
 		}
@@ -183,12 +244,22 @@ VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples){
 	
 	/*compute the feature-wise mean*/
 	for(i=0;i<NB_FEATURES;i++){
-		mean(i) = temp_sum[i]/(double)nb_samples;
+		mean(i) = temp_sum[i]/(double)idx_count;
 	}
 	
 }
 
-MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int nb_samples, VectorXd feature_means){
+/**
+ * VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples)
+ * 
+ * @brief (Private) This function computes the mean over all samples of a given label for each feature.
+ * @param dataset, NxF double array, where N is the number of samples and F the number of features (must match the define).
+ * @param idx_list, list of index belonging to that class.
+ * @param idx_count, the number of indexes to be considered.
+ * @param feature_means, F-sized vector containing the mean of each feature
+ * @return an FxF-sized matrix containing the covariance of each feature
+ */ 
+MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int idx_count, VectorXd feature_means){
 	
 	int i,j,k;
 	double temp_sum[NB_FEATURES][NB_FEATURES];
@@ -203,21 +274,22 @@ MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int nb
 		}
 	}
 	 
-	for(i=0;i<nb_samples;i++){
+	for(i=0;i<idx_count;i++){
 		for(j=0;j<NB_FEATURES;j++){
 			for(k=j;k<NB_FEATURES;k++){
 				temp_sum[j][k] += (dataset[idx_list[i]][j] - feature_means(j))*
 								  (dataset[idx_list[i]][k] - feature_means(k));
-				temp_sum[j][k] /= (double)nb_samples;
+				temp_sum[j][k] /= (double)idx_count;
 			}
 		}
 	}
 	
-	/*and copy top half to bottom half of the mtx at the same time*/
+	/*and copy top half to bottom half of the mtx*/
 	for(j=0;j<NB_FEATURES;j++){
 		for(k=j;k<NB_FEATURES;k++){
 			cov_mtx(j,k) = temp_sum[j][k];
 			
+			/*ignore the diagonal*/
 			if(j!=k)
 				cov_mtx(k,j) = temp_sum[j][k];
 		}
