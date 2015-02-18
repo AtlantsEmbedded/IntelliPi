@@ -35,6 +35,16 @@ int fft_2signals(double signal_1[], double signal_2[],
                  double X1_real[], double X1_imag[], 
                  double X2_real[], double X2_imag[],
                  size_t n);
+                 
+
+/*  
+ * This call returns only the magnitude of the complex fft vectors
+ * 
+ */                 
+int abs_fft_2signals(double signal_1[], double signal_2[], 
+                 double X1[], 
+                 double X2[],
+                 size_t n);
 
 /* 
  * Computes the discrete Fourier transform (DFT) of the given complex vector, storing the result back into the vector.

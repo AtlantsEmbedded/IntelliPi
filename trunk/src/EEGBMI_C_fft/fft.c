@@ -56,8 +56,8 @@ int fft_2signals(double signal_1[], double signal_2[],
 	
 	int status;
 	register int i,k;
-	double *X_real = malloc(n * sizeof(double));
-	double *X_imag = malloc(n * sizeof(double));
+	double *X_real = (double*)malloc(n * sizeof(double));
+	double *X_imag = (double*)malloc(n * sizeof(double));
 	
 	for(i=0;i<n;i++){
 		X_real[i] = signal_1[i];
@@ -112,6 +112,45 @@ cleanup:
 }
 
 
+int abs_fft_2signals(double signal_1[], double signal_2[], 
+                 double X1[], 
+                 double X2[],
+                 size_t n){
+				
+	int i, status;
+					 
+	double* X1_real = (double*)malloc(sizeof(double)*n);
+	double* X1_imag = (double*)malloc(sizeof(double)*n);
+	double* X2_real = (double*)malloc(sizeof(double)*n);
+	double* X2_imag = (double*)malloc(sizeof(double)*n);					 
+					 
+	if(!fft_2signals(signal_1, signal_2, 
+                 X1_real, X1_imag, 
+                 X2_real, X2_imag,
+                 n)){
+		status = 0;	
+		goto cleanup;			
+	}
+                 
+	for(i=0;i<n;i++){
+		X1[i] = sqrt(X1_real[i]*X1_real[i] + X1_imag[i]*X1_imag[i]);
+		X2[i] = sqrt(X2_real[i]*X2_real[i] + X2_imag[i]*X2_imag[i]);
+	}			
+	
+	status = 1;			
+				
+cleanup:
+				
+	free(X1_real);	
+	free(X1_imag);	
+	free(X2_real);	
+	free(X2_imag);	 
+				 
+	return status;				 
+}
+
+
+
 int transform(double real[], double imag[], size_t n) {
 	if (n == 0)
 		return 1;
@@ -151,8 +190,8 @@ int transform_radix2(double real[], double imag[], size_t n) {
 	if (SIZE_MAX / sizeof(double) < n / 2)
 		return 0;
 	size = (n / 2) * sizeof(double);
-	cos_table = malloc(size);
-	sin_table = malloc(size);
+	cos_table = (double*)malloc(size);
+	sin_table = (double*)malloc(size);
 	if (cos_table == NULL || sin_table == NULL)
 		goto cleanup;
 	for (i = 0; i < n / 2; i++) {
@@ -229,14 +268,14 @@ int transform_bluestein(double real[], double imag[], size_t n) {
 		return 0;
 	size_n = n * sizeof(double);
 	size_m = m * sizeof(double);
-	cos_table = malloc(size_n);
-	sin_table = malloc(size_n);
-	areal = calloc(m, sizeof(double));
-	aimag = calloc(m, sizeof(double));
-	breal = calloc(m, sizeof(double));
-	bimag = calloc(m, sizeof(double));
-	creal = malloc(size_m);
-	cimag = malloc(size_m);
+	cos_table = (double*)malloc(size_n);
+	sin_table = (double*)malloc(size_n);
+	areal = (double*)calloc(m, sizeof(double));
+	aimag = (double*)calloc(m, sizeof(double));
+	breal = (double*)calloc(m, sizeof(double));
+	bimag = (double*)calloc(m, sizeof(double));
+	creal = (double*)malloc(size_m);
+	cimag = (double*)malloc(size_m);
 	if (cos_table == NULL || sin_table == NULL
 			|| areal == NULL || aimag == NULL
 			|| breal == NULL || bimag == NULL
@@ -291,9 +330,9 @@ cleanup:
 int convolve_real(const double x[], const double y[], double out[], size_t n) {
 	double *ximag, *yimag, *zimag;
 	int status = 0;
-	ximag = calloc(n, sizeof(double));
-	yimag = calloc(n, sizeof(double));
-	zimag = calloc(n, sizeof(double));
+	ximag = (double*)calloc(n, sizeof(double));
+	yimag = (double*)calloc(n, sizeof(double));
+	zimag = (double*)calloc(n, sizeof(double));
 	if (ximag == NULL || yimag == NULL || zimag == NULL)
 		goto cleanup;
 	
@@ -314,10 +353,10 @@ int convolve_complex(const double xreal[], const double ximag[], const double yr
 	if (SIZE_MAX / sizeof(double) < n)
 		return 0;
 	size = n * sizeof(double);
-	xr = memdup(xreal, size);
-	xi = memdup(ximag, size);
-	yr = memdup(yreal, size);
-	yi = memdup(yimag, size);
+	xr = (double*)memdup(xreal, size);
+	xi = (double*)memdup(ximag, size);
+	yr = (double*)memdup(yreal, size);
+	yi = (double*)memdup(yimag, size);
 	if (xr == NULL || xi == NULL || yr == NULL || yi == NULL)
 		goto cleanup;
 	
