@@ -2,7 +2,7 @@
  * @file user_input.h
  * @author Ronnie Brash (ron.brash@gmail.com)
  * @copy Menu system for Atom Prototype
- */ 
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

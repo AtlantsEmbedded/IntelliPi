@@ -29,9 +29,6 @@
 #define debug_msg(...) \
             do { if (DEBUG) printf(__VA_ARGS__); } while (0)
 
-#define clear_console(...) \
-            printf("\e[1;1H\e[2J")
-
 typedef struct app_info_s {
 	char name[17];
 	char text[17];

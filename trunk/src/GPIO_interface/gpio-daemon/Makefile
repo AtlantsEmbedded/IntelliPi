@@ -8,7 +8,14 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -D_DEBUG
+
+ifeq ($(ARCH)), X86)
+	DEFINES       := -D_DEBUG
+endif
+ifeq ($(ARCH)), RASPI)
+	DEFINES       := RASPI=1
+endif
+
 CFLAGS        = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 INCPATH       = -I/usr/include/x86_64-linux-gnu/ \
@@ -20,7 +27,15 @@ LINK          = g++
 LFLAGS        = -m64
 GLIB2_CC	  = `pkg-config --cflags glib-2.0`
 GLIB2_LINK	  = `pkg-config --libs glib-2.0`
-LIBS          = $(SUBLIBS) -L/usr/lib/x86_64-linux-gnu -lpthread -lezxml
+
+
+ifeq ($(ARCH), RASPI)
+	ARCH_LIBS = -lwiringPi -lwiringPiDev
+else
+	ARCH_LIBS 	  =
+endif
+
+LIBS          = $(SUBLIBS) -L/usr/lib/x86_64-linux-gnu -lpthread -lezxml $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -52,21 +67,24 @@ SOURCES       = src/main.c \
 				src/menu_structure.c \
 				src/menu_item.c \
 				src/event.c \
-				src/socket.c
+				src/socket.c \
+				src/hardware.c
 OBJECTS       = src/main.o \
 				src/xml.o \
 				src/user_input.o \
 				src/menu_structure.o \
 				src/menu_item.o  \
 				src/event.o \
-				src/socket.o
+				src/socket.o \
+				src/hardware.o
 DIST          = src/main.c \
 				src/xml.c \
 				src/user_input.c \
 				src/menu_structure.c \
 				src/menu_item.c \
 				src/event.c \
-				src/socket.c
+				src/socket.c \
+				src/hardware.c
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = gpio_menu
 
@@ -136,6 +154,9 @@ socket.o: src/socket.c
 	
 event.o: src/event.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o event.o src/event.c 
+	
+event.o: src/hardware.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o hardware.o src/hardware.c 
 
 ####### Install
 

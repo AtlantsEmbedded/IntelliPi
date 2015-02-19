@@ -18,6 +18,7 @@
 #include <include/menu_item.h>
 #include <include/socket.h>
 #include <include/event.h>
+#include <include/hardware.h>
 
 #define CONFIG "config/gpio_config.xml"
 
@@ -82,6 +83,10 @@ int main(int argc, char **argv)
 	if (initialize_ipc_sock() < 0) {
 		return (-1);
 	}
+	
+	/// Setup hardware function pointers
+	setup_hardware();
+	
 	/// Print Banner & Instructions
 	print_instructions(&app_info);
 	wait_for_select();
