@@ -19,9 +19,10 @@
 #include <include/menu_structure.h>
 #include <include/menu_item.h>
 #include <include/event.h>
+#include <include/hardware.h>
 
-static inline void dump_ipc_message(ipc_msg_t *msg);
-static inline void print_ipc_message(ipc_msg_t *msg, unsigned int seconds);
+static inline void dump_ipc_message(ipc_msg_t * msg);
+static inline void print_ipc_message(ipc_msg_t * msg, unsigned int seconds);
 
 /**
  * execute_menu_item(GNode *node)
@@ -101,9 +102,8 @@ int finished_menu_item(GNode * node)
 int error_menu_item(GNode * node)
 {
 
-	menu_item_t __attribute__((unused)) *item = (menu_item_t *) node->data;
+	menu_item_t __attribute__ ((unused)) * item = (menu_item_t *) node->data;
 	// Stub function
-
 
 	return (0);
 }
@@ -112,8 +112,8 @@ int error_menu_item(GNode * node)
  * dump_ipc_message(ipc_msg_t *msg)
  * @brief dump ipc message if needded
  * @param msg
- */ 
-static inline void dump_ipc_message(ipc_msg_t *msg)
+ */
+static inline void dump_ipc_message(ipc_msg_t * msg)
 {
 	debug_msg("version:%u\n", msg->msg_version);
 	debug_msg("type:%u\n", msg->msg_type);
@@ -126,12 +126,13 @@ static inline void dump_ipc_message(ipc_msg_t *msg)
  * @brief print out ipc message
  * @param msg
  * @param seconds
- */ 
-static inline void print_ipc_message(ipc_msg_t *msg, unsigned int seconds) {
-	
-	clear_console();
-	printf("%s\n",msg->top_row);
-	printf("%s\n",msg->bot_row);
+ */
+static inline void print_ipc_message(ipc_msg_t * msg, unsigned int seconds)
+{
+
+	_CLEAR_DISPLAY();
+	printf("%s\n", msg->top_row);
+	printf("%s\n", msg->bot_row);
 	sleep(seconds);
 }
 
@@ -163,14 +164,19 @@ int execute_ipc_event(ipc_msg_t * msg)
 		print_ipc_message(msg, OOPS_MSG);
 		break;
 	case IPC_TYPE_COLOR_RED:
+		_SET_DISPLAY_COLOR((void *)RED_COLOR);
 		break;
 	case IPC_TYPE_COLOR_GREEN:
+		_SET_DISPLAY_COLOR((void *)GREEN_COLOR);
 		break;
 	case IPC_TYPE_COLOR_YELLOW:
+		_SET_DISPLAY_COLOR((void *)YELLOW_COLOR);
 		break;
 	case IPC_TYPE_COLOR_BLUE:
+		_SET_DISPLAY_COLOR((void *)BLUE_COLOR);
 		break;
 	case IPC_TYPE_COLOR_NONE:
+		_SET_DISPLAY_COLOR((void *)NO_COLOR);	// Turn off backlight for raspi
 		break;
 	case IPC_TYPE_ERROR:
 		error_menu_item(get_current_node());
@@ -188,7 +194,7 @@ int execute_ipc_event(ipc_msg_t * msg)
 	}
 	print_item_text(get_current_node());
 	print_item_menu(get_current_node());
-	
+
 	return (0);
 
 }
