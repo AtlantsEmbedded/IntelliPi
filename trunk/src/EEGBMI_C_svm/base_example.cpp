@@ -391,6 +391,7 @@ BaseExample::add (const double _y, feature_node * _x)
 int
 BaseExample::add (const double _y, const char *s)
 {
+  /*extract features*/
   return add (_y, (feature_node *) str2feature_node (s));
 }
 
@@ -398,17 +399,28 @@ int
 BaseExample::add (const char *s)
 {
   double _y = 0;
+  /*get string length*/
   int len = strlen (s);
 
   int i;
+  
+  /*parse the length*/
   for (i = 0; i < len;) {
+	  /*skip spaces*/
     while (isspace (s[i])) i++;
+    
+    /*get the class*/
     _y = atof (s + i);
+    
+    /*skip non-spaces?*/
     while (i < len && !isspace (s[i])) i++;
+    
+    /*skip spaces (align with features)*/
     while (i < len && isspace (s[i]))  i++;
     break;
   }
-
+  
+  /*call to extract features*/
   return add (_y, (const char *) (s + i));
 }
 
@@ -421,7 +433,9 @@ BaseExample::writeSVindex (const char *filename, const char *mode, const int off
   if (!fp) return 0;
 
   for (int i = 0; i < svindex_size; i++)
-    fprintf (fp, "%.16g %.16g\n", alpha[i], G[i]);
+	if(alpha[i]>0)
+		fprintf (fp, "%.16g %.16g\n", alpha[i], G[i]);
+		
 
   fclose (fp);
   return 1;
@@ -437,16 +451,20 @@ BaseExample::readSVindex (const char *filename, const char *mode, const int offs
 
   FILE *fp = fopen (filename, mode);
   if (!fp) return 0;
-
+  
   delete [] alpha;
   delete [] G;
 
   int _l = 0;
   char *buf;
-
+  
   while ((buf = readLine (fp)) != NULL) {
     double alpha_, G_;
+    
+    
+    
     if (2 != sscanf (buf, "%lf %lf\n", &alpha_, &G_)) {
+      fprintf(stderr, "Fatal: Format error %s, line %d\n", filename, _l);
       fprintf(stderr, "Fatal: Format error %s, line %d\n", filename, _l);
       fclose (fp);
       return 0;
@@ -456,7 +474,7 @@ BaseExample::readSVindex (const char *filename, const char *mode, const int offs
     G     = _append (G,     _l, G_,     0.0);
     _l++;
   }
-
+  
   fclose (fp);
 
   //  check size of idx file

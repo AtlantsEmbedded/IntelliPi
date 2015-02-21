@@ -36,8 +36,14 @@
 int
 main (int argc, char **argv)
 {
+	/*Initialise a TinySVM::Param*/
    TinySVM::Param param;
+   
+   if(!param.set("-t 1 -d 2 -c 1")){
+	   
+   }
 
+   /*validate the parameters*/
   if (!param.set (argc, argv) || argc < 3) {
     fprintf (stdout, "%s\n", COPYRIGHT);
     fprintf (stdout, "Try `svm_learn --help' for more information.\n");
