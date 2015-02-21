@@ -9,9 +9,9 @@ CC        = g++
 # need flags for math and real-time
 LDFLAGS   = -lm -lrt
 # name of the program
-PROGRAM   = fda_proto.exe
+PROGRAM   = fda_test.exe
 # files of the program
-SRCS      = fda.cpp
+SRCS      = fda.cpp fda_testbench.cpp
 OBJS      = $(SRCS:.c=.o)
 
 #
