@@ -13,8 +13,8 @@ PROGRAM   = EEGBMI.exe
 # files of the program
 SRCS      = main.cpp dataset.cpp
 OBJS      = $(SRCS:.c=.o)
-INC      = -I ./EEGBMI_C_fda/eigen-lib -I ./EEGBMI_C_svm -I ./EEGBMI_C_fft
-LIB  	 = -L./EEGBMI_C_fft -lfft
+INC      = -I ./EEGBMI_C_fda/eigen-lib -I ./EEGBMI_C_svm -I ./EEGBMI_C_fft -I ./EEGBMI_C_fda
+LIB  	 = -L./EEGBMI_C_fft -lfft -L./EEGBMI_C_fda -lfda -L./EEGBMI_C_svm -lsvm
 
 #
 # Launch gcc

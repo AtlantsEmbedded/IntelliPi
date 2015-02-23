@@ -5,8 +5,8 @@ using namespace std;
 using namespace Eigen;
 
 int split_dataset(int *labels, int nb_of_samples, int** label_a_list, int** label_b_list, int* label_a_count, int* label_b_count);
-VectorXd compute_features_mean(double **dataset, int *idx_list, int idx_count);
-MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int idx_count, VectorXd feature_means);
+VectorXd compute_features_mean(double **dataset, int *idx_list, int idx_count, int nb_features);
+MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int idx_count, VectorXd feature_means, int nb_features);
 
 
 
@@ -55,24 +55,34 @@ t_fda *init_fda(double **dataset, int *labels, int nb_of_samples, t_fda_options 
 	/*compute the class-wise mean for each feature*/
 	feature_means_lbl_a = compute_features_mean(dataset, 
 												lbl_a_list, 
-												lbl_a_count);
+												lbl_a_count,
+												options.nb_features);
       	       
 	feature_means_lbl_b = compute_features_mean(dataset, 
 												lbl_b_list, 
-												lbl_b_count);
+												lbl_b_count,
+												options.nb_features);
 	
-	cout << "check1" << endl;
+	cout << "fda: Mean" << endl;
+	
+	cout << "fda: lbl a count" << lbl_a_count << endl;
+	cout << "fda: lbl b count" << lbl_b_count << endl;
+	
 	/*compute class-wise covariance matrices*/
 	feature_cov_mtx_lbl_a = compute_features_covariance_mtx(dataset, 
 															lbl_a_list, 
 															lbl_a_count, 
-															feature_means_lbl_a);
+															feature_means_lbl_a,
+															options.nb_features);
 															
 	feature_cov_mtx_lbl_b = compute_features_covariance_mtx(dataset, 
 															lbl_b_list, 
 															lbl_b_count, 
-															feature_means_lbl_b);
-	cout << "check2" << endl;
+															feature_means_lbl_b,
+															options.nb_features);
+	
+	cout << "fda: Cov Mtx" << endl;
+
 	/*Compute Sb*/
 	temp_vec = (feature_means_lbl_a-feature_means_lbl_b);
 	sb = temp_vec*temp_vec.transpose();
@@ -80,19 +90,24 @@ t_fda *init_fda(double **dataset, int *labels, int nb_of_samples, t_fda_options 
 	/*Compute Sw*/
 	sw = feature_cov_mtx_lbl_a+feature_cov_mtx_lbl_b;
 	
+	cout << "fda: Compute A" << endl;
+	
 	/*Compute A = Sw^-1*Sb*/
 	A = sw.ldlt().solve(sb);
+
+	cout << "fda, Compute Eigen" << endl;
 	
 	/*Compute eigen vectors and values*/
-	EigenSolver<MatrixXd> es(A);
+	SelfAdjointEigenSolver<MatrixXd> es(A);
+	//EigenSolver<MatrixXd> es(A);
 	if (es.info() != Success) abort();
 	
-	cout << "check3" << endl;
+	cout << "fda, after eigen solver" << endl;
 	
 	/*get the real valued part of the eigen values and vectors (the imaginnary part should be 0)*/
 	VectorXd eivals = es.eigenvalues().real();
 	MatrixXd eivects = es.eigenvectors().real();
-	
+		
 	/*find the max eigenvalue*/
 	max_value = eivals(0);
 	max_idx = 0;
@@ -103,6 +118,8 @@ t_fda *init_fda(double **dataset, int *labels, int nb_of_samples, t_fda_options 
 			max_idx = i;
 		}
 	}
+
+	cout << "max, eigen value found" << endl;
 	
 	/*resize fda struct mtx and vector*/
 	pfda->eigen_vectors.resize(options.nb_features,options.nb_features);
@@ -112,14 +129,10 @@ t_fda *init_fda(double **dataset, int *labels, int nb_of_samples, t_fda_options 
 	pfda->eigen_vectors = eivects;
 	pfda->eigen_values = eivals;
 	pfda->max_eigen_value_idx = max_idx;
-	
-	
+		
 	/*output the results for reference*/
 	//cout << "Here's the max eigen vector\n" << eivects.col(max_idx) << endl;
-	
-	cout << "check4" << endl;
-	
-	
+
 	/*clean up*/
 	free(lbl_a_list);
 	free(lbl_b_list);
@@ -187,6 +200,7 @@ int split_dataset(int *labels, int nb_of_samples, int** label_a_list, int** labe
 	
 	/*count the number of labels equal to label A*/
 	for(i=0;i<nb_of_samples;i++){
+		
 		if(labels[i]==LABEL_A){
 			temp_label_a_count++;
 		}
@@ -194,9 +208,6 @@ int split_dataset(int *labels, int nb_of_samples, int** label_a_list, int** labe
 	
 	/*deduce the number of label b*/
 	temp_label_b_count = nb_of_samples-temp_label_a_count;
-	
-	cout << temp_label_b_count << endl;
-	cout << temp_label_a_count << endl;
 	
 	/*create lists*/
 	temp_label_a_list = (int*)malloc(sizeof(int)*temp_label_a_count);
@@ -230,7 +241,7 @@ int split_dataset(int *labels, int nb_of_samples, int** label_a_list, int** labe
 }
 
 /**
- * VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples)
+ * VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples, int nb_features)
  * 
  * @brief (Private) This function computes the mean over all samples of a given label for each feature.
  * @param dataset, NxF double array, where N is the number of samples and F the number of features (must match the define).
@@ -238,29 +249,27 @@ int split_dataset(int *labels, int nb_of_samples, int** label_a_list, int** labe
  * @param idx_count, the number of indexes to be considered.
  * @return an F-sized vector containing the mean of each feature
  */ 
-VectorXd compute_features_mean(double **dataset, int *idx_list, int idx_count){
+VectorXd compute_features_mean(double **dataset, int *idx_list, int idx_count, int nb_features){
 	
 	int i,j;
-	double temp_sum[10];
-	VectorXd mean(10);
+	double temp_sum[nb_features];
+	VectorXd mean(nb_features);
 	
 	/*init the temp sum to 0.0*/
-	for(i=0;i<10;i++){
+	for(i=0;i<nb_features;i++){
 		temp_sum[i] = 0.0;
 	}
 	
 	/*compute the feature-wise sum*/
 	for(i=0;i<idx_count;i++){
-		for(j=0;j<10;j++){
-			
-			cout << idx_list[i] << endl;
+		for(j=0;j<nb_features;j++){
 			
 			temp_sum[j] += dataset[idx_list[i]][j];
 		}
 	}
 	
 	/*compute the feature-wise mean*/
-	for(i=0;i<10;i++){
+	for(i=0;i<nb_features;i++){
 		mean(i) = temp_sum[i]/(double)idx_count;
 	}
 	
@@ -269,7 +278,7 @@ VectorXd compute_features_mean(double **dataset, int *idx_list, int idx_count){
 }
 
 /**
- * VectorXd compute_features_mean(double **dataset, int *idx_list, int nb_samples)
+ * MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int idx_count, VectorXd feature_means)
  * 
  * @brief (Private) This function computes the mean over all samples of a given label for each feature.
  * @param dataset, NxF double array, where N is the number of samples and F the number of features (must match the define).
@@ -278,24 +287,30 @@ VectorXd compute_features_mean(double **dataset, int *idx_list, int idx_count){
  * @param feature_means, F-sized vector containing the mean of each feature
  * @return an FxF-sized matrix containing the covariance of each feature
  */ 
-MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int idx_count, VectorXd feature_means){
+MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int idx_count, VectorXd feature_means, int nb_features){
 	
 	int i,j,k;
-	double temp_sum[10][10];
-	MatrixXd cov_mtx(10,10);
+	double **temp_sum;
+	
+	/*size require it to be dynamic*/
+	temp_sum = (double**)malloc(sizeof(double*)*nb_features);
+	MatrixXd cov_mtx(nb_features,nb_features);
 	
 	/*
 	 * Compute elements of the diagonal and the top matrix
 	 */
-	for(j=0;j<10;j++){
-		for(k=j;k<10;k++){
+	for(j=0;j<nb_features;j++){
+		temp_sum[j] = (double*)malloc(sizeof(double)*nb_features);
+		for(k=j;k<nb_features;k++){
 			temp_sum[j][k] = 0.0;
 		}
 	}
+	
+	cout << "fda: Cov Mtx step 1" << endl;
 	 
 	for(i=0;i<idx_count;i++){
-		for(j=0;j<10;j++){
-			for(k=j;k<10;k++){
+		for(j=0;j<nb_features;j++){
+			for(k=j;k<nb_features;k++){
 				temp_sum[j][k] += (dataset[idx_list[i]][j] - feature_means(j))*
 								  (dataset[idx_list[i]][k] - feature_means(k));
 				temp_sum[j][k] /= (double)idx_count;
@@ -303,9 +318,11 @@ MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int id
 		}
 	}
 	
+	cout << "fda: Cov Mtx step 2" << endl;
+	
 	/*and copy top half to bottom half of the mtx*/
-	for(j=0;j<10;j++){
-		for(k=j;k<10;k++){
+	for(j=0;j<nb_features;j++){
+		for(k=j;k<nb_features;k++){
 			cov_mtx(j,k) = temp_sum[j][k];
 			
 			/*ignore the diagonal*/
@@ -313,6 +330,12 @@ MatrixXd compute_features_covariance_mtx(double **dataset, int *idx_list, int id
 				cov_mtx(k,j) = temp_sum[j][k];
 		}
 	}
+	
+	/*clean up memory*/
+	for(j=0;j<nb_features;j++){
+		free(temp_sum[j]);
+	}
+	free(temp_sum);
 	
 	return cov_mtx;
 }
