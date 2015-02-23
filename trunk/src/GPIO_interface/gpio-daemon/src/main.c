@@ -32,9 +32,11 @@ inline char *which_config(int argc, char **argv);
  */
 inline void print_instructions(app_info_t * app_info)
 {
-
-	printf("%s\n", app_info->name);
-	printf("%s\n", app_info->text);
+	CLEAR_DISPLAY();
+	char msg_str[32] = { 0 };
+	memcpy(msg_str, app_info->name, 16);
+	memcpy(msg_str + 16, app_info->text, 16);
+	OUTPUT_TO_DISPLAY(&msg_str);
 
 }
 
@@ -85,7 +87,10 @@ int main(int argc, char **argv)
 	}
 	
 	/// Setup hardware function pointers
-	setup_hardware();
+	if(setup_hardware() < 0) {
+		debug_msg("Unable to configure hardware\n");
+		exit (-1);
+	}
 	
 	/// Print Banner & Instructions
 	print_instructions(&app_info);

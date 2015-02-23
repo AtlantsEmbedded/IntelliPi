@@ -37,8 +37,10 @@ const char accepted_input_chars[] = { 's', 'b', 'c', 'q', 'a', 'd' };
 
 /// Console related functions for testing from the command line
 
-// LCD handle
+#ifdef RASPI
+/// LCD handle
 static int lcdHandle;
+#endif
 
 /**
  * setup_hardware(void)
@@ -57,31 +59,32 @@ int setup_hardware(void)
 	_WAIT_FOR_INPUT = NULL;
 
 	/// Based on hardware, setup function pointers
-	if (RASPI) {
-		_INIT_HARDWARE = &raspi_setup;
-		_INIT_DISPLAY = &raspi_adafruit_LCD_Setup;
-		_SET_DISPLAY_COLOR = &raspi_set_disp_colour;
-		_CLEAR_DISPLAY = &raspi_clear_display;
-		_OUTPUT_TO_DISPLAY = &raspi_print_to_display;
-		_WAIT_FOR_INPUT_SELECT = &raspi_wait_for_select;
-		_WAIT_FOR_INPUT_ARROWS = &raspi_wait_for_arrows;
-		_WAIT_FOR_INPUT = &raspi_wait_for_button_input;
-		return (0);
-	} else {
-		_INIT_HARDWARE = &cmd_not_used;
-		_INIT_DISPLAY = &cmd_clear_console;
-		_SET_DISPLAY_COLOR = &cmd_not_used;
-		_CLEAR_DISPLAY = &cmd_clear_console;
-		_OUTPUT_TO_DISPLAY = &cmd_print_to_display;
-		_WAIT_FOR_INPUT_SELECT = &cmd_wait_for_select_keys;
-		_WAIT_FOR_INPUT_ARROWS = &cmd_wait_for_arrows;
-		_WAIT_FOR_INPUT = &cmd_wait_for_console_input_keys;
-		return (0);
-	}
+#ifdef RASPI
+	_INIT_HARDWARE = &raspi_setup;
+	_INIT_DISPLAY = &raspi_adafruit_LCD_Setup;
+	_SET_DISPLAY_COLOR = &raspi_set_disp_colour;
+	_CLEAR_DISPLAY = &raspi_clear_display;
+	_OUTPUT_TO_DISPLAY = &raspi_print_to_display;
+	_WAIT_FOR_INPUT_SELECT = &raspi_wait_for_select;
+	_WAIT_FOR_INPUT_ARROWS = &raspi_wait_for_arrows;
+	_WAIT_FOR_INPUT = &raspi_wait_for_button_input;
+	return (0);
+#elif X86
+	_INIT_HARDWARE = &cmd_not_used;
+	_INIT_DISPLAY = &cmd_clear_console;
+	_SET_DISPLAY_COLOR = &cmd_not_used;
+	_CLEAR_DISPLAY = &cmd_clear_console;
+	_OUTPUT_TO_DISPLAY = &cmd_print_to_display;
+	_WAIT_FOR_INPUT_SELECT = &cmd_wait_for_select_keys;
+	_WAIT_FOR_INPUT_ARROWS = &cmd_wait_for_arrows;
+	_WAIT_FOR_INPUT = &cmd_wait_for_console_input_keys;
+	return (0);
+#endif
 
 	return (-1);
 }
 
+#ifdef RASPI
 /**
  * raspi_set_disp_colour(int colour)
  * @brief The colour outputs are inverted.
@@ -139,14 +142,15 @@ int raspi_adafruit_LCD_Setup(void *param)
 /**
  * raspi_setup(void)
  * @brief initialize RASPI hardware & Adafruit LCD
+ * @return 0
  */
 int raspi_setup(void *param __attribute__ ((unused)))
 {
 
-	// Setup wiringPi Library
+	/// Setup wiringPi Library
 	wiringPiSetup();
 
-	// Setup LCD
+	/// Setup LCD
 	mcp23017Setup(AF_BASE, 0x20);
 
 	return (0);
@@ -195,6 +199,7 @@ int raspi_wait_for_arrows(void *param __attribute__ ((unused)))
  */
 int raspi_clear_display(void *param __attribute__ ((unused)))
 {
+	lcdClear(lcdHandle);
 	return (0);
 }
 
@@ -204,8 +209,14 @@ int raspi_clear_display(void *param __attribute__ ((unused)))
  * @param param
  * @return 0 on success, -1 for error
  */
-int raspi_print_to_display(void *param __attribute__ ((unused)))
+int raspi_print_to_display(void *param)
 {
+	message_str_t *msg = (message_str_t *) param;
+
+	lcdPosition(lcdHandle, 0, 0);
+	lcdPuts(lcdHandle, msg->top);
+	lcdPosition(lcdHandle, 0, 1);
+	lcdPuts(lcdHandle, msg->bottom);
 
 	return (0);
 }
@@ -218,43 +229,42 @@ int raspi_print_to_display(void *param __attribute__ ((unused)))
 int raspi_wait_for_button_input(void *param __attribute__ ((unused)))
 {
 	debug_msg("Waiting for button input:\n");
-	int res = 0;
+	int res = -1;
 	for (;;) {
+		if (res >= 1) {
+			if ((digitalRead(AF_UP) == LOW) || (digitalRead(AF_DOWN) == LOW)
+			    || (digitalRead(AF_RIGHT) == LOW) || (digitalRead(AF_LEFT) == LOW))
+				continue;
+			else
+				return res;
+		}
 
-		//~ if (isalpha(buff[0]) != 0) {
-			//~ if (buff[0] == QUIT_CHAR) {
-				//~ debug_msg("Quitting...\n");
-				//~ res = QUIT_EVENT;
-				//~ break;
-			//~ } else if (buff[0] == SELECT_CHAR) {
-				//~ debug_msg("Selecting option\n");
-				//~ res = SELECT_EVENT;
-				//~ break;
-			//~ } else if (buff[0] == BACK_CHAR) {
-				//~ debug_msg("Returning to previous menu\n");
-				//~ res = BACK_EVENT;
-				//~ break;
-			//~ } else if (buff[0] == CANCEL_CHAR) {
-				//~ debug_msg("Canceling task\n");
-				//~ res = CANCEL_EVENT;
-				//~ break;
-			//~ } else if (buff[0] == NEXT_CHAR) {
-				//~ debug_msg("Next task\n");
-				//~ res = NEXT_EVENT;
-				//~ break;
-			//~ } else if (buff[0] == PREV_CHAR) {
-				//~ debug_msg("Previous task\n");
-				//~ res = PREV_EVENT;
-				//~ break;
-			//~ } else {
-				//~ continue;
-			//~ }
-		//~ }
+		if (digitalRead(AF_UP) == LOW) {
+			res = BACK_EVENT;
+			debug_msg("Back event\n");
+		}
+		if (digitalRead(AF_DOWN) == LOW) {
+			res = CANCEL_CHAR;
+			debug_msg("Cancel event\n");
+		}
+		if (digitalRead(AF_LEFT) == LOW) {
+			res = PREV_EVENT;
+			debug_msg("Prev event\n");
+		}
+		if (digitalRead(AF_RIGHT) == LOW) {
+			res = NEXT_EVENT;
+			debug_msg("Next event\n");
+		}
+		if (digitalRead(AF_SELECT) == LOW) {
+			res = SELECT_EVENT;
+			debug_msg("Select event\n");
+		}
 
 	}
 
 	return res;
 }
+#endif
 
 /**
  * cmd_clear_console(void *param)
@@ -377,9 +387,12 @@ int cmd_not_used(void *param __attribute__ ((unused)))
  * @param param
  * @return 0
  */
-int cmd_print_to_display(void *param __attribute__ ((unused)))
+int cmd_print_to_display(void *param)
 {
-
+	char *str = (char *)param;
+	CLEAR_DISPLAY();
+	debug_msg("%.16s\n", str);
+	debug_msg("%.16s\n", str + 16);
 	return (0);
 }
 

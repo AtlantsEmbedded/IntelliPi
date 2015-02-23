@@ -3,8 +3,14 @@
  * @author Ronnie Brash (ron.brash@gmail.com)
  * @brief Hardware specific header - has some macros to handle functions
  */
-#define RASPI 0
-#define X86 0
+//#define RASPI 0
+//#define X86 0
+
+#define NO_COLOR 0
+#define RED_COLOR 1
+#define GREEN_COLOR 2
+#define YELLOW_COLOR 3
+#define BLUE_COLOR 4
 
 #ifdef RASPI
 
@@ -33,11 +39,16 @@
 #define	AF_UP		(AF_BASE +  3)
 #define	AF_LEFT		(AF_BASE +  4)
 
-#define NO_COLOR 0
-#define RED_COLOR 1
-#define GREEN_COLOR 2
-#define YELLOW_COLOR 3
-#define BLUE_COLOR 4
+
+
+int raspi_setup(void *param);
+int raspi_set_disp_colour(void *param);
+int raspi_adafruit_LCD_Setup(void *param);
+int raspi_wait_for_button_input(void *param);
+int raspi_wait_for_select(void *param);
+int raspi_wait_for_arrows(void *param);
+int raspi_clear_display(void *param);
+int raspi_print_to_display(void *param);
 
 #endif
 
@@ -48,25 +59,28 @@
 
 // Defines for the Adafruit Pi LCD interface board
 
-#define SIZE_OF_LCD 16
-#define _CLEAR_DISPLAY() \
+#define SIZE_OF_LCD 16		
+#define CLEAR_DISPLAY() \
 		_CLEAR_DISPLAY(NULL)
 		
-#define _INIT_HARDWARE() \
-		_INIT_HARDWARE(NULL)	
+#define INIT_HARDWARE() \
+		_INIT_HARDWARE(NULL)			
 		
-#define _INIT_DISPLAY() \
+#define INIT_DISPLAY() \
 		_INIT_DISPLAY(NULL)
 
-#define _WAIT_FOR_INPUT_SELECT() \
+#define WAIT_FOR_INPUT_SELECT() \
 		_WAIT_FOR_INPUT_SELECT(NULL)
 		
-#define _WAIT_FOR_INPUT_ARROWS() \
+#define WAIT_FOR_INPUT_ARROWS() \
 		_WAIT_FOR_INPUT_ARROWS(NULL)		
 		
-#define _WAIT_FOR_INPUT() \
-		_WAIT_FOR_INPUT(NULL)		
-
+#define WAIT_FOR_INPUT() \
+		_WAIT_FOR_INPUT(NULL)
+		
+#define OUTPUT_TO_DISPLAY(param) \
+		_OUTPUT_TO_DISPLAY(param)	
+		
 typedef int (*functionPtr_t) (void *);
 functionPtr_t _INIT_HARDWARE;
 functionPtr_t _INIT_DISPLAY;
@@ -77,16 +91,12 @@ functionPtr_t _WAIT_FOR_INPUT_SELECT;
 functionPtr_t _WAIT_FOR_INPUT_ARROWS;
 functionPtr_t _WAIT_FOR_INPUT;
 
-int setup_hardware(void);
+typedef struct message_str_s {
+	char top[16];
+	char bottom[16];
+} message_str_t;	
 
-int raspi_setup(void *param);
-int raspi_set_disp_colour(void *param);
-int raspi_adafruit_LCD_Setup(void *param);
-int raspi_wait_for_button_input(void *param);
-int raspi_wait_for_select(void *param);
-int raspi_wait_for_arrows(void *param);
-int raspi_clear_display(void *param);
-int raspi_print_to_display(void *param);
+int setup_hardware(void);
 
 int cmd_clear_console(void *param);
 int cmd_not_used(void *param);
