@@ -81,7 +81,7 @@ DIST          = src/main.c \
 				src/socket.c \
 				src/hardware.c
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = gpio_menu
+TARGET        = gpio_interface
 
 
 first: all
