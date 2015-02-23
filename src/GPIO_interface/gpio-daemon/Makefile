@@ -8,16 +8,8 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-
-ifeq ($(ARCH)), X86)
-	DEFINES       := -D_DEBUG
-endif
-ifeq ($(ARCH)), RASPI)
-	DEFINES       := RASPI=1
-endif
-
-CFLAGS        = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-CXXFLAGS      = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
+CFLAGS        = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CXXFLAGS      = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 INCPATH       = -I/usr/include/x86_64-linux-gnu/ \
 				-I. \
 				-Iinclude \
@@ -28,10 +20,13 @@ LFLAGS        = -m64
 GLIB2_CC	  = `pkg-config --cflags glib-2.0`
 GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
-
 ifeq ($(ARCH), RASPI)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
-else
+	RASPI_DEFINES  =-DRASPI=1
+else ifeq ($(ARCH), X86)
+	ARCH_LIBS 	  =
+	X86_DEFINES   =-DX86=1
+else 
 	ARCH_LIBS 	  =
 endif
 
@@ -115,6 +110,7 @@ all: clean start compile
 
 start:
 	@echo "\nStarting Make---------------------------------------\n"
+	@echo " >> $(ARCH) selected....\n"
 	 
 compile: Makefile $(TARGET)
 
@@ -155,7 +151,7 @@ socket.o: src/socket.c
 event.o: src/event.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o event.o src/event.c 
 	
-event.o: src/hardware.c
+hardware.o: src/hardware.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o hardware.o src/hardware.c 
 
 ####### Install

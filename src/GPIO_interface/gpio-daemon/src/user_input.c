@@ -30,7 +30,7 @@
 int user_input_manager()
 {
 	// Clear console
-	_CLEAR_DISPLAY();
+	CLEAR_DISPLAY();
 
 	// Print current information about node
 	print_item_text(get_current_node());
@@ -72,7 +72,7 @@ int user_input_manager()
  */
 inline int wait_for_input()
 {
-	return _WAIT_FOR_INPUT();
+	return WAIT_FOR_INPUT();
 }
 
 /**
@@ -82,7 +82,7 @@ inline int wait_for_input()
  */
 inline int wait_for_arrows()
 {
-	return _WAIT_FOR_INPUT_ARROWS();
+	return WAIT_FOR_INPUT_ARROWS();
 
 }
 
@@ -93,5 +93,5 @@ inline int wait_for_arrows()
  */
 inline int wait_for_select()
 {
-	return _WAIT_FOR_INPUT_SELECT();
+	return WAIT_FOR_INPUT_SELECT();
 }

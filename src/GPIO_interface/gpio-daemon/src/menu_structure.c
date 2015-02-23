@@ -2,7 +2,7 @@
  * @file menu_structure.c
  * @author Ronnie Brash (ron.brash@gmail.com)
  * @copy Menu system for Atom Prototype
- */ 
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,6 +15,7 @@
 #include <include/main.h>
 #include <include/menu_structure.h>
 #include <include/menu_item.h>
+#include <include/hardware.h>
 
 GNode *root = NULL;
 GNode *current_node = NULL;
@@ -43,9 +44,10 @@ int initialize_menu_structure()
  * set_current_menu_item(GNode *new_node)
  * @brief Set current node
  * @param new_node
- */ 
-inline void set_current_menu_item(GNode *new_node) {
-	
+ */
+inline void set_current_menu_item(GNode * new_node)
+{
+
 	current_node = new_node;
 }
 
@@ -53,9 +55,10 @@ inline void set_current_menu_item(GNode *new_node) {
  * get_current_node() 
  * @brief Return current node
  * @return current_node
- */ 
-inline GNode *get_current_node() {
-	
+ */
+inline GNode *get_current_node()
+{
+
 	return current_node;
 }
 
@@ -168,39 +171,45 @@ void dump_menu_structure(GNode * node)
  * print_item_text(GNode * node)
  * @brief print current node menu text
  * @param node
- */ 
+ */
 void print_item_text(GNode * node)
 {
 	menu_item_t *item = (menu_item_t *) node->data;
 	debug_msg("\nMENU ITEM-----------------------\n");
-	printf("  %s\n", item->item_name);
-	printf("  %s\n", item->item_text);
+	debug_msg("  %s\n", item->item_name);
+	debug_msg("  %s\n", item->item_text);
+
+	char msg_str[32] = { 0 };
+	memcpy(msg_str, item->item_name, 16);
+	memcpy(msg_str + 16, item->item_text, 16);
+	_OUTPUT_TO_DISPLAY(&msg_str);
 }
 
 /**
  * print_item_menu(GNode * node)
  * @brief print current node menu possibilities
  * @param node
- */ 
+ */
 void print_item_menu(GNode * node)
 {
+#ifdef DEBUG
 	menu_item_t *item = (menu_item_t *) node->data;
 
 	debug_msg("\nMENU OPTIONS-------------------\n");
 	if (item->is_selectable) {
-		printf(" * selectable (s)\n");
+		debug_msg(" * selectable (s)\n");
 	}
 	if (item->is_backable) {
-		printf(" * backable (b)\n");
+		debug_msg(" * backable (b)\n");
 	}
 	if (item->is_cancelable) {
-		printf(" * cancelable (c)\n");
+		debug_msg(" * cancelable (c)\n");
 	}
-	printf(" * left (a)\n");
-	printf(" * right (d)\n");
+	debug_msg(" * left (a)\n");
+	debug_msg(" * right (d)\n");
 
-	printf(" * quit (q)\n");
-	
-	printf("\n");
-	
+	debug_msg(" * quit (q)\n");
+
+	debug_msg("\n");
+#endif
 }

@@ -35,13 +35,16 @@ int execute_menu_item(GNode * node)
 {
 
 	menu_item_t *item = (menu_item_t *) node->data;
+	char msg_str[32] = { 0 };
 
 	if ((item->is_actionable == 1) && (strlen((char *)item->action) > 0)) {
 		if (system(item->action) < 0) {
 			debug_msg("Error executing system command\n");
 			return (-1);
 		}
-		printf("%s\n", (char *)item->action_text);
+		memcpy(msg_str, item->item_name, 16);
+		memcpy(msg_str + 16, item->action, 16);
+		_OUTPUT_TO_DISPLAY(&msg_str);
 	}
 
 	return (0);
@@ -58,13 +61,16 @@ int cancel_menu_item(GNode * node)
 {
 
 	menu_item_t *item = (menu_item_t *) node->data;
+	char msg_str[32] = { 0 };
 
 	if ((item->is_cancelable == 1) && (strlen((char *)item->cancel_action) > 0)) {
 		if (system(item->cancel_action) < 0) {
 			debug_msg("Error executing canceling system command\n");
 			return (-1);
 		}
-		printf("%s\n", (char *)item->cancel_text);
+		memcpy(msg_str, item->item_name, 16);
+		memcpy(msg_str + 16, item->cancel_action, 16);
+		_OUTPUT_TO_DISPLAY(&msg_str);
 	}
 
 	return (0);
@@ -81,13 +87,17 @@ int finished_menu_item(GNode * node)
 {
 
 	menu_item_t *item = (menu_item_t *) node->data;
+	char msg_str[32] = { 0 };
 
 	if ((item->is_finishable == 1) && (strlen((char *)item->finish_text) > 0)) {
 		if (system(item->cancel_action) < 0) {
 			debug_msg("Error executing canceling system command\n");
 			return (-1);
 		}
-		printf("%s\n", (char *)item->finish_text);
+		memcpy(msg_str, item->item_name, 16);
+		memcpy(msg_str + 16, item->finish_text, 16);
+		_OUTPUT_TO_DISPLAY(&msg_str);
+		sleep(5);
 	}
 
 	return (0);
@@ -130,9 +140,11 @@ static inline void dump_ipc_message(ipc_msg_t * msg)
 static inline void print_ipc_message(ipc_msg_t * msg, unsigned int seconds)
 {
 
-	_CLEAR_DISPLAY();
-	printf("%s\n", msg->top_row);
-	printf("%s\n", msg->bot_row);
+	CLEAR_DISPLAY();
+	char msg_str[32] = { 0 };
+	memcpy(msg_str, msg->top_row, 16);
+	memcpy(msg_str + 16, msg->bot_row, 16);
+	OUTPUT_TO_DISPLAY(&msg_str);
 	sleep(seconds);
 }
 

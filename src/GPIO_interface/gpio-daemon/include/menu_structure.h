@@ -37,7 +37,7 @@ typedef struct menu_item_s {
 int initialize_menu_structure();
 int cleanup_menu_structure();
 void dump_menu_structure(GNode * root_of_tree);
-
+	
 void print_item_text(GNode *node);
 void print_item_menu(GNode *node);
 

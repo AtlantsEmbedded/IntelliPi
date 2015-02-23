@@ -182,25 +182,25 @@ void dump_menu_item(menu_item_t * menu_item_obj, uint8_t level)
 		strncat(tabs, "\t", 1);
 	}
 
-	printf("----------------------------------\n");
-	printf("%sname: %s\n", tabs, null_or_not(menu_item_obj->item_name));
-	printf("%stext: %s\n", tabs, null_or_not(menu_item_obj->item_text));
+	debug_msg("----------------------------------\n");
+	debug_msg("%sname: %s\n", tabs, null_or_not(menu_item_obj->item_name));
+	debug_msg("%stext: %s\n", tabs, null_or_not(menu_item_obj->item_text));
 
-	printf("%sselectable: %s\n", tabs, true_or_false(menu_item_obj->is_selectable));
-	printf("%sactionable: %s\n", tabs, true_or_false(menu_item_obj->is_actionable));
-	printf("%scancelable: %s\n", tabs, true_or_false(menu_item_obj->is_cancelable));
-	printf("%sbackable: %s\n", tabs, true_or_false(menu_item_obj->is_backable));
-	printf("%sfinishable: %s\n", tabs, true_or_false(menu_item_obj->is_finishable));
-	printf("%swait_for_finish: %s\n", tabs, true_or_false(menu_item_obj->wait_for_finish));
-	printf("%shas_children: %s\n", tabs, true_or_false(menu_item_obj->has_children));
+	debug_msg("%sselectable: %s\n", tabs, true_or_false(menu_item_obj->is_selectable));
+	debug_msg("%sactionable: %s\n", tabs, true_or_false(menu_item_obj->is_actionable));
+	debug_msg("%scancelable: %s\n", tabs, true_or_false(menu_item_obj->is_cancelable));
+	debug_msg("%sbackable: %s\n", tabs, true_or_false(menu_item_obj->is_backable));
+	debug_msg("%sfinishable: %s\n", tabs, true_or_false(menu_item_obj->is_finishable));
+	debug_msg("%swait_for_finish: %s\n", tabs, true_or_false(menu_item_obj->wait_for_finish));
+	debug_msg("%shas_children: %s\n", tabs, true_or_false(menu_item_obj->has_children));
 
-	printf("%saction: %s\n", tabs, null_or_not(menu_item_obj->action));
-	printf("%saction_text: %s\n", tabs, null_or_not(menu_item_obj->action_text));
+	debug_msg("%saction: %s\n", tabs, null_or_not(menu_item_obj->action));
+	debug_msg("%saction_text: %s\n", tabs, null_or_not(menu_item_obj->action_text));
 
-	printf("%scancel_action: %s\n", tabs, null_or_not(menu_item_obj->cancel_action));
-	printf("%scancel_text: %s\n", tabs, null_or_not(menu_item_obj->cancel_text));
+	debug_msg("%scancel_action: %s\n", tabs, null_or_not(menu_item_obj->cancel_action));
+	debug_msg("%scancel_text: %s\n", tabs, null_or_not(menu_item_obj->cancel_text));
 
-	printf("%sfinish_text: %s\n", tabs, null_or_not(menu_item_obj->finish_text));
-	printf("----------------------------------\n\n");
+	debug_msg("%sfinish_text: %s\n", tabs, null_or_not(menu_item_obj->finish_text));
+	debug_msg("----------------------------------\n\n");
 
 }
