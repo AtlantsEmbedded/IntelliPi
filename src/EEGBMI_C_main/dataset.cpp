@@ -61,7 +61,7 @@ t_dataset *init_dataset(const char* path){
 	fscanf(pfile,"Nb of record trials: %i\n",&pdataset->nb_train_trials);
 	
 	/*get the number of test trials*/
-	fscanf(pfile,"Nb of record trials: %i\n",&pdataset->nb_test_trials);
+	fscanf(pfile,"Nb of test trials: %i\n",&pdataset->nb_test_trials);
 	
 	/*sum up the number of trials*/
 	pdataset->nb_trials = pdataset->nb_train_trials+pdataset->nb_test_trials;
@@ -72,6 +72,11 @@ t_dataset *init_dataset(const char* path){
 	/*read the file, drop the trial id*/
 	for(i=0;i<pdataset->nb_trials;i++){
 		fscanf(pfile,"%i %i\n",&dummy,&pdataset->labels[i]);
+		
+		/*redefine the labels to 1 and -1*/
+		if(pdataset->labels[i]==2){
+			pdataset->labels[i]=-1;
+		}
 	}
 	
 	/*close the info file*/
@@ -109,10 +114,9 @@ t_dataset *init_dataset(const char* path){
 			break;
 		}
 			
-			
 		/*read it and copy it in the array*/
 		for(k=0;k<TIMESERIES_LENGTH;k++){
-			fscanf(pfile,"%f %f %f %f\n",
+			fscanf(pfile,"%lf %lf %lf %lf\n",
 			&pdataset->samplesdata[i].timeseries[0][k],
 			&pdataset->samplesdata[i].timeseries[1][k],
 			&pdataset->samplesdata[i].timeseries[2][k],
@@ -120,7 +124,6 @@ t_dataset *init_dataset(const char* path){
 		}
 				
 	}
-	
 	
 	/*compute the number of train and test trials*/
 	pdataset->nb_train_trials = ceil(TRAIN_TRIALS_PROP*pdataset->nb_trials);
@@ -214,6 +217,7 @@ int preprocess_data(t_dataset *pdataset){
 		}
 	}			 
 
+
 	return EXIT_SUCCESS;
 }
 
@@ -265,9 +269,10 @@ int get_train_dataset_ffted(t_dataset *pdataset, double **feature_vectors, int* 
 	/*form an array of feature vectors using only train trials*/
 	for(i=0;i<pdataset->nb_train_trials;i++){
 		for(j=0;j<NB_CHANNELS;j++){
-			offset = j*TIMESERIES_LENGTH;
+			offset = j*TIMESERIES_LENGTH/2;
 			
-			for(k=0;k<TIMESERIES_LENGTH;k++){
+			/*take only the first half of the fft vector*/
+			for(k=0;k<TIMESERIES_LENGTH/2;k++){
 				feature_vectors[i][k+offset] = pdataset->samplesdata[pdataset->list_of_train_trials[i]].fft_vectors[j][k];
 			}
 		}
@@ -311,7 +316,7 @@ int get_test_dataset_timeseries(t_dataset *pdataset, double **timeseries_vectors
 }
 
 /**
- * get_test_dataset(t_dataset *pdataset, float **feature_vectors, int* labels)randsample(int n)
+ * randsample(int array[], int n)
  * 
  * @brief return an array of n elements. The array is the series of numbers [0, n-1] randomly permutated a large number of times (n*10)
  * @param n, size of the array and range of the indexes

@@ -144,8 +144,8 @@ t_svm* load_svm(){
 	psvm->model->readSVindex("test_svm_svidx.svm_sv");
 	
 	/*hardcoded options for now*/
-	psvm->options.nb_samples = 180; // this do not reflect the number of saved examples however
-	psvm->options.nb_features = 10;
+	//psvm->options.nb_samples = 180; // this do not reflect the number of saved examples however
+	psvm->options.nb_features = 1;
 	
 	return psvm;
 }
