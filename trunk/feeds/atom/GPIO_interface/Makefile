@@ -29,7 +29,7 @@ define Package/GPIO_interface/install
 	$(INSTALL_DIR) $(1)/atom
 	$(INSTALL_DIR) $(1)/atom/bin
 	$(INSTALL_DIR) $(1)/atom/config
-        $(INSTALL_BIN) $(PKG_BUILD_DIR)/gpio-daemon/config/gpio_config.xml $(1)/atom/bin/config
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/gpio-daemon/config/gpio_config.xml $(1)/atom/bin/config
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/gpio-daemon/gpio_interface $(1)/atom/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/gpio-ipc-client/gpio_ipc_client $(1)/atom/bin
 	$(INSTALL_DIR) $(1)/etc
