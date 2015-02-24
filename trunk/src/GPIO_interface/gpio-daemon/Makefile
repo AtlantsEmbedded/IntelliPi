@@ -122,12 +122,6 @@ $(TARGET):  $(OBJECTS)
 
 dist: 
 
-clean: 
-	@echo "\nClean-----------------------------------------------\n"
-	-$(DEL_FILE) $(TARGET)
-	-$(DEL_FILE) $(OBJECTS)
-	-$(DEL_FILE) *~ core *.core
-	@echo "\nClean complete--------------------------------------\n"
 
 
 ####### Compile
