@@ -108,7 +108,7 @@ first: all
 
 ####### Build rules
 
-all: clean start compile
+all: start compile
 
 start:
 	@echo "\nStarting Make---------------------------------------\n"
