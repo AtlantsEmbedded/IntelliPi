@@ -215,6 +215,7 @@ int raspi_print_to_display(void *param)
 {
 	message_str_t *msg = (message_str_t *) param;
 
+	CLEAR_DISPLAY();
 	lcdPosition(lcdHandle, 0, 0);
 	lcdPuts(lcdHandle, msg->top);
 	lcdPosition(lcdHandle, 0, 1);
