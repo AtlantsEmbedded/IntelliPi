@@ -19,7 +19,7 @@ define Package/wiringPi
 	SECTION:=libs
 	CATEGORY:=Libraries
 	TITLE:=wiringPi
-	DEPENDS:=+libpthread +libstdcpp +libc
+	DEPENDS:=+pthread
 endef
 
 define Package/wiringPi/description

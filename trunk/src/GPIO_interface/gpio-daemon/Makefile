@@ -8,22 +8,19 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-CFLAGS        = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
-CXXFLAGS      = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
-INCPATH       = -I/usr/include/x86_64-linux-gnu/ \
-				-I. \
-				-Iinclude \
-				-I/usr/include/glib-2.0 \
-				-I/usr/lib/x86_64-linux-gnu/glib-2.0/include/
+CFLAGS        = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CXXFLAGS      =  -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+INCPATH       = -I. \
+		-Iinclude
 LINK          = g++
-LFLAGS        = -m64
+LFLAGS        =
 GLIB2_CC	  = `pkg-config --cflags glib-2.0`
 GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
-ifeq ($(ARCH), RASPI)
+ifeq ($(ARCH_D), RASPI)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
 	RASPI_DEFINES  =-DRASPI=1
-else ifeq ($(ARCH), X86)
+else ifeq ($(ARCH_D), X86)
 	ARCH_LIBS 	  =
 	X86_DEFINES   =-DX86=1
 else 
