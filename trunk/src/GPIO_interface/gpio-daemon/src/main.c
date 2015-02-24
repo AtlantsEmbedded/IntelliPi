@@ -100,6 +100,8 @@ int main(int argc, char **argv)
 	wait_for_select();
 
 	/// Wait for arrows
+	set_current_menu_item(return_root_node());
+	print_item_text(get_current_node());
 	wait_for_arrows();
 
 	/*
