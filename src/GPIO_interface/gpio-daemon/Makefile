@@ -6,14 +6,14 @@ MAKEFILE      = Makefile
 
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC            = $(CC)
+CXX           = $(CXX)
 CFLAGS        = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 CXXFLAGS      =  -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
-LINK          = g++
+LINK          = $(LD)
 LFLAGS        =
-#GLIB2_CC	  = `pkg-config --cflags glib-2.0`
-#GLIB2_LINK	  = `pkg-config --libs glib-2.0`
+GLIB2_CC	  = `pkg-config --cflags glib-2.0`
+GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
 ifeq ($(ARCH), arm)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
