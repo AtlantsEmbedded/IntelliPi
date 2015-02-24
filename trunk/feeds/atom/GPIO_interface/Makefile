@@ -17,7 +17,7 @@ define Package/GPIO_interface
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=GPIO_interface
-	DEPENDS:=wiringPi +libpthread +ezxml +glib2
+	DEPENDS:=wiringPi +libpthread +libezxml +glib2
 endef
 
 define Package/GPIO_interface/description
