@@ -66,8 +66,8 @@ int raspi_print_to_display(void *param);
 #define INIT_HARDWARE() \
 		_INIT_HARDWARE(NULL)			
 		
-#define INIT_DISPLAY() \
-		_INIT_DISPLAY(NULL)
+#define INIT_DISPLAY(param) \
+		_INIT_DISPLAY(param)
 
 #define WAIT_FOR_INPUT_SELECT() \
 		_WAIT_FOR_INPUT_SELECT(NULL)
