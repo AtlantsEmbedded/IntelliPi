@@ -8,8 +8,8 @@ MAKEFILE      = Makefile
 
 CC            = $(CC)
 CXX           = $(CXX)
-CFLAGS        = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
-CXXFLAGS      =  -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CXXFLAGS      =  -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 LINK          = $(LD)
 LFLAGS        =
 GLIB2_CC	  = `pkg-config --cflags glib-2.0`
@@ -31,7 +31,7 @@ else
 	ARCH_LIBS 	  =
 endif
 
-LIBS          = $(SUBLIBS) -L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
+LIBS          = $(LIBS) -L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
