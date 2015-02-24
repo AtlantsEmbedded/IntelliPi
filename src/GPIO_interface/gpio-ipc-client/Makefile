@@ -6,17 +6,37 @@ MAKEFILE      = Makefile
 
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC            = $(CC)
+CXX           = $(CC)
 DEFINES       = -D_DEBUG
-CFLAGS        = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-CXXFLAGS      = -m64 -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
+CFLAGS        = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
+CXXFLAGS      = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 INCPATH       = -I/usr/include/x86_64-linux-gnu/ -I. -Iinclude -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include/
-LINK          = g++
-LFLAGS        = -m64
+LINK          = $(CC)
+LFLAGS        = 
 GLIB2_CC	  = `pkg-config --cflags glib-2.0`
 GLIB2_LINK	  = `pkg-config --libs glib-2.0`
-LIBS          = $(SUBLIBS) -L/usr/lib/x86_64-linux-gnu -lpthread -lezxml
+
+ifeq ($(ARCH), arm)
+	ARCH_LIBS = -lwiringPi -lwiringPiDev
+	RASPI_DEFINES  =-DRASPI=1
+	INCPATH       = -I. \
+	-Iinclude \
+	-I$(STAGING_DIR)/include \
+	-I$(STAGING_DIR)/usr/include/glib-2.0/
+	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT -fPIE  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+else ifeq ($(ARCH), x86)
+	ARCH_LIBS 	  =
+	X86_DEFINES   =-DX86=1
+	INCPATH       = -I. \
+	-Iinclude \
+else 
+	ARCH_LIBS 	  =
+endif
+
+LIBS=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
+
+
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
