@@ -31,7 +31,7 @@ else
 	ARCH_LIBS 	  =
 endif
 
-LIBS          = $(LIBS) -L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
+LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
