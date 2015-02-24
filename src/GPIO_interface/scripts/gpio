@@ -5,7 +5,7 @@ START=1
 STOP=2
  
 start() {        
-        /atom/gpio/gpio_interface &
+        /atom/gpio/gpio_interface /atom/gpio/config/gpio_config.xml &
 }                 
  
 stop() {          
@@ -13,5 +13,5 @@ stop() {
 }
 
 boot() {
-        /atom/gpio/gpio_interface &
+        /atom/gpio/gpio_interface /atom/gpio/config/gpio_config.xml &
 }

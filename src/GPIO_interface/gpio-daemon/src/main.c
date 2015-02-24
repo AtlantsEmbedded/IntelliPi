@@ -98,9 +98,9 @@ int main(int argc, char **argv)
 	/// Print Banner & Instructions
 	print_instructions(&app_info);
 	wait_for_select();
-
+	
 	/// Wait for arrows
-	set_current_menu_item(return_root_node());
+	set_current_menu_item(g_node_first_sibling(return_root_node()));
 	print_item_text(get_current_node());
 	wait_for_arrows();
 
