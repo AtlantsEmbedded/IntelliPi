@@ -12,8 +12,8 @@ CFLAGS        = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINE
 CXXFLAGS      =  -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 LINK          = g++
 LFLAGS        =
-GLIB2_CC	  = `pkg-config --cflags glib-2.0`
-GLIB2_LINK	  = `pkg-config --libs glib-2.0`
+#GLIB2_CC	  = `pkg-config --cflags glib-2.0`
+#GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
 ifeq ($(ARCH), arm)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
@@ -31,7 +31,7 @@ else
 	ARCH_LIBS 	  =
 endif
 
-LIBS          = $(SUBLIBS) -L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml $(ARCH_LIBS)
+LIBS          = $(SUBLIBS) -L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
