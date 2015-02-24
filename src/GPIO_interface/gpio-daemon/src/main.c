@@ -92,6 +92,9 @@ int main(int argc, char **argv)
 		exit (-1);
 	}
 	
+	/// Initialize hardware abstraction layer & LCD
+	INIT_HARDWARE();
+	
 	/// Print Banner & Instructions
 	print_instructions(&app_info);
 	wait_for_select();

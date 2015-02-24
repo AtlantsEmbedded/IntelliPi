@@ -152,6 +152,8 @@ int raspi_setup(void *param __attribute__ ((unused)))
 
 	/// Setup LCD
 	mcp23017Setup(AF_BASE, 0x20);
+	
+	INIT_DISPLAY(BLUE_COLOR);
 
 	return (0);
 }
