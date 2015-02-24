@@ -5,7 +5,7 @@ START=1
 STOP=2
  
 start() {        
-        /atom/bin/gpio_interface 1 &
+        /atom/gpio/gpio_interface &
 }                 
  
 stop() {          
@@ -13,5 +13,5 @@ stop() {
 }
 
 boot() {
-        /atom/bin/gpio_interface 1 &
+        /atom/gpio/gpio_interface &
 }
