@@ -54,9 +54,9 @@ define Package/wiringPi/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(INSTALL_DIR) $(1)/usr/include
 	$(INSTALL_DIR) $(1)/usr/bin
-	cp $(PKG_BUILD_DIR)/devLib/libwiringPiDev.so $(1)/usr/lib/
+	cp $(PKG_BUILD_DIR)/devLib/libwiringPiDev.so.* $(1)/usr/lib/libwiringPiDev.so
 	cp $(PKG_BUILD_DIR)/devLib/*.h $(1)/usr/include/
-	cp $(PKG_BUILD_DIR)/wiringPi/libwiringPi.so $(1)/usr/lib/
+	cp $(PKG_BUILD_DIR)/wiringPi/libwiringPi.so.* $(1)/usr/lib/libwiringPi.so
 	cp $(PKG_BUILD_DIR)/wiringPi/*.h $(1)/usr/include/
 	cp $(PKG_BUILD_DIR)/gpio/gpio $(1)/usr/bin/
 endef
