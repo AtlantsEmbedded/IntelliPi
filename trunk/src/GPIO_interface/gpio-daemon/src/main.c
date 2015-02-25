@@ -97,19 +97,30 @@ int main(int argc, char **argv)
 	
 	/// Print Banner & Instructions
 	print_instructions(&app_info);
+	
+	/// Wait for select
 	wait_for_select();
 	
 	/// Wait for arrows
-	set_current_menu_item(g_node_first_sibling(return_root_node()));
+	
+	/// Step 1 set menu item to child of root
+	set_current_menu_item(g_node_first_child(return_root_node()));
+	
+	/// Step 2 print node
 	print_item_text(get_current_node());
+	
+	/// Step 3 wait for left or right "arrow" button to be pressed
 	wait_for_arrows();
+	
+	/// Step 4 set node to first child of this parent
+	set_current_menu_item(g_node_first_child(get_current_node()));
 
 	/*
 	 * Dump complete menu data structure if needed
 	 * dump_menu_structure(return_root_node());
 	 */
 
-	/// Control loop
+	/// Control loop to begin normal menu operation
 	for (;;) {
 		int res = 0;
 		res = user_input_manager();

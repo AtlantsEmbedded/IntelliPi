@@ -152,7 +152,7 @@ int raspi_setup(void *param __attribute__ ((unused)))
 
 	/// Setup LCD
 	mcp23017Setup(AF_BASE, 0x20);
-	
+
 	INIT_DISPLAY(BLUE_COLOR);
 
 	return (0);
@@ -165,7 +165,7 @@ int raspi_setup(void *param __attribute__ ((unused)))
  */
 int raspi_wait_for_select(void *param __attribute__ ((unused)))
 {
-	debug_msg("Press SELECT to continue: ");
+	debug_msg("Press SELECT to continue: \n");
 
 	while (digitalRead(AF_SELECT) == HIGH)	// Wait for push
 		delay(1);
@@ -183,13 +183,27 @@ int raspi_wait_for_select(void *param __attribute__ ((unused)))
  */
 int raspi_wait_for_arrows(void *param __attribute__ ((unused)))
 {
-	debug_msg("Press ARROWS (left/Right) to continue: ");
+	debug_msg("Press ARROWS (left/Right) to continue: \n");
 
-	while ((digitalRead(AF_LEFT) == HIGH) || (digitalRead(AF_RIGHT) == HIGH))	// Wait for push
-		delay(1);
+	int res = 0;
+	for (;;) {
+		if (res >= 1) {
+			if ((digitalRead(AF_UP) == LOW) || (digitalRead(AF_DOWN) == LOW)
+			    || (digitalRead(AF_RIGHT) == LOW) || (digitalRead(AF_LEFT) == LOW))
+				continue;
+			else
+				return (0);
+		}
 
-	while ((digitalRead(AF_LEFT) == LOW) || (digitalRead(AF_RIGHT) == LOW))	// Wait for release
-		delay(1);
+		if (digitalRead(AF_LEFT) == LOW) {
+			res = PREV_EVENT;
+			debug_msg("Prev event\n");
+		}
+		if (digitalRead(AF_RIGHT) == LOW) {
+			res = NEXT_EVENT;
+			debug_msg("Next event\n");
+		}
+	}
 
 	return (0);
 }
