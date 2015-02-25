@@ -27,8 +27,8 @@ void kill_svm(t_svm* psvm);
 
 double classify_with_svm(t_svm* psvm, double *samples);
 
-int save_svm(t_svm* psvm);
-t_svm* load_svm();
+int save_svm(t_svm* psvm, char* name);
+t_svm* load_svm(char* name);
 
 
 

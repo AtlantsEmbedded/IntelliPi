@@ -41,7 +41,7 @@ t_svm* train_svm(double **samples, int* labels, t_svm_options options){
 	psvm->options = options;
 	
 	/*set the parameters for a default svm*/
-	if (!param.set("-l 0 -t 1 -d 2 -c 1")){
+	if (!param.set("-l 0 -t 0 -c 0.2")){
 		fprintf(stderr, "Error params");
 		goto cleanup;
 	}
@@ -118,10 +118,33 @@ double classify_with_svm(t_svm* psvm, double *sample){
  * @param psvm, a trained svm 
  * @return EXIT_SUCCESS
  */
-int save_svm(t_svm* psvm){
+int save_svm(t_svm* psvm, char* name){
 	
-	psvm->model->write ("test_svm_examples.svm_ex");
-	psvm->model->writeSVindex ("test_svm_svidx.svm_sv");
+	FILE* pfile;
+	char buffer[80];
+	
+	strcpy(buffer,name);
+	strcat(buffer,".svm_ex");
+	
+	psvm->model->write (buffer);
+	
+	strcpy(buffer,name);
+	strcat(buffer,".svm_sv");
+	
+	psvm->model->writeSVindex(buffer);
+	
+	strcpy(buffer,name);
+	strcat(buffer,".svm_opt");
+	
+	pfile = fopen(buffer,"wb");
+	
+	if(!pfile){
+		printf("Error: svm save option file cannot be opened\n");
+		return EXIT_FAILURE;
+	}
+	
+	fwrite(&(psvm->options.nb_samples),sizeof(int),1,pfile);
+	fwrite(&(psvm->options.nb_features),sizeof(int),1,pfile);
 	
 	return EXIT_SUCCESS;
 }
@@ -133,19 +156,38 @@ int save_svm(t_svm* psvm){
  * @param psvm, a trained svm 
  * @return the svm loaded by the function
  */
-t_svm* load_svm(){
+t_svm* load_svm(char* name){
+	
+	FILE* pfile;
+	char buffer[80];
 	
 	/*init the empty svm*/
 	t_svm* psvm = (t_svm*)malloc(sizeof(t_svm));
 	psvm->model = new TinySVM::Model();
 	
-	/*read the saved parameters*/
-	psvm->model->read("test_svm_examples.svm_ex");	
-	psvm->model->readSVindex("test_svm_svidx.svm_sv");
+	strcpy(buffer,name);
+	strcat(buffer,".svm_ex");
 	
-	/*hardcoded options for now*/
-	//psvm->options.nb_samples = 180; // this do not reflect the number of saved examples however
-	psvm->options.nb_features = 1;
+	/*read the saved parameters*/
+	psvm->model->read(buffer);
+	
+	strcpy(buffer,name);
+	strcat(buffer,".svm_sv");
+		
+	psvm->model->readSVindex(buffer);
+	
+	strcpy(buffer,name);
+	strcat(buffer,".svm_opt");
+		
+	pfile = fopen(buffer,"wb");
+	
+	if(!pfile){
+		printf("Error: svm save option file cannot be opened\n");
+		return NULL;
+	}
+	
+	fread(&(psvm->options.nb_samples),sizeof(int),1,pfile); // this do not reflect the number of saved examples to be fixed
+	fread(&(psvm->options.nb_features),sizeof(int),1,pfile);
 	
 	return psvm;
 }

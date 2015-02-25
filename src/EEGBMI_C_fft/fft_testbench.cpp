@@ -74,34 +74,11 @@ static double max_log_error = -INFINITY;
 	int prev;
 	srand(time(NULL));
 	
-	test_real_valued_fft(128);
+	test_real_valued_fft(200);
 	
-#if 0
-	/*Test power-of-2 size FFTs*/
-	/*from N=2^0 to 2^12*/
-	for (i = 0; i <= 12; i++)
-		test_real_valued_fft(1 << i);
-	
-	/*Test small size FFTs*/
-	/*from N=0 to 30*/
-	for (i = 0; i < 30; i++)
-		test_real_valued_fft(i);
-	
-	// Test diverse size FFTs
-	prev = 0;
-	for (i = 0; i <= 100; i++) {
-		int n = (int)lround(pow(1500, i / 100.0));
-		if (n > prev) {
-			test_real_valued_fft(n);
-			prev = n;
-		}
-	}
-#endif
-
-	
-	printf("\n");
-	printf("Max log err = %.1f\n", max_log_error);
-	printf("Test %s\n", max_log_error < -10 ? "passed" : "failed");
+	//printf("\n");
+	//printf("Max log err = %.1f\n", max_log_error);
+	//printf("Test %s\n", max_log_error < -10 ? "passed" : "failed");
 	return 0;
 }
 
@@ -115,19 +92,24 @@ static double max_log_error = -INFINITY;
 static void test_real_valued_fft(int n) {
 
 	int i,k;
-	double *real_valued_signal;
+	double signal_avg = 0.0;
+	double *real_valued_signal, *real_valued_signal2;
 	double *inputreal, *inputimag;
 	double *refoutreal, *refoutimag;
-	double *tempoutreal, *tempoutimag;
-	double *actualoutreal, *actualoutimag;
-	double *Ar, *Ai, *Br, *Bi;
+	double *X1_abs, *X2_abs;
 	
 	/*Create a real-valued signal g(n)*/
-	real_valued_signal = random_reals(2*n);
+	real_valued_signal = zero_reals(n);
+	real_valued_signal2 = zero_reals(n);
 	
+	for(k=0;k<n;k++){
+		real_valued_signal[k] = sin(M_PI *4*k / n);
+		real_valued_signal2[k] = sin(M_PI *8*k / n);
+		signal_avg += real_valued_signal[k]/n;
+	}
 	
-	for(k=0;k<2*n;k++){
-		real_valued_signal[k] = -sin(M_PI * 3*k / n);
+	for(k=0;k<n;k++){
+		real_valued_signal[k] -= signal_avg;
 	}
 	
 	/*
@@ -138,19 +120,15 @@ static void test_real_valued_fft(int n) {
 	*/
 	
 	/*perform the 2*N naive-dft by padding the imaginary part with 0s*/
-	inputreal = memdup(real_valued_signal,2 * n);
-	inputimag = zero_reals(2 * n);
-	refoutreal = malloc(2 * n * sizeof(double));
-	refoutimag = malloc(2 * n * sizeof(double));
-	naive_dft(inputreal, inputimag, refoutreal, refoutimag, 0, 2*n);
+	inputreal = (double*)memdup(real_valued_signal, n* sizeof(double));
+	inputimag = zero_reals(n);
+	refoutreal = (double*)malloc(n * sizeof(double));
+	refoutimag = (double*)malloc(n * sizeof(double));
+	naive_dft(inputreal, inputimag, refoutreal, refoutimag, 0, n);
 	
-	/*
-	for(k=0;k<2*n;k++){
-		printf("%0.4f\n",sqrt(refoutreal[k]*refoutreal[k]+refoutimag[k]*refoutimag[k]));
+	for(k=0;k<n;k++){
+		printf("%f\n",inputimag[k]);
 	}
-	*/
-	
-	/*rearrange the result to get the true G(k)*/
 	
 	/*Terminate the test*/
 	free(inputreal);
@@ -165,121 +143,37 @@ static void test_real_valued_fft(int n) {
 	*/
 	
 	/*form the complex signal x(n) = g1(n)+j*g2(n)*/
-	inputreal = malloc(n * sizeof(double));
-	inputimag = malloc(n * sizeof(double));
+	inputreal = (double*)malloc(n * sizeof(double));
+	inputimag = (double*)malloc(n * sizeof(double));
 	
 	for(i=0;i<n;i++){
-		inputreal[i] = real_valued_signal[2*i];
-		inputimag[i] = real_valued_signal[2*i+1];
+		inputreal[i] = real_valued_signal[i];
+		inputimag[i] = real_valued_signal2[i];
 	}
 	
 	//naive_dft(inputreal, inputimag, refoutreal, refoutimag, 0, n);
 	
 	/*run the N-fft*/
-	tempoutreal = memdup(inputreal, n * sizeof(double));
-	tempoutimag = memdup(inputimag, n * sizeof(double));
-	transform(tempoutreal, tempoutimag, n);
+	X1_abs = (double*)malloc(n * sizeof(double));
+	X2_abs = (double*)malloc(n * sizeof(double));
 	
+	abs_fft_2signals(inputreal,inputimag,X1_abs,X2_abs,n);
 	
-	/* Rearrange the result X(k) to get the desired G(k)
-	 * Equation: G(k) = X(k)*A(k) + X*(N-k)B(k)
-	 *
-	 * which can be expressed as:
-	 * Gr(k) = Xr(k)Ar(k) - Xi(k)Ai(k) + Xr(N-k)Br(k) + Xi(N-k)Bi(k) 
-	 * Gi(k) = Xi(k)Ar(k) + Xr(k)Ai(k) + Xr(N-k)Bi(k) - Xi(N-k)Br(k)
-	 * with k = 0,1,...,N-1 and X(N) = X(0)
-	 *
-	 * Gr(N) = Xr(0) - Xi(0)
-	 * Gi(N) = 0
-	 *
-	 * Symmetric part of the fft
-	 * Gr(2N-k) = Gr(k)
-	 * Gi(2N-k) = Gi(k)
-	 *
-	 * With Ar, Ai, Br and Bi equal to:
-	 * Ar(k) = -sin(pi*k/N)
-	 * Ai(k) = -cos(pi*k/N)
-	 * Br(k) = sin(pi*k/N)
-	 * Bi(k) = cos(pi*k/N)
-	 * with k=0->N-1
-	*/
-	/*allocate the memory for G(k)*/
-	actualoutreal = malloc(2 * n * sizeof(double));
-	actualoutimag = malloc(2 * n * sizeof(double));
-	
-	/*and for the A and B factors*/
-	Ar = malloc(n * sizeof(double));
-	Ai = malloc(n * sizeof(double));
-	Br = malloc(n * sizeof(double));
-	Bi = malloc(n * sizeof(double));
-	
-	/*Buid the Ar, Ai, Br and Bi tables*/
 	for(k=0;k<n;k++){
-		Ar[k] = -sin(M_PI * k / n);
-		Ai[k] = -cos(M_PI * k / n);
-		Br[k] = sin(M_PI * k / n);
-		Bi[k] = cos(M_PI * k / n);
-	}
-	
-	actualoutreal[0] =  tempoutreal[0]*Ar[0] 
-						- tempoutimag[0]*Ai[0]
-						+ tempoutreal[0]*Br[0]
-						+ tempoutimag[0]*Bi[0];
-	actualoutimag[0] =  tempoutimag[0]*Ar[0] 
-						+ tempoutreal[0]*Ai[0]
-						+ tempoutreal[0]*Bi[0]
-						- tempoutimag[0]*Br[0];
-							
-	/*start with k = 0->N-1*/
-	for(k=1;k<n;k++){		
-		
-		/* Gr(k) = Xr(k)Ar(k) 
-				   - Xi(k)Ai(k) 
-				   + Xr(N-k)Br(k) 
-				   + Xi(N-k)Bi(k) */
-		actualoutreal[k] =  tempoutreal[k]*Ar[k] 
-							- tempoutimag[k]*Ai[k]
-							+ tempoutreal[n-k]*Br[k]
-							+ tempoutimag[n-k]*Bi[k];
-							 
-		/* Gi(k) = Xi(k)Ar(k) 
-				   + Xr(k)Ai(k) 
-				   + Xr(N-k)Bi(k) 
-				   - Xi(N-k)Br(k)*/
-		actualoutimag[k] =  tempoutimag[k]*Ar[k] 
-							+ tempoutreal[k]*Ai[k]
-							+ tempoutreal[n-k]*Bi[k]
-							- tempoutimag[n-k]*Br[k];
-	}
-	
-	/*then k = N->2*N*/
-	actualoutreal[n] = tempoutreal[0]-tempoutimag[0];
-	actualoutimag[n] = 0;
-	
-	for(k=1;k<n;k++){		
-		actualoutreal[2*n-k] = actualoutreal[k]; 
-		actualoutimag[2*n-k] = -actualoutimag[k];
-	}
-	
-	
-	for(k=0;k<2*n;k++){
-		printf("%0.4f %0.4f\n",sqrt(refoutreal[k]*refoutreal[k]+refoutimag[k]*refoutimag[k]),sqrt(actualoutreal[k]*actualoutreal[k]+actualoutimag[k]*actualoutimag[k]));
+		printf("%0.4f %0.4f %0.4f\n",sqrt(refoutreal[k]*refoutreal[k]+refoutimag[k]*refoutimag[k]),X1_abs[k],X2_abs[k]);
 	}
 	
 	/*Compare the results*/
-	printf("fftsize=%4d  logerr=%5.1f\n", n, log10_rms_err(refoutreal, refoutimag, actualoutreal, actualoutimag, 2*n));
+	//printf("fftsize=%4d  logerr=%5.1f\n", n, log10_rms_err(refoutreal, refoutimag, actualoutreal, actualoutimag, 2*n));
 	
 	free(real_valued_signal);
-	free(Ar);
-	free(Ai);
-	free(Br);
-	free(Bi);
+	
 	free(inputreal);
 	free(inputimag);
 	free(refoutreal);
 	free(refoutimag);
-	free(actualoutreal);
-	free(actualoutimag);
+	free(X1_abs);
+	free(X2_abs);
 }
 
 
@@ -347,7 +241,7 @@ static double log10_rms_err(const double *xreal, const double *ximag, const doub
  * @return 1 if success, 0 otherwise
  */ 
 static double *random_reals(int n) {
-	double *result = malloc(n * sizeof(double));
+	double *result = (double*)malloc(n * sizeof(double));
 	int i;
 	for (i = 0; i < n; i++)
 		result[i] = (rand() / (RAND_MAX + 1.0)) * 2 - 1;
@@ -362,7 +256,7 @@ static double *random_reals(int n) {
  * @return 1 if success, 0 otherwise
  */ 
 static double *zero_reals(int n) {
-	double *result = malloc(n * sizeof(double));
+	double *result = (double*)malloc(n * sizeof(double));
 	int i;
 	for (i = 0; i < n; i++)
 		result[i] = 0;
@@ -380,7 +274,7 @@ static double *zero_reals(int n) {
  * @return 1 if success, 0 otherwise
  */ 
 static void *memdup(const void *src, size_t n) {
-	void *dest = malloc(n);
+	void *dest = (double*)malloc(n);
 	if (dest != NULL)
 		memcpy(dest, src, n);
 	return dest;

@@ -4,14 +4,14 @@
 # Frédéric Simard, 2014
 
 # compile with gcc
-CC        = gcc 
+CC        = g++ 
 
 # need flags for math and real-time
 LDFLAGS   = -lm -lrt
 # name of the program
 PROGRAM   = EEGBMI_fft.exe
 # files of the program
-SRCS      = 2_signals_1fft.c fft.c
+SRCS      = fft_testbench.cpp fft.cpp
 OBJS      = $(SRCS:.c=.o)
 
 #
