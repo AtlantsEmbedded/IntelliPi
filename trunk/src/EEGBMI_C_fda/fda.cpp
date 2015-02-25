@@ -154,12 +154,13 @@ void kill_fda(t_fda *pfda){
 /**
  * int transform_data(t_fda *pfda, double **dataset, double **fdaed_dataset, int nb_samples)
  * 
- * @brief (TO BE DONE)this function brings the data contained in the dataset into the fda defined space of representation.
+ * @brief this function brings the data contained in the dataset into the fda defined space of representation.
  * @param dataset, NxF double array, where N is the number of samples and F the number of features (must match the define).
  * @param (out)fdaed_dataset, transformed data.
- * @return 1 if success, 0 otherwise
+ * @param nb_samples, number of samples.
+ * @return EXIT_SUCCESS if success, EXIT_FAILURE otherwise
  */ 
-int transform_data(t_fda *pfda, double **dataset, double *fdaed_dataset, int nb_samples){
+int transform_data(t_fda *pfda, double **dataset, double **fdaed_dataset, int nb_samples){
 	
 	int i,j;
 	double temp_sum;
@@ -174,9 +175,105 @@ int transform_data(t_fda *pfda, double **dataset, double *fdaed_dataset, int nb_
 			temp_sum += dataset[i][j]*eign_vec(j);
 		}	
 		
-		fdaed_dataset[i]=temp_sum;
+		fdaed_dataset[i][0]=temp_sum;
 	}
+	
+	return EXIT_SUCCESS;
 }
+
+/**
+ * int save_fda(t_fda *pfda, char* filename)
+ * 
+ * @brief Saves the FDA parameters in a binary file.
+ * @param pfda, FDA to be saved
+ * @param filename, filename to be used.
+ * @return EXIT_SUCCESS if success, EXIT_FAILURE otherwise
+ */ 
+int save_fda(t_fda *pfda, char* filename){
+	
+	int i,j;
+	FILE* pfile;
+	double temp_d;
+	int temp_i;
+	
+	pfile = fopen(filename,"wb");
+	
+	if(!pfile){
+		printf("Error: fda save file cannot be opened\n");
+		return EXIT_FAILURE;
+	}
+	
+	fwrite(&(pfda->options.nb_classes),sizeof(int),1,pfile);
+	fwrite(&(pfda->options.nb_features),sizeof(int),1,pfile);
+	
+	for(i=0;i<pfda->options.nb_features;i++){
+		for(j=0;j<pfda->options.nb_features;j++){
+			temp_d = pfda->eigen_vectors(i,j);
+			fwrite(&temp_d,sizeof(double),1,pfile);
+		}
+	}
+	
+	for(i=0;i<pfda->options.nb_features;i++){
+		temp_d = pfda->eigen_values(i);
+		fwrite(&temp_d,sizeof(double),1,pfile);
+	}
+
+	fwrite(&(pfda->max_eigen_value_idx),sizeof(int),1,pfile);	
+	
+	fclose(pfile);	
+	
+	return EXIT_SUCCESS;
+}
+
+/**
+ * t_fda *load_fda(char* filename)
+ * 
+ * @brief Loads the FDA parameters from a binary file.
+ * @param filename, filename to be used.
+ * @return a FDA ready to be used
+ */ 
+t_fda *load_fda(char* filename){
+
+	int i,j;	
+	t_fda *pfda = (t_fda*)malloc(sizeof(t_fda));
+	FILE* pfile;
+	double temp_d;
+	int temp_i;
+	
+	pfile = fopen(filename,"rb");
+	
+	if(!pfile){
+		printf("Error: fda save file cannot be opened\n");
+		return NULL;
+	}
+	
+	fread(&(pfda->options.nb_classes),sizeof(int),1,pfile);
+	fread(&(pfda->options.nb_features),sizeof(int),1,pfile);
+	
+	pfda->eigen_vectors.resize(pfda->options.nb_features,pfda->options.nb_features);
+	pfda->eigen_values.resize(pfda->options.nb_features);
+	
+	for(i=0;i<pfda->options.nb_features;i++){
+		for(j=0;j<pfda->options.nb_features;j++){
+			fread(&temp_d,sizeof(double),1,pfile);
+			pfda->eigen_vectors(i,j) = temp_d;
+		}
+	}
+	
+	for(i=0;i<pfda->options.nb_features;i++){
+		fread(&temp_d,sizeof(double),1,pfile);
+		pfda->eigen_values(i) = temp_d;
+	}
+
+	fread(&(pfda->max_eigen_value_idx),sizeof(int),1,pfile);	
+	
+	fclose(pfile);	
+	
+	return pfda;
+}
+
+
+
 
 /**
  * int split_dataset(int *labels, int nb_of_samples, int** label_a_list, int** label_b_list, int* label_a_count, int* label_b_count)

@@ -3,7 +3,7 @@
  * @author Frédéric Simard
  * @date January, 2015
  * @brief This file implements a wrapper that reads the samples from ASCII files.
- *		  It then process the timeseries to build the feature vectors. It offers
+ *		  It then process the timeseries to build the feature vectors (fft). It offers
  *        the functionalities to shuffle the dataset into a train and test set.
  */
 
@@ -214,6 +214,11 @@ int preprocess_data(t_dataset *pdataset){
 							 pdataset->samplesdata[i].fft_vectors[j*2], 
 							 pdataset->samplesdata[i].fft_vectors[j*2+1],
 							 TIMESERIES_LENGTH);
+			
+			/*patch*/
+			//pdataset->samplesdata[i].fft_vectors[j*2][0] = 0;
+			//pdataset->samplesdata[i].fft_vectors[j*2+1][0] = 0;				 
+							 
 		}
 	}			 
 

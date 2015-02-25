@@ -11,7 +11,7 @@
 #define TIMESERIES_LENGTH 600
 #define NB_CHANNELS 4
 #define FFTED_VECTOR_LENGTH TIMESERIES_LENGTH/2*NB_CHANNELS
-#define TRAIN_TRIALS_PROP 0.85
+#define TRAIN_TRIALS_PROP 0.95
 
 typedef struct Ssampledata{
 	double **timeseries; // timeseries associated with each trials, one per channels
