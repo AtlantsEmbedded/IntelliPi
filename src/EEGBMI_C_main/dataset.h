@@ -43,6 +43,5 @@ int preprocess_data(t_dataset *pdataset);
 int split_train_test_sets(t_dataset *pdataset);
 
 int get_train_dataset_ffted(t_dataset *pdataset, double **feature_vectors, int* labels);
-int get_test_dataset_timeseries(t_dataset *pdataset, double **timeseries_vectors, int* labels);
-
+int get_test_sample_timeseries(t_dataset *pdataset, double **timeseries_vectors, int* labels);
 #endif
