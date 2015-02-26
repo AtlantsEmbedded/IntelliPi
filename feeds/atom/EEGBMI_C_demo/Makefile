@@ -30,7 +30,7 @@ define Package/EEGBMI_C_demo/install
 	$(INSTALL_DIR) $(1)/atom/demo/config_files
 	$(INSTALL_DIR) $(1)/atom/demo/acii_files_3
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/EEGBMI.exe $(1)/atom/demo/eegbmi
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ascii_files_3/* $(1)/atom/demo/acii_files_3/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ascii_files_3/* $(1)/atom/demo/ascii_files_3/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/config_files/* $(1)/atom/demo/config_files/
 endef
 
