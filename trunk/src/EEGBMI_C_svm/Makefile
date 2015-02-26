@@ -17,17 +17,19 @@ TARGET2       = lib$(LIBBASENAME).so.$(MAJVER).$(MINVER)
 ####### Compiler, tools and options
 LD	      	  := $(CC)
 CC            := $(CC)
-CXX           := $(CC)
+CXX           := $(CXX)
 LEX           := flex
 YACC          := yacc
 CFLAGS        := -Wall -fPIC $(CFLAGS)
 CXXFLAGS      := -Wall -fPIC $(CXXFLAGS)
 LEXFLAGS      := 
 YACCFLAGS     := -d
-INCPATH       := -I. -I/include/ -I/usr/include/
+INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
+#INCPATH       := -I. -I/include/ -I/usr/include/
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
-LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
+LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib
+#LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
 AR            := ar
 AR_ARGS	      := cqs	
 RANLIB        := 
@@ -63,7 +65,17 @@ SOURCES       = svm.cpp \
 				svm_solver.cpp \
 				qp_solver.cpp
 				
-OBJECTS       = $(SRCS:.cpp=.o)
+OBJECTS       = svm.o \
+				base_example.o \
+				oneclass_solver.o \
+				classifier.o \
+				example.o \
+				svr_solver.o \
+				param.o \
+				q_matrix.o \
+				model.o \
+				svm_solver.o \
+				qp_solver.o
 
 first: all
 ####### Implicit rules
@@ -117,27 +129,27 @@ distclean: clean
 
 ####### Compile
 
-base_example.cpp.o: base_example.cpp 
+base_example.o: base_example.cpp 
 
-oneclass_solver.cpp.o: oneclass_solver.cpp 
+oneclass_solver.o: oneclass_solver.cpp 
 
-svm.cpp.o: svm.cpp 
+svm.o: svm.cpp 
 
-svr_solver.cpp.o: svr_solver.cpp 
+svr_solver.o: svr_solver.cpp 
 
-classifier.cpp.o: classifier.cpp 
+classifier.o: classifier.cpp 
 
-param.cpp.o: param.cpp 
+param.o: param.cpp 
 
-example.cpp.o: example.cpp 
+example.o: example.cpp 
 
-q_matrix.cpp.o:	q_matrix.cpp 
+q_matrix.o:	q_matrix.cpp 
 
-svm_solver.cpp.o: svm_solver.cpp 
+svm_solver.o: svm_solver.cpp 
 
-model.cpp.o: model.cpp 
+model.o: model.cpp 
 
-qp_solver.cpp.o: qp_solver.cpp
+qp_solver.o: qp_solver.cpp
 
 ####### Install
 
