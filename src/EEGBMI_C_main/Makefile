@@ -10,12 +10,11 @@ CC            = $(CC)
 CXX           = $(CXX)
 DEFINES       = -D_DEBUG
 CFLAGS        = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-CXXFLAGS      = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) -I$(STAGING_DIR)/usr/include/uClibc++
+CXXFLAGS      = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) \
+				-I$(STAGING_DIR)/usr/include/uClibc++
 INCPATH       = -I. -Iinclude
 LINK          = $(CC)
 LFLAGS        = 
-GLIB2_CC	  = `pkg-config --cflags glib-2.0`
-GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
 ifeq ($(ARCH), arm)
 	ARCH_LIBS = 
@@ -23,8 +22,8 @@ ifeq ($(ARCH), arm)
 	INCPATH       = -I. \
 	-Iinclude \
 	-I$(STAGING_DIR)/include \
-	-I$(STAGING_DIR)/usr/include/glib-2.0/
-	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT -fPIE  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT \
+	-fPIE  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
 	X86_DEFINES   =-DX86=1
@@ -108,7 +107,7 @@ compile: Makefile $(TARGET)
 
 $(TARGET):  $(OBJECTS)
 	@echo "\nLinking----------------------------------------------\n"
-	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(GLIB2_LINK)
+	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 dist: 
 
