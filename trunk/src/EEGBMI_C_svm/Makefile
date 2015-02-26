@@ -24,7 +24,8 @@ CFLAGS        := -Wall -fPIC $(CFLAGS)
 CXXFLAGS      := -Wall -fPIC $(CXXFLAGS) -fno-builtin -fno-rtti -nostdinc++
 LEXFLAGS      := 
 YACCFLAGS     := -d
-INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include -I$(STAGING_DIR)/usr/include/uClibc++
+INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include \
+			-I$(STAGING_DIR)/usr/include/uClibc++
 #INCPATH       := -I. -I/include/ -I/usr/include/
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
