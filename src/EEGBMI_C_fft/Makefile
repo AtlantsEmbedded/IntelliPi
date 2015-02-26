@@ -109,7 +109,7 @@ distclean: clean
 
 ####### Compile
 
-fft.o: fft.cpp
+fft.cpp.o: fft.cpp
 
 ####### Install
 
