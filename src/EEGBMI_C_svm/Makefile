@@ -51,19 +51,21 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = svm.cpp \
-				base_example.cpp \ 
-				classifier.cpp \
-				example.cpp \
-				model.cpp \
-				param.cpp \
-				q_matrix.cpp \
-				qp_solver.cpp \
-				svm_solver.cpp \
+SOURCES       = base_example.cpp \ 
+				oneclass_solver.cpp \
+				svm.cpp \
 				svr_solver.cpp \
-				oneclass_solver.cpp
+				classifier.cpp \
+				param.cpp \
+				svm_learn \
+				example.cpp \
+				q_matrix.cpp \
+				model.cpp \
+				svm_solver.cpp \
+				qp_solver.cpp
+				
 		
-OBJECTS       = $(SRCS:.c=.o)
+OBJECTS       = $(SRCS:.cpp=.o)
 
 first: all
 ####### Implicit rules
