@@ -101,11 +101,7 @@ t_dataset *init_dataset(const char* path){
 		/*open the file*/
 			
 		/*build path/filename*/
-		sprintf(filename,"%s",path);
-		strcat(filename,"trial_");
-		sprintf(buffer,"%i",i+1);
-		strcat(filename,buffer);
-		strcat(filename,".asc");
+		sprintf(filename,"%strial_%i.asc",path,i+1);
 		pfile = fopen(filename,"r");
 					
 		/*confirm*/
