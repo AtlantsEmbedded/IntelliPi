@@ -21,7 +21,7 @@ define Package/EEGBMI_C_fft
 endef
 
 define Package/EEGBMI_C_fft/description
-	EEG SVM library
+	EEG FFT library
 endef
 
 define Package/EEGBMI_C_fft/install
@@ -35,6 +35,7 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/lib
 	cp $(PKG_BUILD_DIR)/libeeg_fft.so* $(STAGING_DIR)/usr/lib/
+	cp $(PKG_BUILD_DIR)/*.h $(STAGING_DIR)/usr/include
 
 endef
 
