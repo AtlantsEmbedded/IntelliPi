@@ -55,7 +55,7 @@ OBJECTS_DIR   = ./
 
 SOURCES       = fft.cpp
 		
-OBJECTS       = $(SRCS:.cpp=.o)
+OBJECTS       = $(SRCS:.c=.o)
 
 first: all
 ####### Implicit rules
@@ -109,7 +109,7 @@ distclean: clean
 
 ####### Compile
 
-fft.cpp.o: fft.cpp
+fft.o: fft.cpp
 
 ####### Install
 
