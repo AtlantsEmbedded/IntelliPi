@@ -58,7 +58,6 @@ SOURCES       = svm.cpp \
 				example.cpp \
 				svr_solver.cpp \
 				param.cpp \
-				svm_learn \
 				q_matrix.cpp \
 				model.cpp \
 				svm_solver.cpp \
@@ -123,25 +122,23 @@ base_example.cpp.o: base_example.cpp
 
 oneclass_solver.cpp.o: oneclass_solver.cpp 
 
-svm.cpp.o:			svm.cpp 
+svm.cpp.o: svm.cpp 
 
-svr_solver.cpp.o:		svr_solver.cpp 
+svr_solver.cpp.o: svr_solver.cpp 
 
-classifier.cpp.o:				classifier.cpp 
+classifier.cpp.o: classifier.cpp 
 
-param.cpp.o:				param.cpp 
+param.cpp.o: param.cpp 
 
-svm_learn.cpp.o:				svm_learn.cpp 
+example.cpp.o: example.cpp 
 
-example.cpp.o:				example.cpp 
+q_matrix.cpp.o:	q_matrix.cpp 
 
-q_matrix.cpp.o:				q_matrix.cpp 
+svm_solver.cpp.o: svm_solver.cpp 
 
-svm_solver.cpp.o:				svm_solver.cpp 
+model.cpp.o: model.cpp 
 
-model.cpp.o:				model.cpp 
-
-qp_solver.cpp.o:				qp_solver.cpp
+qp_solver.cpp.o: qp_solver.cpp
 
 ####### Install
 
