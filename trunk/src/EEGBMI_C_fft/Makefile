@@ -24,10 +24,12 @@ CFLAGS        := -Wall -fPIC $(CFLAGS)
 CXXFLAGS      := -Wall -fPIC $(CXXFLAGS)
 LEXFLAGS      := 
 YACCFLAGS     := -d
-INCPATH       := -I. -I/include/ -I/usr/include/
+INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
+#INCPATH       := -I. -I/include/ -I/usr/include/
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
-LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
+LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib
+#LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
 AR            := ar
 AR_ARGS	      := cqs	
 RANLIB        := 
@@ -107,7 +109,7 @@ distclean: clean
 
 ####### Compile
 
-ftt.o: fft.cpp
+fft.o: fft.cpp
 
 ####### Install
 
