@@ -130,37 +130,37 @@ distclean: clean
 ####### Compile
 
 base_example.o: base_example.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o base_example.o base_example.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o base_example.o base_example.cpp
 
 oneclass_solver.o: oneclass_solver.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o oneclass_solver.o oneclass_solver.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o oneclass_solver.o oneclass_solver.cpp 
 
 svm.o: svm.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o svm.o svm.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o svm.o svm.cpp
 
 svr_solver.o: svr_solver.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o svr_solver.o svr_solver.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o svr_solver.o svr_solver.cpp
 
 classifier.o: classifier.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o classifier.o classifier.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o classifier.o classifier.cpp 
 
 param.o: param.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o param.o param.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o param.o param.cpp 
 
 example.o: example.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o example.o example.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o example.o example.cpp
 
 q_matrix.o: q_matrix.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o q_matrix.o q_matrix.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o q_matrix.o q_matrix.cpp 
 
 svm_solver.o: svm_solver.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o svm_solver.o svm_solver.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o svm_solver.o svm_solver.cpp 
 
 model.o: model.cpp 
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o model.o model.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o model.o model.cpp 
 
 qp_solver.o: qp_solver.cpp
-	$(CXX) -c $(XXCFLAGS) $(INCPATH) -o qp_solver.o qp_solver.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qp_solver.o qp_solver.cpp
 
 ####### Install
 
