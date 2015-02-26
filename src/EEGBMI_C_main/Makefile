@@ -7,7 +7,7 @@ MAKEFILE      = Makefile
 ####### Compiler, tools and options
 
 CC            = $(CC)
-CXX           = $(CC)
+CXX           = $(CXX)
 DEFINES       = -D_DEBUG
 CFLAGS        = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES) -I$(STAGING_DIR)/usr/include/uClibc++
@@ -36,7 +36,7 @@ endif
 
 LIBS=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread \
 		-lm -lrt -leeg_fda -leeg_fft -leeg_svm \
-		-nodefaultlibs -luClibc++ -luclibc $(ARCH_LIBS)
+		 -luClibc++ $(ARCH_LIBS)
 
 
 AR            = ar cqs
