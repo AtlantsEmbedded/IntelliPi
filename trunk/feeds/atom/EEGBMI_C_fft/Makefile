@@ -34,7 +34,7 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR)/usr
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/lib
-	cp $(PKG_BUILD_DIR)/libeeg_fft.so* $(1)/usr/lib/
+	cp $(PKG_BUILD_DIR)/libeeg_fft.so* $(STAGING_DIR)/usr/lib/
 
 endef
 
