@@ -17,7 +17,7 @@ define Package/EEGBMI_C_svm
 	SECTION:=libs
 	CATEGORY:=Libraries
 	TITLE:=EEGBMI_C_svm
-	DEPENDS:=+librt +uClibcxx
+	DEPENDS:=+librt +uclibcxx
 endef
 
 define Package/EEGBMI_C_svm/description
