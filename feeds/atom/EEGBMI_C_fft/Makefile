@@ -17,7 +17,7 @@ define Package/EEGBMI_C_fft
 	SECTION:=libs
 	CATEGORY:=Libraries
 	TITLE:=EEGBMI_C_fft
-	DEPENDS:=+librt +libmath
+	DEPENDS:=+librt
 endef
 
 define Package/EEGBMI_C_fft/description
