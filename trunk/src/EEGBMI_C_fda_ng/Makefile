@@ -2,7 +2,7 @@
 # Library Makefile for building: EEG-BMI prototype
 # Provided by Frédéric Simard, 2014
 #############################################################################
-LIBBASENAME = eeg_fft
+LIBBASENAME = eeg_fda
 MAJVER = 1
 MINVER = 0
 PATCHVER = 0
