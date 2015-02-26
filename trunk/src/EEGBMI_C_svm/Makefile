@@ -51,14 +51,14 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = base_example.cpp \ 
+SOURCES       = svm.cpp \
+				base_example.cpp \ 
 				oneclass_solver.cpp \
-				svm.cpp \
-				svr_solver.cpp \
 				classifier.cpp \
+				example.cpp \
+				svr_solver.cpp \
 				param.cpp \
 				svm_learn \
-				example.cpp \
 				q_matrix.cpp \
 				model.cpp \
 				svm_solver.cpp \
@@ -119,29 +119,29 @@ distclean: clean
 
 ####### Compile
 
-base_example.o: base_example.cpp 
+base_example.cpp.o: base_example.cpp 
 
-oneclass_solver.o: oneclass_solver.cpp 
+oneclass_solver.cpp.o: oneclass_solver.cpp 
 
-svm.o:			svm.cpp 
+svm.cpp.o:			svm.cpp 
 
-svr_solver.o:		svr_solver.cpp 
+svr_solver.cpp.o:		svr_solver.cpp 
 
-classifier.o:				classifier.cpp 
+classifier.cpp.o:				classifier.cpp 
 
-param.o:				param.cpp 
+param.cpp.o:				param.cpp 
 
-svm_learn.o:				svm_learn.cpp 
+svm_learn.cpp.o:				svm_learn.cpp 
 
-example.o:				example.cpp 
+example.cpp.o:				example.cpp 
 
-q_matrix.o:				q_matrix.cpp 
+q_matrix.cpp.o:				q_matrix.cpp 
 
-svm_solver.o:				svm_solver.cpp 
+svm_solver.cpp.o:				svm_solver.cpp 
 
-model.o:				model.cpp 
+model.cpp.o:				model.cpp 
 
-qp_solver.o:				qp_solver.cpp
+qp_solver.cpp.o:				qp_solver.cpp
 
 ####### Install
 
