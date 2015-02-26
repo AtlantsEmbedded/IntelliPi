@@ -42,7 +42,7 @@ DEL_FILE      = rm -f
 SYMLINK       = ln -sf
 DEL_DIR       = rmdir
 MOVE          = mv -f
-CHK_DIR_EXISTS= test -d
+CHK_DIR_EXISTS = test -d
 MKDIR         = mkdir -p
 
 ####### Output directory
@@ -52,7 +52,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = svm.cpp \
-				base_example.cpp \ 
+				base_example.cpp \
 				oneclass_solver.cpp \
 				classifier.cpp \
 				example.cpp \
@@ -63,7 +63,6 @@ SOURCES       = svm.cpp \
 				svm_solver.cpp \
 				qp_solver.cpp
 				
-		
 OBJECTS       = $(SRCS:.cpp=.o)
 
 first: all
