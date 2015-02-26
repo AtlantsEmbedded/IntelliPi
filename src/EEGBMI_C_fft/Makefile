@@ -109,8 +109,8 @@ distclean: clean
 
 ####### Compile
 
-fft.o: ftt.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ftt.o ftt.cpp
+fft.o: fft.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fft.o fft.cpp
 
 ####### Install
 
