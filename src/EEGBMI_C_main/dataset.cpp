@@ -39,11 +39,11 @@ t_dataset *init_dataset(const char* path){
 	 **********************/
 	
 	/*build path/filename*/
-	strcpy(filename,path);
-	strcat(filename,"infos");
+	//~ strcpy(filename,path);
+	//~ strcat(filename,"infos");
 	
 	/*open the file*/
-	pfile = fopen(filename,"r");
+	pfile = fopen("ascii_files_3/infos","r");
 	
 	/*confirm*/
 	if(pfile == NULL){
@@ -101,7 +101,7 @@ t_dataset *init_dataset(const char* path){
 		/*open the file*/
 			
 		/*build path/filename*/
-		strcpy(filename,path);
+		sprintf(filename,"%s",path);
 		strcat(filename,"trial_");
 		sprintf(buffer,"%i",i+1);
 		strcat(filename,buffer);
