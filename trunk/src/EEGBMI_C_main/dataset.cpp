@@ -296,27 +296,25 @@ int get_train_dataset_ffted(t_dataset *pdataset, double **feature_vectors, int* 
  * @param pdataset, pointer to the dataset
  * @param (out)feature_vectors, feature vectors of the trials [size = nb_test_trials x TIMESERIES_LENGTH*NB_CHANNELS]
  * @param (out)labels, labels of the trials [size = nb_test_trials]
- * @return the number of trials copied
+ * @return EXIT_SUCCESS
  */
-int get_test_dataset_timeseries(t_dataset *pdataset, double **timeseries_vectors, int* labels){
+int get_test_sample_timeseries(t_dataset *pdataset, double **timeseries_vectors, int* labels){
 
-	int i,j,k,offset;
+	int i,j, sample_id;
 
-	/*form an array of timeseries using only test trials*/
-	for(i=0;i<pdataset->nb_test_trials;i++){
-		for(j=0;j<NB_CHANNELS;j++){
-			offset = j*TIMESERIES_LENGTH;
-			
-			for(k=0;k<TIMESERIES_LENGTH;k++){
-				timeseries_vectors[i][k+offset] = pdataset->samplesdata[pdataset->list_of_test_trials[i]].fft_vectors[j][k];
-			}
+	/*select a test sample at random*/
+	sample_id = rand()%pdataset->nb_train_trials;
+	
+	/*copy it in the output*/
+	for(i=0;i<NB_CHANNELS;i++){
+		for(j=0;j<TIMESERIES_LENGTH;j++){
+			timeseries_vectors[i][j] = pdataset->samplesdata[pdataset->list_of_train_trials[sample_id]].timeseries[i][j];
 		}
-		
-		/*and one for the labels*/
-		labels[i] = pdataset->labels[pdataset->list_of_test_trials[i]];
 	}
 	
-	return pdataset->nb_test_trials;
+	(*labels) = pdataset->labels[pdataset->list_of_train_trials[sample_id]];
+	
+	return EXIT_SUCCESS;
 	
 }
 

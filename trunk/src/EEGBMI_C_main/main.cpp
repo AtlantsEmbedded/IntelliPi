@@ -23,19 +23,17 @@ using namespace std;
 #define DEBUG_LOG 0
 #define COMPUTE_FDA 0
 #define COMPUTE_SCALER 0
-#define COMPUTE_SVM 0
+#define COMPUTE_SVM 1
 
 
-//int eegbmi_train(double** train_dataset, int nb_train_samples,TinySVM::Model *model);
-//int eegbmi_train(double** train_dataset, int nb_train_samples);
-//int eegbmi_classify();
 int debug_save_samples(char* filename, double **samples, int *labels, int nb_samples, int nb_features);
 
 const char* DATASET_PATH = "ascii_files_3/";
+const char* CONFIGFILE_PATH = "config_files/";
 
 int main()
 {
-	int i,j;
+	int i,j,k;
 	t_dataset *pdataset;
 	double** train_samples;
 	int* train_labels;
@@ -45,7 +43,6 @@ int main()
 	double max_value;
 	
 	t_feat_scaler *pfft_scaler;
-	t_feat_scaler *pfda_scaler;
 	
 	t_fda_options fda_options;
 	t_fda *pfda;
@@ -95,10 +92,10 @@ int main()
 	pfft_scaler = init_feat_scaler(train_samples, pdataset->nb_train_trials, FFTED_VECTOR_LENGTH);
 	save_feat_scaler(pfft_scaler,"fft_scaler.scl");
 #else
-	pfft_scaler = load_feat_scaler("fft_scaler.scl");
+	pfft_scaler = load_feat_scaler("config_files/fft_scaler.scl");
 #endif	
 	/*scale de features*/
-	scale_features(pfft_scaler, train_samples, pdataset->nb_train_trials, FFTED_VECTOR_LENGTH, SCALING);
+	scale_features(pfft_scaler, train_samples, pdataset->nb_train_trials, FFTED_VECTOR_LENGTH, STANDARTISATION);
 	
 #if DEBUG_LOG
 	debug_save_samples("ffted_samples_normed.dbg", train_samples, train_labels, pdataset->nb_train_trials, FFTED_VECTOR_LENGTH);
@@ -121,7 +118,7 @@ int main()
 #else
 
 	/*load the fda*/
-	pfda = load_fda("fda_dataset1.fdadta");
+	pfda = load_fda("config_files/fda_dataset1.fdadta");
 	
 #endif
 
@@ -136,21 +133,9 @@ int main()
 	for(i=0;i<pdataset->nb_train_trials;i++){
 		fdaed_samples[i][1] = 1.0;
 	}
-	
-	/*
-	 * Rescale the data
-	 */
-	
-#if COMPUTE_SCALER
-	/*init fda scaler*/
-	pfda_scaler = init_feat_scaler(fdaed_samples, pdataset->nb_train_trials, 2);
-	save_feat_scaler(pfda_scaler,"fda_scaler.scl");
-#else
-	pfda_scaler = load_feat_scaler("fda_scaler.scl");
-#endif	
 
 	/*scale fdaed data*/
-	scale_features(pfda_scaler, fdaed_samples, pdataset->nb_train_trials, 2, SCALING);
+	//scale_features(pfda_scaler, fdaed_samples, pdataset->nb_train_trials, 2, SCALING);
 
 #if DEBUG_LOG
 	debug_save_samples("fdaed_samples_normed.dbg", fdaed_samples, train_labels, pdataset->nb_train_trials, 1);
@@ -166,9 +151,9 @@ int main()
 	svm_options.nb_features = 2;
 	/*train the svm*/
 	psvm = train_svm(fdaed_samples, train_labels, svm_options);
-	save_svm(psvm,"svm");
+	save_svm(psvm,"config_files/svm");
 #else
-	psvm = load_svm("svm");
+	psvm = load_svm("config_files/svm");
 #endif
 
 #if 1
@@ -176,18 +161,91 @@ int main()
 	 * Run-time
 	/**********************************/
 
-	/*Load test sample(s) timeseries*/
+	int test_label;
 	
-	/*fft them*/
+	int nb_success = 0;
+	double predicted_label;
+	double predicted_label_prime;
+	double **test_sample = (double**)malloc(sizeof(double*)*NB_CHANNELS);
+	double **ffted_test_sample = (double**)malloc(sizeof(double*)*NB_CHANNELS);
 	
-	/*classify them one by one*/
+	double *ffted_vector = (double*)malloc(sizeof(double)*FFTED_VECTOR_LENGTH);
+	int offset;
+	
+	double fdaed_test_sample;
+	
+	for(i=0;i<NB_CHANNELS;i++){
+		test_sample[i] = (double*)malloc(sizeof(double)*TIMESERIES_LENGTH);
+		ffted_test_sample[i] = (double*)malloc(sizeof(double)*TIMESERIES_LENGTH);
+	}
 
-	/*compute performance*/
+	
+	/*simulate single sample classification*/
+	for(i=0;i<1000;i++){
+	
+		printf("Sample: %i : ",i);
+		/*Load test sample(s) timeseries*/
+		get_test_sample_timeseries(pdataset, test_sample, &test_label);
+	
+		for(j=0;j<NB_CHANNELS/2;j++){
+			/*fft the 4 channels*/
+			abs_fft_2signals(test_sample[j*2], 
+							 test_sample[j*2+1], 
+							 ffted_test_sample[j*2], 
+							 ffted_test_sample[j*2+1],
+							 TIMESERIES_LENGTH);
+		}
+		
+		/*form the vector*/
+		
+		for(j=0;j<NB_CHANNELS/2;j++){
+			offset = j*TIMESERIES_LENGTH/2;
+			
+			/*take only the first half of the fft vector*/
+			for(k=0;k<TIMESERIES_LENGTH/2;k++){
+				ffted_vector[k+offset] = ffted_test_sample[j][k];
+			}
+		}
+		
+		/*scale the fft*/
+		scale_features(pfft_scaler, &ffted_vector, 1, FFTED_VECTOR_LENGTH, STANDARTISATION);
+		
+		/*fda the features*/
+		/*transform the training set*/
+		double* pfdaed_test_sample = &fdaed_test_sample;
+		
+		transform_data(pfda, &ffted_vector, &pfdaed_test_sample, 1);
+	
+		/*classify it*/
+		predicted_label = classify_with_svm(psvm, &fdaed_test_sample);
+		
+		if(predicted_label<-3.5 | predicted_label>-1.2){
+			predicted_label_prime = 1;
+		}
+		else{
+			predicted_label_prime = -1;
+		}
+		
+		/*Show output*/
+		printf("labels: P:%f D:%i: ",predicted_label, test_label);
+		
+		if((predicted_label_prime>0 & test_label>0) | (predicted_label_prime<0 & test_label<0)){
+			printf("Success!\n",predicted_label, test_label);
+			nb_success++;
+		}
+		else{
+			printf("Failed!\n",predicted_label, test_label);
+		}
+		
+		
+	
+	}
+	
+	printf("%f\n",(double)nb_success/1000);
 
 #endif
 
 	kill_feat_scaler(pfft_scaler);
-	kill_feat_scaler(pfda_scaler);
 	kill_svm(psvm);
 	kill_fda(pfda);
 	kill_dataset(pdataset);
@@ -195,56 +253,6 @@ int main()
 
 }
 
-/**
- * eegbmi_train(double** samples, int labels, int nb_samples, TinySVM::Model *model)
- * 
- * @brief 
- * @param 
- * @param 
- * @param 
- * @return 
- */
-//int eegbmi_train(double** samples, int labels, int nb_samples, TinySVM::Model *model){
-int eegbmi_train(double** samples, int labels, int nb_samples){
-	
-	int i = 0;
-	
-	/*Use the training dataset to find the fda transform*/
-
-
-
-
-
-
-
-
-
-	
-	return EXIT_SUCCESS;
-}
-
-/**
- * eegbmi_classify()
- * 
- * @brief 
- * @param 
- * @param 
- * @param 
- * @return 
- */
-int eegbmi_classify(){
-
-
-	/*pre-process it(them)*/
-
-
-	/*represent it(them) in fisher space*/
-
-
-	/*classify it(them)*/	
-	
-	return EXIT_SUCCESS;
-}
 
 
 int debug_save_samples(char* filename, double **samples, int *labels, int nb_samples, int nb_features){
