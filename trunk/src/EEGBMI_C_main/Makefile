@@ -36,7 +36,7 @@ endif
 
 LIBS=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread \
 		-lm -lrt -leeg_fda -leeg_fft -leeg_svm \
-		-nodefaultlibs -luClibc++ $(ARCH_LIBS)
+		-nodefaultlibs -luClibc++ -luclibc $(ARCH_LIBS)
 
 
 AR            = ar cqs
