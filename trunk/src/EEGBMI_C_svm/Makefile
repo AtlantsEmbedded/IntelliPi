@@ -2,7 +2,7 @@
 # Library Makefile for building: EEG-BMI prototype
 # Provided by Frédéric Simard, 2014
 #############################################################################
-LIBBASENAME = eeg_fft
+LIBBASENAME = eeg_svm
 MAJVER = 1
 MINVER = 0
 PATCHVER = 0
@@ -15,7 +15,7 @@ TARGET1       = lib$(LIBBASENAME).so.$(MAJVER)
 TARGET2       = lib$(LIBBASENAME).so.$(MAJVER).$(MINVER)
 
 ####### Compiler, tools and options
-LD	      := $(CC)
+LD	      	  := $(CC)
 CC            := $(CC)
 CXX           := $(CC)
 LEX           := flex
@@ -51,7 +51,17 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = fft.cpp
+SOURCES       = svm.cpp \
+				base_example.cpp \ 
+				classifier.cpp \
+				example.cpp \
+				model.cpp \
+				param.cpp \
+				q_matrix.cpp \
+				qp_solver.cpp \
+				svm_solver.cpp \
+				svr_solver.cpp \
+				oneclass_solver.cpp
 		
 OBJECTS       = $(SRCS:.c=.o)
 
@@ -107,7 +117,18 @@ distclean: clean
 
 ####### Compile
 
-ftt_fft.o: fft.cpp
+base_example.o: base_example.cpp 
+oneclass_solver.o: oneclass_solver.cpp 
+svm.o:			svm.cpp 
+svr_solver.o:		svr_solver.cpp 
+classifier.o:				classifier.cpp 
+param.o:				param.cpp 
+svm_learn.o:				svm_learn.cpp 
+example.o:				example.cpp 
+q_matrix.o:				q_matrix.cpp 
+svm_solver.o:				svm_solver.cpp 
+model.o:				model.cpp 
+qp_solver.o:				qp_solver.cpp
 
 ####### Install
 
