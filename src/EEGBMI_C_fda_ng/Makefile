@@ -17,7 +17,7 @@ TARGET2       = lib$(LIBBASENAME).so.$(MAJVER).$(MINVER)
 ####### Compiler, tools and options
 LD	      := $(CC)
 CC            := $(CC)
-CXX           := $(CC)
+CXX           := $(CXX)
 LEX           := flex
 YACC          := yacc
 CFLAGS        := -Wall -fPIC $(CFLAGS)
@@ -53,7 +53,7 @@ OBJECTS_DIR   = ./
 
 SOURCES       = fda.cpp
 		
-OBJECTS       = $(SRCS:.cpp=.o)
+OBJECTS       = fda.o
 
 first: all
 ####### Implicit rules
@@ -107,7 +107,8 @@ distclean: clean
 
 ####### Compile
 
-fda.cpp.o: fda.cpp
+fda.o: fda.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fda.o fda.cpp
 
 ####### Install
 
