@@ -21,7 +21,7 @@ ifeq ($(ARCH), arm)
 	RASPI_DEFINES  =-DRASPI=1
 	INCPATH       = -I. \
 	-Iinclude \
-	-I$(STAGING_DIR)/include \
+	-I$(STAGING_DIR)/include
 	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT \
 	-fPIE  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
