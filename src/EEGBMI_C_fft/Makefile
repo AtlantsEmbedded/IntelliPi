@@ -17,7 +17,7 @@ TARGET2       = lib$(LIBBASENAME).so.$(MAJVER).$(MINVER)
 ####### Compiler, tools and options
 LD	      := $(CC)
 CC            := $(CC)
-CXX           := $(CC)
+CXX           := $(CXX)
 LEX           := flex
 YACC          := yacc
 CFLAGS        := -Wall -fPIC $(CFLAGS)
@@ -55,7 +55,7 @@ OBJECTS_DIR   = ./
 
 SOURCES       = fft.cpp
 		
-OBJECTS       = $(SRCS:.c=.o)
+OBJECTS       = fft.o
 
 first: all
 ####### Implicit rules
@@ -109,7 +109,8 @@ distclean: clean
 
 ####### Compile
 
-fft.o: fft.cpp
+fft.o: ftt.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ftt.o ftt.cpp
 
 ####### Install
 
