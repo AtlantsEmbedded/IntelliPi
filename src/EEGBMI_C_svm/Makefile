@@ -118,16 +118,27 @@ distclean: clean
 ####### Compile
 
 base_example.o: base_example.cpp 
+
 oneclass_solver.o: oneclass_solver.cpp 
+
 svm.o:			svm.cpp 
+
 svr_solver.o:		svr_solver.cpp 
+
 classifier.o:				classifier.cpp 
+
 param.o:				param.cpp 
+
 svm_learn.o:				svm_learn.cpp 
+
 example.o:				example.cpp 
+
 q_matrix.o:				q_matrix.cpp 
+
 svm_solver.o:				svm_solver.cpp 
+
 model.o:				model.cpp 
+
 qp_solver.o:				qp_solver.cpp
 
 ####### Install
