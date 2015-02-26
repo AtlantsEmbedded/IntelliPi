@@ -17,7 +17,7 @@ define Package/EEGBMI_C_fda
 	SECTION:=libs
 	CATEGORY:=Libraries
 	TITLE:=EEGBMI_C_fda
-	DEPENDS:=+librt +libmath
+	DEPENDS:=+librt
 endef
 
 define Package/EEGBMI_C_fda/description
