@@ -16,8 +16,9 @@ include $(INCLUDE_DIR)/package.mk
 PKG_FIXUP:=autoreconf
 
 define Package/MLP_C_sequential
-	SECTION:=Machine Learning Libraries
+	SECTION:=libraries
 	CATEGORY:=Atom
+	SUBMENU:=Machine Learning Libraries
 	TITLE:=MLP_C_sequential
 	DEPENDS:=+libpthread +librt
 endef

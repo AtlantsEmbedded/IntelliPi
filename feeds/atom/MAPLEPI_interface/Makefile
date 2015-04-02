@@ -14,8 +14,9 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/MAPLEPI_interface
-	SECTION:=Interfaces
+	SECTION:=system
 	CATEGORY:=Atom
+	SUBMENU:=Interfaces
 	TITLE:=MAPLEPI_interface
 	DEPENDS:=wiringPi
 endef
