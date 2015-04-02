@@ -16,8 +16,8 @@ include $(INCLUDE_DIR)/package.mk
 PKG_FIXUP:=autoreconf
 
 define Package/MLP_C_par_spinlocks
-	SECTION:=utils
-	CATEGORY:=Utilities
+	SECTION:=Machine Learning Libraries
+	CATEGORY:=Atom
 	TITLE:=MLP_C_par_spinlocks
 	DEPENDS:=+libpthread +librt
 endef
