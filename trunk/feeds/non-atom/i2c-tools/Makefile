@@ -30,7 +30,7 @@ endef
 define Package/libi2c
   $(call Package/i2c/Default)
   SECTION:=libs
-  CATEGORY:=Atom
+  CATEGORY:=Atom-GPL
   SUBMENU:=Libraries
   TITLE+=library
 endef
