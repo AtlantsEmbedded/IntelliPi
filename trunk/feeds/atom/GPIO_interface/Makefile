@@ -14,8 +14,8 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/GPIO_interface
-	SECTION:=utils
-	CATEGORY:=Utilities
+	SECTION:=Interfaces
+	CATEGORY:=Atom
 	TITLE:=GPIO_interface
 	DEPENDS:=wiringPi +libpthread +libezxml +glib2
 endef
