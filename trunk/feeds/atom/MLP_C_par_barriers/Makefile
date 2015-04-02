@@ -16,8 +16,9 @@ include $(INCLUDE_DIR)/package.mk
 PKG_FIXUP:=autoreconf
 
 define Package/MLP_C_par_barriers
-	SECTION:=Machine Learning Libraries
+	SECTION:=libraries
 	CATEGORY:=Atom
+	SUBMENU:=Machine Learning Libraries
 	TITLE:=MLP_C_par_barriers
 	DEPENDS:=+libpthread +librt
 endef

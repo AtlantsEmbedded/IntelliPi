@@ -17,6 +17,7 @@ define Package/GPIO_interface
 	SECTION:=Interfaces
 	CATEGORY:=Atom
 	TITLE:=GPIO_interface
+	SUBMENU:=Interfaces
 	DEPENDS:=wiringPi +libpthread +libezxml +glib2
 endef
 
