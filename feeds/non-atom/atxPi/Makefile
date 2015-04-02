@@ -15,8 +15,9 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/atxPi
 	SECTION:=utils
-	CATEGORY:=Utilities
+	CATEGORY:=Atom
 	TITLE:=atxPi
+	SUBMENU:=Utilities
 	DEPENDS:=wiringPi
 endef
 
