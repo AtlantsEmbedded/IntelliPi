@@ -15,7 +15,7 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/DHT22_interface
 	SECTION:=utils
-	CATEGORY:=Atom
+	CATEGORY:=Atom-GPL
 	TITLE:=DHT22_interface
 	SUBMENU:=Utilities
 	DEPENDS:=wiringPi
