@@ -3,45 +3,63 @@
  * @author Frédéric Simard, Atom embedded
  * @date March, 2015
  * @brief This library implements various linear algebra methods used
- * for embedded Machine Learning Systems. At the present the methods 
+ * for Embedded Machine Learning Systems. At the present the methods 
  * allow for:
  * 
- *   - Cholesky decomposition
+ *   Basic Matrix operations
  *   - Matrix multiplication
  *   - Matrix transpose
+ *   - Cholesky decomposition
+ *
+ *   Basic Vector operations
+ *   - vector-vector addition
+ *   - vector-vector subtraction
+ *   - vector-scalar multiply
+ *   - vector norm
+ *   - vector dot product
+ *
+ *   Methods for Eigen problem solving
+ *   - Lanczos algorithm
  * 
+ *   Other utils
  *   - Show matrix
+ *   - Generate Random unit length vector
  * 
- * It should be noted that the library is row major. Matrix must be organized
+ * It should be noted that this library is row major. Matrix must be organized
  * such that the row elements are contiguous in memory.
- * 
- * Developed using:
- *        http://rosettacode.org/wiki/Cholesky_decomposition
+ * Ex: a 3x4 matrix should be:
+ * 1234
+ * 5678
+ * 9012
+ *
+ * References:
+ *    Cholesky decomposition:
+ *    - http://rosettacode.org/wiki/Cholesky_decomposition
+ *    
+ *    Lanczos Procedure:
+ *    - Cullum J and Willoughby (1981) Computing Eigenvalues of Very Large Symmetric Matrices - 
+ *      An Implementation of Lanczos Algorithm with no Reorthogonalization. Computational Physics. 
+ *      (44)329-358.
+ *    - http://en.wikipedia.org/wiki/Lanczos_algorithm
+ *
  *
  */
  
 #include "linear_algebra.h"
  
  /**
- * double *mtx_chol(double *A, int n) 
+ * double *mtx_chol(double *A, double *L, int n) 
  * 
  * @brief Computes the cholesky factorization of a n-square matrix, such that A = LL'
  * refer to: http://rosettacode.org/wiki/Cholesky_decomposition
  * @param A, NxN double array, the matrix to be factorized
+ * @return (out)L, NxN square array containing the triangular L matrix resulting from the factorization
  * @param n, the value of N.
- * @return a NxN square array containing the triangular L matrix resulting from the factorization
  */ 
-double *mtx_chol(double *A, int n) {
+void mtx_chol(double *A, double *L, int n) {
 	
-#if 1	
 	int i,j,k;
 	
-	/*allocate memory for resulting matrix L*/
-    double *L = (double*)calloc(n * n, sizeof(double));
-    
-    if (L == NULL)
-        exit(EXIT_FAILURE);
- 
 	/*compute all terms of the lower triagular matrix*/
     for(i = 0; i < n; i++){
         for(j = 0; j < (i+1); j++){
@@ -65,29 +83,23 @@ double *mtx_chol(double *A, int n) {
         }
 	}
 	
-	/*return the cholesky factor*/
-    return L;
-#endif
     
 }
 
  /**
- * double *mtx_mult(double *A, double *B, int dim_i, int dim_j, int dim_k)
+ * void mtx_mult(double *A, double *B, int dim_i, int dim_j, int dim_k)
  * 
  * @brief Multiply matrix A and B such that C = AB.
  * @param A, IxJ double array, the left matrix to be multiplied
  * @param B, JxK double array, the right matrix to be multiplied
+ * @param (out)C, IxK array containing resulting matrix
  * @param dim_i, the value of I.
  * @param dim_j, the value of J.
  * @param dim_k the value of K.
- * @return a IxK array containing resulting matrix C
  */ 
-double *mtx_mult(double *A, double *B, int dim_i, int dim_j, int dim_k){
+void mtx_mult(double *A, double *B, double *C, int dim_i, int dim_j, int dim_k){
 	
 	int i,j,k = 0;
-	
-	/**allocate memory for C*/
-	double* C = (double*)calloc(dim_i * dim_k, sizeof(double));
 	
 	/*all elements of the matrix*/
 	for (k = 0; k < dim_k; k++){
@@ -103,25 +115,20 @@ double *mtx_mult(double *A, double *B, int dim_i, int dim_j, int dim_k){
 		}
 	}
 	
-	return C;
-	
 }
 
  /**
- * double *mtx_transpose(double *A, int dim_i, int dim_j)
+ * void mtx_transpose(double *A, double *A_prime, int dim_i, int dim_j)
  * 
  * @brief Transpose matrix A -> A'
  * @param A, IxJ double array, the matrix to be transposed
+ * @param (out)A_prime, a JxI square array containing the transpose of A
  * @param dim_i, the value of I.
  * @param dim_j, the value of J.
- * @return a IxK square array containing the triangular L matrix resulting from the factorization
  */ 
-double *mtx_transpose(double *A, int dim_i, int dim_j){
+void mtx_transpose(double *A, double *A_prime, int dim_i, int dim_j){
 	
 	int i,j = 0;
-	
-	/*allocate memory for A'*/
-	double* A_prime = (double*)calloc(dim_j * dim_i, sizeof(double));
 	
 	/*transpose the matrix such that A'[j,i] = A[i,j]*/
 	for (i = 0; i < dim_i; i++){
@@ -129,16 +136,272 @@ double *mtx_transpose(double *A, int dim_i, int dim_j){
 			A_prime[i*dim_j + j] = A[j*dim_i + i];
 		}
 	}
-	
-	return A_prime;
 }
 
+/**
+ * void vect_add(double* a, double b*, int n)
+ * 
+ * @brief computes the sum of vector a and b, such that a = a+b
+ * @param n, length of the vectors
+ */ 
+void vect_add(double* a, double b*, int n)
+{
+	int i;
+	
+	for(i=0;i<n;i++){
+		a[n] += a[n]+b[n];
+	}
+}
+
+/**
+ * void vect_sub(double* a, double b*, int n)
+ * 
+ * @brief computes the sum of vector a and b, such that a = a-b
+ * @param n, length of the vectors
+ */ 
+void vect_sub(double* a, double b*, int n)
+{
+	int i;
+	
+	for(i=0;i<n;i++){
+		a[n] += a[n]-b[n];
+	}
+}
+
+
+/**
+ * void vect_scalar_multiply(double* a, double b, int n)
+ * 
+ * @brief computes the product between the vector a and the scalar b such that
+ *        a = a*b
+ * @param n, length of the vector
+ */ 
+void vect_scalar_multiply(double* a, double b, int n)
+{
+	int i;
+	
+	for(i=0;i<n;i++){
+		a[i] += a[i]*b;
+	}
+}
+
+/**
+ * double vect_dot_product(double* a, double b*, int n)
+ * 
+ * @brief computes the dot (scalar) product between vector a and b
+ * @param n, length of the vectors
+ * @return the result of the dot product
+ */ 
+double vect_dot_product(double* a, double b*, int n)
+{
+	int i;
+	double dot_product = 0.0;
+	
+	for(i=0;i<n;i++){
+		dot_product[n] += a[n]*b[n];
+	}
+	
+	return dot_product;
+}
+
+
+
+/**
+ * double vect_norm(double* a, int n)
+ * 
+ * @brief computes the norm |a| of vector a
+ * @param n, length of the vector
+ * @return the norm of the vector
+ */ 
+double vect_norm(double* a, int n)
+{
+	int i;
+	double norm = 0.0;
+	
+	for(i=0;i<n;i++){
+		norm[i] += a[i]*a[i];
+	}
+	
+	norm = sqrt(norm);
+	
+	return norm;
+}
+
+/**
+ * double* vect_rand_unit(int length)
+ * 
+ * @brief Utility function that generates a random unit vector
+ * @param length, length of the vector
+ * @return the random unit vector
+ */ 
+double* vect_rand_unit(int length)
+{
+	int i,j;
+	double vect_norm = 0.0;
+	double* unit_vect = (double*)calloc(length, sizeof(double));
+
+	/*fill the vector with random numbers*/
+	for(i=0;i<length;i++){
+		unit_vect[i] = (double)rand()/RAND_MAX;
+		vect_norm += unit_vect[i]*unit_vect[i];
+	}
+	
+	/*adjust the norm*/
+	/*vect = vect/|vect|*/
+	vect_norm = sqrt(vect_norm);
+	for(i=0;i<length;i++){	
+		unit_vect[i] /= vect_norm;
+	}
+	
+	return unit_vect;
+}
  
-void show_matrix(double *A, int n) {
+
+/**
+ * void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
+ * 
+ * @brief Fonction that implements the first step of the eigenproblem solution
+ *        based on lanzos algorithm. This function generates a matrix Tm that contains 
+ *        a set (<=) of eigenvalues that approximate those of matrix A. Finding the eigenvalues
+ *        in Tm is easier and serves as an optimization method for problems in which only a few 
+ *        eigenpairs are required.
+ * @param A, the matrix on which the procedure is applied. Needs to be square and Hermitian.
+ * @param (out)Tm, a m*m tridiagonal square matrix Tm which contains a set of eigenvalues that approximate those found in A...
+ * @param n, the dimensions of the square matrix A
+ * @param m, the number of iterations for the lanczos procedure (and the dimensions of the array returned)
+ */ 
+void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
+{
+	int i,j,array_index_i;
+	
+	double* a = (double*)calloc(m, sizeof(double));
+	double* b = (double*)calloc(m, sizeof(double));
+	double* v_i = (double*)calloc(n, sizeof(double));
+	double* a_times_v_i = (double*)calloc(n, sizeof(double));
+	double* b_times_v_i_minus_one = (double*)calloc(n, sizeof(double));
+	double* v_i_minus_one = (double*)calloc(n, sizeof(double));
+	double* w_i = (double*)calloc(n, sizeof(double));
+	
+	double* temp;
+
+	/*get a n-long random vector with norm equal to 1*/
+	double* v1 = vect_rand(n);
+	
+	/*first iteration of the procedure*/
+	i = 1;
+	array_index_i = i-1;
+	
+	/*computes w_i*/
+	/*w[i] <= A*v[i]*/
+	mtx_mult(A, v1, w_i, n, n, 1);
+	
+	/*computes a_i*/
+	/*a[i] <= w[i]*v[i]*/
+	a[array_index_i] = vect_dot_product(w_i, v1);
+	
+	/*update w_i*/
+	/*w[i] <= w[i]-a[i]*v[i]-b[i]*v[i-1]*/
+	/*b[1] = 0*/
+	memcpy(a_times_v_i,v_i,n*sizeof(double));
+	vect_scalar_multiply(a_times_v_i,a[array_index_i],n);
+	vect_sub(w_i, a_times_v_i);
+	
+	/*computes next b_i*/
+	/*b[i+1] = ||w[i]||*/
+	b[array_index_i+1] = vect_norm(w_i,m);
+	
+	/*save current v_i*/
+	temp = v_i_minus_one;
+	v_i_minus_one = v_i;
+	
+	/*computes next v_i = w_i/b(i+1)*/
+	/*v[i+1] = w[i]/b[i+1]*/
+	v_i = w_i;
+	vect_scalar_multiply(v_i, 1/b[array_index_i+1]);
+	
+	/*reuse memory former v_i_minus_one space for w_i*/
+	w_i = temp;
+	
+	/*rest of the iterations of the procedure*/
+	for(i=2;i<=m-1;i++){
+		array_index_i = i-1;
+		
+		/*computes w_i*/
+		/*w[i] <= A*v[i]*/
+		mtx_mult(A, v1, w_i, n, n, 1);
+		
+		/*computes a_i*/
+		/*a[i] <= w[i]*v[i]*/
+		a[array_index_i] = vect_dot_product(w_i, v1);
+		
+		/*update w_i*/
+		/*prepare a[i]*v[i]*/
+		memcpy(a_times_v_i,v_i,n*sizeof(double));
+		vect_scalar_multiply(a_times_v_i,a[array_index_i],n);
+		
+		/*prepare b[i]*v[i-1]*/
+		memcpy(b_times_v_i_minus_one,v_i_minus_one,n*sizeof(double));
+		vect_scalar_multiply(b_times_v_i_minus_one,b[array_index_i],n);
+		
+		/*w[i] <= w[i]-a[i]*v[i]-b[i]*v[i-1]*/
+		vect_sub(w_i, a_times_v_i);
+		vect_sub(w_i, b_times_v_i_minus_one);
+		
+		/*computes next b_i*/
+		/*b[i+1] = ||w[i]||*/
+		b[array_index_i+1] = vect_norm(w_i,m);
+		
+		/*save current v_i*/
+		temp = v_i_minus_one;
+		v_i_minus_one = v_i;
+		
+		/*computes next v_i = w_i/b(i+1)*/
+		/*v[i+1] = w[i]/b[i+1]*/
+		v_i = w_i;
+		vect_scalar_multiply(v_i, 1/b[array_index_i+1]);
+		
+		/*reuse memory former v_i_minus_one space for w_i*/
+		w_i = temp;	
+	
+	}
+	
+	/*compute last term a[m]*/
+	array_index_i = m-1;
+	a[array_index_i] = vect_dot_product(w_i, v1);
+	
+	/*construct tridiagonal matrix tm*/
+	Tm[0] = a[0];
+	for(i=1;i<m-1;i++){
+		Tm[i*m+i] = a[i]; 
+		Tm[i*m+i-1] = b[i]; 
+		Tm[i*m+i+1] = b[i]; 
+	}
+	Tm[m*m-1] = a[m-1];
+	
+	/*free memory space*/
+	free(a);
+	free(b);
+	free(v_i);
+	free(a_times_v_i);
+	free(b_times_v_i_minus_one);
+	free(v_i_minus_one);
+	free(w_i);
+} 
+ 
+/**
+ * void show_matrix(double *A, int dim_i, int dim_j)
+ * 
+ * @brief Utility function to show the matrix in the command window
+ * @param A, IxJ double array, the matrix to be displayed
+ * @param dim_i, the value of I.
+ * @param dim_j, the value of J.
+ */ 
+void show_matrix(double *A, int dim_i, int dim_j) {
 	int i,j;
 	
-    for(i = 0; i < n; i++) {
-        for(j = 0; j < n; j++)
+    for(i = 0; i < dim_i; i++) {
+        for(j = 0; j < dim_j; j++)
+			/*row major!*/
             printf("%2.5f ", A[i * n + j]);
         printf("\n");
     }
