@@ -2145,19 +2145,19 @@ config BUSYBOX_DEFAULT_TCPSVD
 	default n
 config BUSYBOX_DEFAULT_TELNET
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_TELNET_TTYPE
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_TELNET_AUTOLOGIN
 	bool
 	default n
 config BUSYBOX_DEFAULT_TELNETD
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_TELNETD_STANDALONE
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_TELNETD_INETD_WAIT
 	bool
 	default n
@@ -2184,13 +2184,13 @@ config BUSYBOX_DEFAULT_TFTP_DEBUG
 	default n
 config BUSYBOX_DEFAULT_TRACEROUTE
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_TRACEROUTE6
 	bool
 	default n
 config BUSYBOX_DEFAULT_FEATURE_TRACEROUTE_VERBOSE
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_TRACEROUTE_SOURCE_ROUTE
 	bool
 	default n
@@ -2226,7 +2226,7 @@ config BUSYBOX_DEFAULT_DHCPD_LEASES_FILE
 	default ""
 config BUSYBOX_DEFAULT_UDHCPC
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_UDHCPC_ARPING
 	bool
 	default n
@@ -2238,7 +2238,7 @@ config BUSYBOX_DEFAULT_UDHCP_DEBUG
 	default 0
 config BUSYBOX_DEFAULT_FEATURE_UDHCP_RFC3397
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_UDHCP_8021Q
 	bool
 	default n
@@ -2259,16 +2259,16 @@ config BUSYBOX_DEFAULT_VCONFIG
 	default y
 config BUSYBOX_DEFAULT_WGET
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_WGET_STATUSBAR
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_WGET_AUTHENTICATION
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_WGET_LONG_OPTIONS
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_WGET_TIMEOUT
 	bool
 	default n
@@ -2397,7 +2397,7 @@ config BUSYBOX_DEFAULT_FEATURE_PS_WIDE
 	default y
 config BUSYBOX_DEFAULT_FEATURE_PS_LONG
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_FEATURE_PS_TIME
 	bool
 	default n
