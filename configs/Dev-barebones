@@ -1230,6 +1230,7 @@ CONFIG_PACKAGE_wireless-tools=y
 #
 # Interfaces
 #
+# CONFIG_PACKAGE_DATA_interface is not set
 CONFIG_PACKAGE_GPIO_interface=y
 # CONFIG_PACKAGE_MAPLEPI_interface is not set
 
