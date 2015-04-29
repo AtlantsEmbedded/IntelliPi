@@ -1,15 +1,10 @@
 /**
  * @file linear_algebra.c
- * @author Frédéric Simard, Atom embedded
+ * @author Frédéric Simard, Atlans embedded
  * @date March, 2015
  * @brief This library implements various linear algebra methods used
  * for Embedded Machine Learning Systems. At the present the methods 
  * allow for:
- * 
- *   Basic Matrix operations
- *   - Matrix multiplication
- *   - Matrix transpose
- *   - Cholesky decomposition
  *
  *   Basic Vector operations
  *   - vector-vector addition
@@ -17,6 +12,11 @@
  *   - vector-scalar multiply
  *   - vector norm
  *   - vector dot product
+ *  
+ *   Basic Matrix operations
+ *   - Matrix multiplication
+ *   - Matrix transpose
+ *   - Cholesky decomposition
  *
  *   Methods for Eigen problem solving
  *   - Lanczos algorithm
@@ -46,45 +46,142 @@
  */
  
 #include "linear_algebra.h"
- 
- /**
- * double *mtx_chol(double *A, double *L, int n) 
+
+/**
+ * void vect_add(double* a, double b*, int n)
  * 
- * @brief Computes the cholesky factorization of a n-square matrix, such that A = LL'
- * refer to: http://rosettacode.org/wiki/Cholesky_decomposition
- * @param A, NxN double array, the matrix to be factorized
- * @return (out)L, NxN square array containing the triangular L matrix resulting from the factorization
- * @param n, the value of N.
+ * @brief computes the sum of vector a and b, such that a = a+b
+ * @param n, length of the vectors
  */ 
-void mtx_chol(double *A, double *L, int n) {
+void vect_add(double* a, double *b, int n)
+{
+	int i;
 	
-	int i,j,k;
+	for(i=0;i<n;i++){
+		a[i] += b[i];
+	}
+}
+
+/**
+ * void vect_sub(double* a, double b*, int n)
+ * 
+ * @brief computes the sum of vector a and b, such that a = a-b
+ * @param n, length of the vectors
+ */ 
+void vect_sub(double *a, double *b, int n)
+{
+	int i;
 	
-	/*compute all terms of the lower triagular matrix*/
-    for(i = 0; i < n; i++){
-        for(j = 0; j < (i+1); j++){
-			
-            double s = 0;
-            
-            /*sum up the terms*/
-            for(k = 0; k < j; k++){
-                s += L[i * n + k] * L[j * n + k];
-			}
-			
-			/*check if on the diagonal*/
-			if(i==j){
-				/*yes, compute the sqrt*/
-				L[i * n + j] = sqrt(A[i * n + i] - s);
-			}
-			else{
-				/*no, compute the sqrt*/
-				L[i * n + j] = (1.0 / L[j * n + j] * (A[i * n + j] - s));
-			}
-        }
+	for(i=0;i<n;i++){
+		a[i] -= b[i];
+	}
+}
+
+
+/**
+ * void vect_scalar_multiply(double* a, double b, int n)
+ * 
+ * @brief computes the product between the vector a and the scalar b such that
+ *        a = a*b
+ * @param n, length of the vector
+ */ 
+void vect_scalar_multiply(double *a, double b, int n)
+{
+	int i;
+	
+	for(i=0;i<n;i++){
+		a[i] *= b;
+	}
+}
+
+/**
+ * double vect_dot_product(double* a, double b*, int n)
+ * 
+ * @brief computes the dot (scalar) product between vector a and b
+ * @param n, length of the vectors
+ * @return the result of the dot product
+ */ 
+double vect_dot_product(double *a, double *b, int n)
+{
+	int i;
+	double dot_product = 0.0;
+	
+	for(i=0;i<n;i++){
+		dot_product += a[i]*b[i];
 	}
 	
-    
+	return dot_product;
 }
+
+
+
+/**
+ * double vect_norm(double* a, int n)
+ * 
+ * @brief computes the norm |a| of vector a
+ * @param n, length of the vector
+ * @return the norm of the vector
+ */ 
+double vect_norm(double *a, int n)
+{
+	int i;
+	double norm = 0.0;
+	
+	for(i=0;i<n;i++){
+		norm += a[i]*a[i];
+	}
+	
+	norm = sqrt(norm);
+	
+	return norm;
+}
+
+/**
+ * void vect_rand_unit(double *a, int length)
+ * 
+ * @brief Utility function that generates a random unit vector
+ * @param length, length of the vector
+ * @return the random unit vector
+ */ 
+void vect_rand_unit(double *a, int length)
+{
+	int i,j;
+	double vect_norm = 0.0;
+
+	/*fill the vector with random numbers*/
+	for(i=0;i<length;i++){
+		a[i] = (double)rand()/RAND_MAX;
+		vect_norm += a[i]*a[i];
+	}
+	
+	/*adjust the norm*/
+	/*vect = vect/|vect|*/
+	vect_norm = sqrt(vect_norm);
+	for(i=0;i<length;i++){	
+		a[i] /= vect_norm;
+	}
+}
+ 
+
+/**
+ * void show_vector(double *a, int n)
+ * 
+ * @brief Utility function to show the vector in the command window
+ * @param a, n-long double array, the vector to be displayed
+ * @param n, length of the vector
+ */  
+void show_vector(double *a, int n)
+{
+	int i;
+	
+    for(i = 0; i < n; i++) {
+        /*row major!*/
+        printf("%2.4f ", a[i]);
+    }	
+    
+    printf("\n");
+}
+ 
 
  /**
  * void mtx_mult(double *A, double *B, int dim_i, int dim_j, int dim_k)
@@ -133,129 +230,50 @@ void mtx_transpose(double *A, double *A_prime, int dim_i, int dim_j){
 	/*transpose the matrix such that A'[j,i] = A[i,j]*/
 	for (i = 0; i < dim_i; i++){
 		for (j = 0; j < dim_j; j++){
-			A_prime[i*dim_j + j] = A[j*dim_i + i];
+			A_prime[j*dim_i + i] = A[i*dim_j + j];
 		}
 	}
 }
-
-/**
- * void vect_add(double* a, double b*, int n)
+ /**
+ * double *mtx_chol(double *A, double *L, int n) 
  * 
- * @brief computes the sum of vector a and b, such that a = a+b
- * @param n, length of the vectors
+ * @brief Computes the cholesky factorization of a n-square matrix, such that A = LL'
+ * refer to: http://rosettacode.org/wiki/Cholesky_decomposition
+ * @param A, NxN double array, the matrix to be factorized
+ * @return (out)L, NxN square array containing the triangular L matrix resulting from the factorization
+ * @param n, the value of N.
  */ 
-void vect_add(double* a, double b*, int n)
-{
-	int i;
+void mtx_chol(double *A, double *L, int n) {
 	
-	for(i=0;i<n;i++){
-		a[n] += a[n]+b[n];
+	int i,j,k;
+	
+	/*compute all terms of the lower triagular matrix*/
+    for(i = 0; i < n; i++){
+        for(j = 0; j < (i+1); j++){
+			
+            double s = 0;
+            
+            /*sum up the terms*/
+            for(k = 0; k < j; k++){
+                s += L[i * n + k] * L[j * n + k];
+			}
+			
+			/*check if on the diagonal*/
+			if(i==j){
+				/*yes, compute the sqrt*/
+				L[i * n + j] = sqrt(A[i * n + i] - s);
+			}
+			else{
+				/*no, compute the sqrt*/
+				L[i * n + j] = (1.0 / L[j * n + j] * (A[i * n + j] - s));
+			}
+        }
 	}
-}
-
-/**
- * void vect_sub(double* a, double b*, int n)
- * 
- * @brief computes the sum of vector a and b, such that a = a-b
- * @param n, length of the vectors
- */ 
-void vect_sub(double* a, double b*, int n)
-{
-	int i;
-	
-	for(i=0;i<n;i++){
-		a[n] += a[n]-b[n];
-	}
-}
-
-
-/**
- * void vect_scalar_multiply(double* a, double b, int n)
- * 
- * @brief computes the product between the vector a and the scalar b such that
- *        a = a*b
- * @param n, length of the vector
- */ 
-void vect_scalar_multiply(double* a, double b, int n)
-{
-	int i;
-	
-	for(i=0;i<n;i++){
-		a[i] += a[i]*b;
-	}
-}
-
-/**
- * double vect_dot_product(double* a, double b*, int n)
- * 
- * @brief computes the dot (scalar) product between vector a and b
- * @param n, length of the vectors
- * @return the result of the dot product
- */ 
-double vect_dot_product(double* a, double b*, int n)
-{
-	int i;
-	double dot_product = 0.0;
-	
-	for(i=0;i<n;i++){
-		dot_product[n] += a[n]*b[n];
-	}
-	
-	return dot_product;
+	    
 }
 
 
 
-/**
- * double vect_norm(double* a, int n)
- * 
- * @brief computes the norm |a| of vector a
- * @param n, length of the vector
- * @return the norm of the vector
- */ 
-double vect_norm(double* a, int n)
-{
-	int i;
-	double norm = 0.0;
-	
-	for(i=0;i<n;i++){
-		norm[i] += a[i]*a[i];
-	}
-	
-	norm = sqrt(norm);
-	
-	return norm;
-}
-
-/**
- * double* vect_rand_unit(int length)
- * 
- * @brief Utility function that generates a random unit vector
- * @param length, length of the vector
- * @return the random unit vector
- */ 
-double* vect_rand_unit(int length)
-{
-	int i,j;
-	double vect_norm = 0.0;
-	double* unit_vect = (double*)calloc(length, sizeof(double));
-
-	/*fill the vector with random numbers*/
-	for(i=0;i<length;i++){
-		unit_vect[i] = (double)rand()/RAND_MAX;
-		vect_norm += unit_vect[i]*unit_vect[i];
-	}
-	
-	/*adjust the norm*/
-	/*vect = vect/|vect|*/
-	vect_norm = sqrt(vect_norm);
-	for(i=0;i<length;i++){	
-		unit_vect[i] /= vect_norm;
-	}
-	
-	return unit_vect;
-}
- 
 
 /**
  * void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
@@ -281,11 +299,12 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	double* b_times_v_i_minus_one = (double*)calloc(n, sizeof(double));
 	double* v_i_minus_one = (double*)calloc(n, sizeof(double));
 	double* w_i = (double*)calloc(n, sizeof(double));
+	double* v1 = (double*)calloc(n, sizeof(double));
 	
 	double* temp;
 
 	/*get a n-long random vector with norm equal to 1*/
-	double* v1 = vect_rand(n);
+	vect_rand_unit(v1,n);
 	
 	/*first iteration of the procedure*/
 	i = 1;
@@ -297,18 +316,18 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	
 	/*computes a_i*/
 	/*a[i] <= w[i]*v[i]*/
-	a[array_index_i] = vect_dot_product(w_i, v1);
+	a[array_index_i] = vect_dot_product(w_i, v1,n);
 	
 	/*update w_i*/
 	/*w[i] <= w[i]-a[i]*v[i]-b[i]*v[i-1]*/
 	/*b[1] = 0*/
 	memcpy(a_times_v_i,v_i,n*sizeof(double));
 	vect_scalar_multiply(a_times_v_i,a[array_index_i],n);
-	vect_sub(w_i, a_times_v_i);
+	vect_sub(w_i, a_times_v_i, n);
 	
 	/*computes next b_i*/
 	/*b[i+1] = ||w[i]||*/
-	b[array_index_i+1] = vect_norm(w_i,m);
+	b[array_index_i+1] = vect_norm(w_i,n);
 	
 	/*save current v_i*/
 	temp = v_i_minus_one;
@@ -317,7 +336,7 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	/*computes next v_i = w_i/b(i+1)*/
 	/*v[i+1] = w[i]/b[i+1]*/
 	v_i = w_i;
-	vect_scalar_multiply(v_i, 1/b[array_index_i+1]);
+	vect_scalar_multiply(v_i, 1/b[array_index_i+1], n);
 	
 	/*reuse memory former v_i_minus_one space for w_i*/
 	w_i = temp;
@@ -328,11 +347,11 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 		
 		/*computes w_i*/
 		/*w[i] <= A*v[i]*/
-		mtx_mult(A, v1, w_i, n, n, 1);
+		mtx_mult(A, v_i, w_i, n, n, 1);
 		
 		/*computes a_i*/
 		/*a[i] <= w[i]*v[i]*/
-		a[array_index_i] = vect_dot_product(w_i, v1);
+		a[array_index_i] = vect_dot_product(w_i, v_i, n);
 		
 		/*update w_i*/
 		/*prepare a[i]*v[i]*/
@@ -344,12 +363,12 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 		vect_scalar_multiply(b_times_v_i_minus_one,b[array_index_i],n);
 		
 		/*w[i] <= w[i]-a[i]*v[i]-b[i]*v[i-1]*/
-		vect_sub(w_i, a_times_v_i);
-		vect_sub(w_i, b_times_v_i_minus_one);
+		vect_sub(w_i, a_times_v_i,n);
+		vect_sub(w_i, b_times_v_i_minus_one,n);
 		
 		/*computes next b_i*/
 		/*b[i+1] = ||w[i]||*/
-		b[array_index_i+1] = vect_norm(w_i,m);
+		b[array_index_i+1] = vect_norm(w_i,n);
 		
 		/*save current v_i*/
 		temp = v_i_minus_one;
@@ -358,7 +377,7 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 		/*computes next v_i = w_i/b(i+1)*/
 		/*v[i+1] = w[i]/b[i+1]*/
 		v_i = w_i;
-		vect_scalar_multiply(v_i, 1/b[array_index_i+1]);
+		vect_scalar_multiply(v_i, 1/b[array_index_i+1],n);
 		
 		/*reuse memory former v_i_minus_one space for w_i*/
 		w_i = temp;	
@@ -367,7 +386,7 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	
 	/*compute last term a[m]*/
 	array_index_i = m-1;
-	a[array_index_i] = vect_dot_product(w_i, v1);
+	a[array_index_i] = vect_dot_product(w_i,v_i,n);
 	
 	/*construct tridiagonal matrix tm*/
 	Tm[0] = a[0];
@@ -402,7 +421,7 @@ void show_matrix(double *A, int dim_i, int dim_j) {
     for(i = 0; i < dim_i; i++) {
         for(j = 0; j < dim_j; j++)
 			/*row major!*/
-            printf("%2.5f ", A[i * n + j]);
+            printf("%2.5f ", A[i * dim_j + j]);
         printf("\n");
     }
 }
