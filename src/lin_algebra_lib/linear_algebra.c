@@ -304,7 +304,10 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	double* temp;
 
 	/*get a n-long random vector with norm equal to 1*/
-	vect_rand_unit(v1,n);
+	//vect_rand_unit(v1,n);
+	for(i=0;i<n;i++){
+	    v1[i] = 1/sqrt(n);
+	}
 	
 	/*first iteration of the procedure*/
 	i = 1;
@@ -317,20 +320,24 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	/*computes a_i*/
 	/*a[i] <= w[i]*v[i]*/
 	a[array_index_i] = vect_dot_product(w_i, v1,n);
-	
+
 	/*update w_i*/
 	/*w[i] <= w[i]-a[i]*v[i]-b[i]*v[i-1]*/
-	/*b[1] = 0*/
-	memcpy(a_times_v_i,v_i,n*sizeof(double));
+	/*note: b[1] = 0*/
+	memcpy(a_times_v_i,v1,n*sizeof(double));
 	vect_scalar_multiply(a_times_v_i,a[array_index_i],n);
 	vect_sub(w_i, a_times_v_i, n);
 	
 	/*computes next b_i*/
 	/*b[i+1] = ||w[i]||*/
 	b[array_index_i+1] = vect_norm(w_i,n);
-	
-	/*save current v_i*/
+
+	/*copy v1 to v_i*/
+	memcpy(v_i,v1,n*sizeof(double));
+		
+	/*save v[i] to be used asv[i-1]*/
 	temp = v_i_minus_one;
+	
 	v_i_minus_one = v_i;
 	
 	/*computes next v_i = w_i/b(i+1)*/
@@ -343,6 +350,7 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	
 	/*rest of the iterations of the procedure*/
 	for(i=2;i<=m-1;i++){
+		
 		array_index_i = i-1;
 		
 		/*computes w_i*/
@@ -385,26 +393,28 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	}
 	
 	/*compute last term a[m]*/
-	array_index_i = m-1;
+	array_index_i = m-1;	
+	mtx_mult(A, v_i, w_i, n, n, 1);
 	a[array_index_i] = vect_dot_product(w_i,v_i,n);
-	
+		
 	/*construct tridiagonal matrix tm*/
 	Tm[0] = a[0];
-	for(i=1;i<m-1;i++){
+	for(i=1;i<=m-1;i++){
 		Tm[i*m+i] = a[i]; 
-		Tm[i*m+i-1] = b[i]; 
-		Tm[i*m+i+1] = b[i]; 
+		Tm[i*m+i-m] = b[i]; 
+		Tm[i*m+(i-1)] = b[i]; 
 	}
-	Tm[m*m-1] = a[m-1];
 	
 	/*free memory space*/
 	free(a);
 	free(b);
+	free(v1);
 	free(v_i);
 	free(a_times_v_i);
 	free(b_times_v_i_minus_one);
 	free(v_i_minus_one);
 	free(w_i);
+	
 } 
  
 /**
