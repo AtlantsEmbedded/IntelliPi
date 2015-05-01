@@ -23,7 +23,7 @@ int main() {
 	
 	//test_basic_mtx_op();
     
-    test_eigen_solver();
+    //test_eigen_solver();
     
     
     return 0;
