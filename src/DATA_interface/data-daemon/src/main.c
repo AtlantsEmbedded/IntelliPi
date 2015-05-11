@@ -9,10 +9,18 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <pthread.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
+
+#include "main.h"
+#include "socket.h"
+#include "hardware.h"
+#include "xml.h"
+#include "debug.h"
+
 
 #define KEEP_ALIVE "k\r\n"
 #define NOTCH_FREQ "g 407c\r\n" // 60hz
@@ -66,27 +74,6 @@ int main(int argc, char **argv)
 
 	close_sockets();
 	return 0;
-}
-
-void hex_dump(unsigned char *buffer, unsigned long index, unsigned long width) {
-	unsigned long i;
-	for (i=0; i<index; i++) {
-		printf("%02x ", buffer[i]);
-	}
-	unsigned long spacer;
-	for (spacer = index; spacer < width; spacer++) {
-		printf("        ");
-		
-	}
-	printf(": ");
-	for(i=0;i<index;i++){
-		if(buffer[i] < 32) {
-			printf(".");
-		} else {
-			printf("%c", buffer[i]);
-		}
-		printf("\n");
-	}
 }
 
 

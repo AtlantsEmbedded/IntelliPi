@@ -27,9 +27,12 @@ else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
 	X86_DEFINES   =-DX86=1
 	INCPATH       = -I. \
-               		 -Iinclude \
+               		-Iinclude
 else 
 	ARCH_LIBS 	  =
+	X86_DEFINES   =-DX86=1
+	INCPATH       = -I. \
+               		-Iinclude
 endif
 
 LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lbluetooth -lglib-2.0 $(ARCH_LIBS)
