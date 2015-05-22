@@ -3,11 +3,12 @@
 #
 # Frédéric Simard, 2014
 
+
 # compile with gcc
 CC        = gcc 
-
+               		 
 # need flags for math and real-time
-LDFLAGS   = -lm -lrt
+LDFLAGS   = -L. -lm -lrt -lstegr -lf2c
 # name of the program
 PROGRAM   = lin_alg_test.exe
 # files of the program
@@ -19,6 +20,10 @@ OBJS      = $(SRCS:.c=.o)
 #
 
 default: all
+
+dependencies: 
+	cd f2clib; make
+	cd stegr; make
 
 all: $(PROGRAM) 
 

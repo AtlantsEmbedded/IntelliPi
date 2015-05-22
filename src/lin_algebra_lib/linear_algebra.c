@@ -20,6 +20,7 @@
  *
  *   Methods for Eigen problem solving
  *   - Lanczos algorithm
+ *   - Multiple Relatively Robust Representation
  * 
  *   Other utils
  *   - Show matrix
@@ -46,6 +47,9 @@
  */
  
 #include "linear_algebra.h"
+
+void convert_double_to_real_array(double* double_array, real* real_array, int n);
+void convert_real_to_double_array(real* real_array, double* double_array, int n);
 
 /**
  * void vect_add(double* a, double b*, int n)
@@ -278,7 +282,7 @@ void mtx_chol(double *A, double *L, int n) {
 /**
  * void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
  * 
- * @brief Fonction that implements the first step of the eigenproblem solution
+ * @brief Function that implements the first step of the eigenproblem solution
  *        based on lanzos algorithm. This function generates a matrix Tm that contains 
  *        a set (<=) of eigenvalues that approximate those of matrix A. Finding the eigenvalues
  *        in Tm is easier and serves as an optimization method for problems in which only a few 
@@ -288,12 +292,10 @@ void mtx_chol(double *A, double *L, int n) {
  * @param n, the dimensions of the square matrix A
  * @param m, the number of iterations for the lanczos procedure (and the dimensions of the array returned)
  */ 
-void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
+void mtx_lanczos_procedure(double *A, double *a, double *b, int n, int m)
 {
 	int i,j,array_index_i;
 	
-	double* a = (double*)calloc(m, sizeof(double));
-	double* b = (double*)calloc(m, sizeof(double));
 	double* v_i = (double*)calloc(n, sizeof(double));
 	double* a_times_v_i = (double*)calloc(n, sizeof(double));
 	double* b_times_v_i_minus_one = (double*)calloc(n, sizeof(double));
@@ -320,7 +322,7 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	/*computes a_i*/
 	/*a[i] <= w[i]*v[i]*/
 	a[array_index_i] = vect_dot_product(w_i, v1,n);
-
+	
 	/*update w_i*/
 	/*w[i] <= w[i]-a[i]*v[i]-b[i]*v[i-1]*/
 	/*note: b[1] = 0*/
@@ -396,18 +398,13 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	array_index_i = m-1;	
 	mtx_mult(A, v_i, w_i, n, n, 1);
 	a[array_index_i] = vect_dot_product(w_i,v_i,n);
-		
-	/*construct tridiagonal matrix tm*/
-	Tm[0] = a[0];
-	for(i=1;i<=m-1;i++){
-		Tm[i*m+i] = a[i]; 
-		Tm[i*m+i-m] = b[i]; 
-		Tm[i*m+(i-1)] = b[i]; 
-	}
 	
-	/*free memory space*/
-	free(a);
-	free(b);
+	/*translate data representation in the b matrix to match the CLAPACK standard*/
+	for(i=0;i<(n-1);i++){
+		b[i] = b[i+1];
+	}
+	b[n-1] = 0;
+	
 	free(v1);
 	free(v_i);
 	free(a_times_v_i);
@@ -416,6 +413,166 @@ void mtx_lanczos_procedure(double *A, double *Tm, int n, int m)
 	free(w_i);
 	
 } 
+
+/**
+ * void mtx_mrrr(double *a,double *b, double *eigvalues, int n)
+ * 
+ * @brief This function finds the eigenvalues of matrix T (represented by diagonal a and offdiagonal b) 
+ *        using the multiple relatively robust representation algorithm.
+ *        It's a wrapper around the stegr routine found in LAPACK.
+ * @param a, the diagonal of tridiagonal matrix T
+ * @param b, the off-diagonal of tridiagonal matrix T (size should n-1)
+ * @param (out)eigvalues, the eigenvalues of the matrix
+ * @param n, the dimensions of the square matrix T
+ */ 
+void mtx_mrrr(double *a,double *b, double *eigvalues, int n)
+{
+
+/*  JOBZ    (input) CHARACTER*1 */
+/*          = 'N':  Compute eigenvalues only; */
+/*          = 'V':  Compute eigenvalues and eigenvectors. */
+char jobz = 'N';
+
+/*  RANGE   (input) CHARACTER*1 */
+/*          = 'A': all eigenvalues will be found. */
+/*          = 'V': all eigenvalues in the half-open interval (VL,VU] */
+/*                 will be found. */
+/*          = 'I': the IL-th through IU-th eigenvalues will be found. */
+char range = 'A';
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix.  N >= 0. */
+
+integer n_prime = (integer)n;
+
+/*  D       (input/output) REAL array, dimension (N) */
+/*          On entry, the N diagonal elements of the tridiagonal matrix */
+/*          T. On exit, D is overwritten. */
+real *d = (real*)malloc(sizeof(real)*n);
+convert_double_to_real_array(a,d,n);
+
+
+/*  E       (input/output) REAL array, dimension (N) */
+/*          On entry, the (N-1) subdiagonal elements of the tridiagonal */
+/*          matrix T in elements 1 to N-1 of E. E(N) need not be set on */
+/*          input, but is used internally as workspace. */
+/*          On exit, E is overwritten. */
+
+real *e = (real*)malloc(sizeof(real)*(n-1));
+convert_double_to_real_array(b,e,n-1);
+
+/*  VL      (input) REAL */
+/*  VU      (input) REAL */
+/*          If RANGE='V', the lower and upper bounds of the interval to */
+/*          be searched for eigenvalues. VL < VU. */
+/*          Not referenced if RANGE = 'A' or 'I'. */
+real *vl = NULL;
+real *vu = NULL;
+
+/*  IL      (input) INTEGER */
+/*  IU      (input) INTEGER */
+/*          If RANGE='I', the indices (in ascending order) of the */
+/*          smallest and largest eigenvalues to be returned. */
+/*          1 <= IL <= IU <= N, if N > 0. */
+/*          Not referenced if RANGE = 'A' or 'V'. */
+integer il = 0;
+integer iu = 0;
+
+/*  ABSTOL  (input) REAL */
+/*          Unused.  Was the absolute error tolerance for the */
+/*          eigenvalues/eigenvectors in previous versions. */
+real *abstol = NULL;
+
+/*  M       (output) INTEGER */
+/*          The total number of eigenvalues found.  0 <= M <= N. */
+/*          If RANGE = 'A', M = N, and if RANGE = 'I', M = IU-IL+1. */
+integer m = 0;
+
+/*  W       (output) REAL array, dimension (N) */
+/*          The first M elements contain the selected eigenvalues in */
+/*          ascending order. */
+real *w = (real*)malloc(sizeof(real)*n);
+
+/*  Z       (output) REAL array, dimension (LDZ, max(1,M) ) */
+/*          If JOBZ = 'V', and if INFO = 0, then the first M columns of Z */
+/*          contain the orthonormal eigenvectors of the matrix T */
+/*          corresponding to the selected eigenvalues, with the i-th */
+/*          column of Z holding the eigenvector associated with W(i). */
+/*          If JOBZ = 'N', then Z is not referenced. */
+/*          Note: the user must ensure that at least max(1,M) columns are */
+/*          supplied in the array Z; if RANGE = 'V', the exact value of M */
+/*          is not known in advance and an upper bound must be used. */
+/*          Supplying N columns is always safe. */
+real *z= NULL;
+
+/*  LDZ     (input) INTEGER */
+/*          The leading dimension of the array Z.  LDZ >= 1, and if */
+/*          JOBZ = 'V', then LDZ >= max(1,N). */
+integer ldz = 1;
+
+/*  ISUPPZ  (output) INTEGER ARRAY, dimension ( 2*max(1,M) ) */
+/*          The support of the eigenvectors in Z, i.e., the indices */
+/*          indicating the nonzero elements in Z. The i-th computed eigenvector */
+/*          is nonzero only in elements ISUPPZ( 2*i-1 ) through */
+/*          ISUPPZ( 2*i ). This is relevant in the case when the matrix */
+/*          is split. ISUPPZ is only accessed when JOBZ is 'V' and N > 0. */
+integer *isuppz= NULL;
+
+/*  WORK    (workspace/output) REAL array, dimension (LWORK) */
+/*          On exit, if INFO = 0, WORK(1) returns the optimal */
+/*          (and minimal) LWORK. */
+real *work= (real*)malloc(sizeof(real)*12*n);
+
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. LWORK >= max(1,18*N) */
+/*          if JOBZ = 'V', and LWORK >= max(1,12*N) if JOBZ = 'N'. */
+/*          If LWORK = -1, then a workspace query is assumed; the routine */
+/*          only calculates the optimal size of the WORK array, returns */
+/*          this value as the first entry of the WORK array, and no error */
+/*          message related to LWORK is issued by XERBLA. */
+integer lwork= 12*n;
+
+/*  IWORK   (workspace/output) INTEGER array, dimension (LIWORK) */
+/*          On exit, if INFO = 0, IWORK(1) returns the optimal LIWORK. */
+integer *iwork = (integer*)malloc(sizeof(integer)*8*n);
+
+/*  LIWORK  (input) INTEGER */
+/*          The dimension of the array IWORK.  LIWORK >= max(1,10*N) */
+/*          if the eigenvectors are desired, and LIWORK >= max(1,8*N) */
+/*          if only the eigenvalues are to be computed. */
+/*          If LIWORK = -1, then a workspace query is assumed; the */
+/*          routine only calculates the optimal size of the IWORK array, */
+/*          returns this value as the first entry of the IWORK array, and */
+/*          no error message related to LIWORK is issued by XERBLA. */
+integer liwork= 8*n;
+
+/*  INFO    (output) INTEGER */
+/*          On exit, INFO */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  if INFO = 1X, internal error in SLARRE, */
+/*                if INFO = 2X, internal error in SLARRV. */
+/*                Here, the digit X = ABS( IINFO ) < 10, where IINFO is */
+/*                the nonzero error code returned by SLARRE or */
+/*                SLARRV, respectively. */
+integer info = 0;
+
+/*call the CLAPACK MRRR routine*/
+sstegr_(&jobz, &range, &n_prime, d, 
+	e, vl, vu, &il, &iu, abstol, 
+	&m, w, z, &ldz, isuppz, work, &lwork, iwork, &liwork, &info);
+
+/*copy back into the eigvalues array*/
+convert_real_to_double_array(w,eigvalues,n);
+
+/*free the memory*/
+free(iwork);
+free(work);
+free(e);
+free(d);
+
+}
+
  
 /**
  * void show_matrix(double *A, int dim_i, int dim_j)
@@ -438,5 +595,41 @@ void show_matrix(double *A, int dim_i, int dim_j) {
  
 
 
+/**
+ * void convert_double_to_real_array(double* double_array, real* real_array, int n)
+ * 
+ * @brief Utility function to convert between IntelliPi double standard and CLAPACK real
+ * @param double_array, (real) array to be converted
+ * @param real_array, (double) converted array
+ * @param n, number of elements to be converted
+ */ 
+void convert_double_to_real_array(double* double_array, real* real_array, int n)
+{ 
+	int i=0;
+	
+	for(i=0;i<n;i++)
+	{
+		real_array[i] = (real)double_array[i];
+	}
+}
+
+
+/**
+ * void convert_real_to_double_array(real* real_array, double* double_array, int n)
+ * 
+ * @brief Utility function to convert between CLAPACK real and IntelliPi double standard 
+ * @param real_array, (real) array to be converted
+ * @param double_array, (double) converted array
+ * @param n, number of elements to be converted
+ */ 
+void convert_real_to_double_array(real* real_array, double* double_array, int n)
+{ 
+	int i=0;
+	
+	for(i=0;i<n;i++)
+	{
+		double_array[i] = (double)real_array[i];
+	}
+}
 
 

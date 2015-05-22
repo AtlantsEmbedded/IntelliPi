@@ -6,6 +6,9 @@
 #include <string.h>
 #include <math.h>
 
+#include "includes/f2c.h"
+#include "includes/clapack.h"
+
 /***************************/
 /* Basic Vector operations */
 /***************************/
@@ -54,7 +57,11 @@ void show_matrix(double *A, int dim_i, int dim_j);
 /* Eigen solver            */
 /***************************/
 /*A => Tm*/
-void mtx_lanczos_procedure(double *A, double *Tm, int n, int m);
+void mtx_lanczos_procedure(double *A, double *a, double *b, int n, int m);
+
+/*Get eigenvalues of T*/
+void mtx_mrrr(double *a,double *b, double *eigvalues, int n);
+
 
 
 #endif
