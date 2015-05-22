@@ -198,6 +198,7 @@ typedef VOID H_f;	/* character function */
 typedef VOID Z_f;	/* double complex function */
 typedef doublereal E_f;	/* real function with -R not specified */
 
+
 /* undef any lower-case symbols that your C compiler predefines, e.g.: */
 
 #ifndef Skip_f2c_Undefs

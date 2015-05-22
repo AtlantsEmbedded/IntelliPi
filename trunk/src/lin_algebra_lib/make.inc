@@ -27,5 +27,5 @@ RANLIB   = ranlib
 #
 #  Names of generated libraries.
 #
-SMALLLAPACKLIB    = libsmalllapack.a
+STEGRLIB    = libstegr.a
 F2CLIB       = libf2c.a

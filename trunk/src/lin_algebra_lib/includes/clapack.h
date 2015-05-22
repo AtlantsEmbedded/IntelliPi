@@ -154,6 +154,15 @@ doublereal slanst_(char *norm, integer *n, real *d__, real *e);
 	
 /* Subroutine */ int xerbla_(char *srname, integer *info);
 
+/* Subroutine */ int slasq4_(integer *i0, integer *n0, real *z__, integer *pp, 
+	 integer *n0in, real *dmin__, real *dmin1, real *dmin2, real *dn, 
+	real *dn1, real *dn2, real *tau, integer *ttype, real *g);
+	
+	
+integer iparmq_(integer *ispec, char *name__, char *opts, integer *n, integer 
+	*ilo, integer *ihi, integer *lwork);
+	
+
 #ifdef __cplusplus
 }
 #endif

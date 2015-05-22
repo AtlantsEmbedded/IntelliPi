@@ -12,8 +12,8 @@
 
 #include "linear_algebra.h"
 
-void test_vector_op(void);
-void test_mtx_op(void);
+void test_basic_vector_op(void);
+void test_basic_mtx_op(void);
 void test_eigen_solver(void);
 
 int main() {
@@ -23,7 +23,7 @@ int main() {
 	
 	//test_basic_mtx_op();
     
-    //test_eigen_solver();
+    test_eigen_solver();
     
     
     return 0;
@@ -181,6 +181,7 @@ void test_basic_mtx_op(void)
 
 void test_eigen_solver(void)
 {
+	int i = 0;
 	int n = 3;
 	int m = 3;
 
@@ -189,6 +190,10 @@ void test_eigen_solver(void)
 					      2.5214, 2.7030, 93.3993};
 					      
 	double lancz_trans_mtx[9];
+	
+	double a[3];
+	double b[3];
+	double eigvalues[3];
 									  
 	double exp_lancz_trans_mtx[9] = {65.0446, 40.8835, 0,
 									 40.8835, 31.2460, 7.1235,
@@ -199,10 +204,33 @@ void test_eigen_solver(void)
 	printf("Matrix D'\n");	
 	show_matrix(matrix_D, n, n);
 
-	mtx_lanczos_procedure(matrix_D, lancz_trans_mtx, n, m);
+	mtx_lanczos_procedure(matrix_D, a, b, n, m);
 	
+	
+	/*construct tridiagonal matrix tm*/
+	lancz_trans_mtx[0] = a[0];
+	for(i=1;i<=m-1;i++){
+		lancz_trans_mtx[i*m+i] = a[i]; 
+		lancz_trans_mtx[i*m+i-m] = b[i-1]; 
+		lancz_trans_mtx[i*m+(i-1)] = b[i-1]; 
+	}
+	
+	printf("\n");
 	printf("Expected Lanczos'\n");	
 	show_matrix(exp_lancz_trans_mtx, m, m);
 	printf("Obtained Lanczos'\n");	
 	show_matrix(lancz_trans_mtx, m, m);
+	
+	/*call the MRRR routine*/
+	mtx_mrrr(a, b, eigvalues, n);
+	
+	printf("\n");
+	printf("expected eigvalues: 3.4789 84.1301 94.2744\n");	
+	printf("obtained eigvalues: ");	
+	
+	for(i=0;i<3;i++){
+		printf("%.4f ",eigvalues[i]);	
+	}
+	printf("\n\n");
+	
 }
