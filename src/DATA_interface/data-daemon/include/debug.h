@@ -1,1 +1,11 @@
-void hex_dump(unsigned char *buffer, unsigned long index, unsigned long width);
+/**
+ * @file debug.h
+ * @author Ron Brash (ron.brash@gmail.com)
+ * @brief Hexdump/debugging header 
+ */
+
+#ifndef HEXDUMP_COLS
+#define HEXDUMP_COLS 8
+#endif
+
+void hexdump(void *mem, unsigned int len);

@@ -1,5 +1,5 @@
 #############################################################################
-# Makefile for building: data_interface
+# Makefile for building: data_interface 
 #############################################################################
 
 MAKEFILE      = Makefile
@@ -67,6 +67,7 @@ SOURCES       = src/main.c \
 				src/hardware.c \
 				src/debug.c \
 				src/data_structure.c \
+				src/app_signal.c \
 				src/supported_hardware/muse.c \
 				src/supported_hardware/openbci.c
 OBJECTS       = src/main.o \
@@ -75,6 +76,7 @@ OBJECTS       = src/main.o \
 				src/hardware.o \
 				src/debug.o \
 				src/data_structure.o \
+				src/app_signal.o \
 				src/supported_hardware/muse.o \
 				src/supported_hardware/openbci.o
 DIST          = 
@@ -130,17 +132,20 @@ xml.o: src/xml.c
 socket.o: src/socket.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o socket.o src/socket.c 
 	
-hardware.o: src/hardware.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o hardware.o src/hardware.c 
-
 debug.o: src/debug.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o debug.o src/debug.c 
 
 data_structure.o: src/data_structure.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o data_structure.o src/data_structure.c 
 	
+app_signal.o: src/app_signal.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o app_signal.o src/app_signal.c 
+	
 muse.o: src/supported_hardware/muse.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o muse.o src/supported_hardware/muse.c
+	
+hardware.o: src/hardware.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o hardware.o src/hardware.c 
 
 openbci.o: src/supported_hardware/openbci.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o openbci.o src/supported_hardware/openbci.c
