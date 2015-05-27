@@ -300,20 +300,20 @@ void mtx_chol(double *A, double *L, int n) {
  */ 
 void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j)
 {
-	double *L = (double*)calloc(sizeof(double)*dim_i*dim_i);
-	double *L_prime = (double*)calloc(sizeof(double)*dim_i*dim_i);
-	double *Z = (double*)calloc(sizeof(double)*dim_i*dim_j);
+	double *L = (double*)calloc(dim_i*dim_i,sizeof(double));
+	double *L_prime = (double*)calloc(dim_i*dim_i,sizeof(double));
+	double *Z = (double*)calloc(dim_i*dim_j,sizeof(double));
 
 	/*Find the cholesky factor of matrix A*/
 	mtx_chol(A, L, dim_i);
 
 	/*Solve the forward substitution (LZ=B)*/
-	lin_solve_triangular_lin_sys(L, Z, B, dim_i, dim_j, 1);
+	lin_solve_triangular_equ(L, Z, B, dim_i, dim_j, 1);
 		
 	/*Solve the backward substitution (L'X=Z)*/
 	/*compute the transpose of L -> L'*/
 	mtx_transpose(L, L_prime, dim_i, dim_i);
-	lin_solve_triangular_lin_sys(L_prime, X, Z, dim_i, dim_j, 0);
+	lin_solve_triangular_equ(L_prime, X, Z, dim_i, dim_j, 0);
 	
 	free(L);
 	free(L_prime);
@@ -321,7 +321,7 @@ void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j)
 }
 
 /**
- * void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j))
+ * void lin_solve_triangular_equ(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower)
  * 
  * @brief Function that implements the linear equation solver for triangular matrices.
  *        The problem must be presented under the form AX=B, where X is the unknown.
@@ -333,7 +333,7 @@ void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j)
  * @param dim_j, matrices dimension variable (see above)
  * @param lower, flag indicating if the triangular is lower triangular (1) or upper (0)
  */ 
-void lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower)
+void lin_solve_triangular_equ(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower)
 {
 	int i,j;
 	double sub_sum;
@@ -345,7 +345,7 @@ void lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim
 		for(i=0;i<dim_i;i++){	
 			sub_sum = 0.0;
 			for(j=0;j<i;j++){
-				sub_sum -= Z[j]*tri_mtx[dim_i*(j+1)+j];
+				sub_sum -= Z[j]*tri_mtx[dim_i*i+j];
 			}
 			Z[i] = (B[i]+sub_sum)/tri_mtx[i*dim_i+i];
 		}
@@ -357,7 +357,7 @@ void lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim
 		for(i=(dim_i-1);i>=0;i--){	
 			sub_sum = 0.0;
 			for(j=(dim_i-1);j>i;j--){
-				sub_sum -= Z[j]*tri_mtx[(j+1)*(dim_i-1)+j-dim_i+1];
+				sub_sum -= Z[j]*tri_mtx[i*dim_i+j];
 			}
 			Z[i] = (B[i]+sub_sum)/tri_mtx[i*dim_i+i];
 		}

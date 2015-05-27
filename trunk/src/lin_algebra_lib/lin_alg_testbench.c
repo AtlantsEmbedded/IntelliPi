@@ -183,15 +183,108 @@ void test_basic_mtx_op(void)
 
 void test_linear_solver(void)
 {
-
+	int i;
+	int dim_i = 3;
+	int dim_j = 3;
+	
+	/*Definition of the variables of problem 1: lower triangular matrix linear system solver*/
+	double A_1[9] = {0.6790, 0.0000, 0.0000,
+					 0.7580, 0.6550, 0.0000,
+					 0.7430, 0.1710, 0.2770};
+	
+	double x_1[3] = {0.0460,
+					 0.0970,
+					 0.8230};
+    
+	double b_1[3] = {0.031234,
+					 0.098403,
+					 0.278736};
+					 
+					 
+	/*Definition of the variables of problem 2: upper triangular matrix linear system solver*/
+	double A_2[9] = {0.6950, 0.0340, 0.7660,
+					 0.0000, 0.4390, 0.7950,
+					 0.0000, 0.0000, 0.1870};
+	
+	double x_2[3] = {0.4900,
+					 0.4460,
+					 0.6460};
+    
+	double b_2[3] = {0.850550,
+					 0.709364,
+					 0.120802};				 
+					 
+					 
+	/*Definition of the variables of problem 3: symmetric matrix linear system solver*/
+	double A_3[9] = {0.7510, 0.1400, 0.1300,
+					 0.1400, 0.2550, 0.2140,
+					 0.1300, 0.2140, 0.5060};
+	
+	double x_3[3] = {0.8140,
+					 0.2440,
+					 0.9290};
+    
+	double b_3[3] = {0.766244,
+					 0.374986,
+					 0.628110};				 
+	
+    /*------------*/
+    /* TEST 1     */
+    /*------------*/
+    printf("Test 1: lower triangular matrix linear equation solver\n");
+    printf("Expected: ");
+	for(i=0;i<dim_i;i++){
+		printf("%.4f\t",x_1[i]);
+	}
+	printf("\n");
+	
 	/*Test the lower triangular matrix linear equation solver*/
-	lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower);
+	lin_solve_triangular_equ(A_1, x_1, b_1, dim_i, dim_j, 1);
+	
+	printf("Obtained: ");
+	for(i=0;i<dim_i;i++){
+		printf("%.4f\t",x_1[i]);
+	}
+	printf("\n");
+	
+    /*------------*/
+    /* TEST 2     */
+    /*------------*/
+    printf("Test 2: upper triangular matrix linear equation solver\n");
+    printf("Expected: ");
+	for(i=0;i<dim_i;i++){
+		printf("%.4f\t",x_2[i]);
+	}
+	printf("\n");
+	
+	/*Test the lower triangular matrix linear equation solver*/
+	lin_solve_triangular_equ(A_2, x_2, b_2, dim_i, dim_j, 0);
+	
+	printf("Obtained: ");
+	for(i=0;i<dim_i;i++){
+		printf("%.4f\t",x_2[i]);
+	}
+	printf("\n");
 
-	/*Test the upper triangular matrix linear equation solver*/
-	lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower);
+    /*------------*/
+    /* TEST 3     */
+    /*------------*/
+    printf("Test 3: Symmetric matrix linear equation solver\n");
+    printf("Expected: ");
+	for(i=0;i<dim_i;i++){
+		printf("%.4f\t",x_3[i]);
+	}
+	printf("\n");
+	
+	/*Test the lower triangular matrix linear equation solver*/
+	lin_solve_PSD(A_3, x_3, b_3, dim_i, dim_j);
+	
+	printf("Obtained: ");
+	for(i=0;i<dim_i;i++){
+		printf("%.4f\t",x_3[i]);
+	}
+	printf("\n");
 
-	/*Test the PSD matrix linear equation solver*/
-	lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j, int dim_k);
 }
 
 

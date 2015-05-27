@@ -59,13 +59,13 @@ void show_matrix(double *A, int dim_i, int dim_j);
 /*AX = B*/
 /*in which x is the unknown.*/
 /*A must be PSD*/
-void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j, int dim_k);
+void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j);
 
 /*Solve system of linear equations of the type: */
 /*AX = B*/
 /*in which x is the unknown.*/
 /*A is trianguler (lower or upper)*/
-void lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower);
+void lin_solve_triangular_equ(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower);
 
 /***************************/
 /* Eigen solver            */
