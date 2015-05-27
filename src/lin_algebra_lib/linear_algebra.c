@@ -18,6 +18,9 @@
  *   - Matrix transpose
  *   - Cholesky decomposition
  *
+ *   Methods for Linear equation solving
+ *   - lin_solve_PSD
+ *
  *   Methods for Eigen problem solving
  *   - Lanczos algorithm
  *   - Multiple Relatively Robust Representation
@@ -36,6 +39,9 @@
  * References:
  *    Cholesky decomposition:
  *    - http://rosettacode.org/wiki/Cholesky_decomposition
+ *
+ *    Linear system solver, based on cholesky decomposition
+ *    - http://www.seas.ucla.edu/~vandenbe/103/lectures/chol.pdf
  *    
  *    Lanczos Procedure:
  *    - Cullum J and Willoughby (1981) Computing Eigenvalues of Very Large Symmetric Matrices - 
@@ -43,6 +49,9 @@
  *      (44)329-358.
  *    - http://en.wikipedia.org/wiki/Lanczos_algorithm
  *
+ *    MRRR for eigenvalues
+ *    - Dhillon IS, Beresford PN and Vomel C (2006) The Design and Implementation of the MRRR Algorithm. 
+ *      ACM Transactions on Mathematical Software, 32(4):533-560.
  *
  */
  
@@ -277,6 +286,84 @@ void mtx_chol(double *A, double *L, int n) {
 }
 
 
+/**
+ * void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j))
+ * 
+ * @brief Function that implements the linear equation solver for positive semi-definite matrices.
+ *        It formulates the problem as a forward/backward substitution, based on the cholesky decomposition.
+ *        The problem must be presented under the form AX=B, where X is the unknown
+ * @param A, dim_i x dim_i square matrix. Must be PSD.
+ * @param (out)X, dim_i x dim_j matrix array that will contain the solution to the problem
+ * @param B, dim_i x dim_j matrix array that is on the right side of the equation
+ * @param dim_i, matrices dimension variable (see above)
+ * @param dim_j, matrices dimension variable (see above)
+ */ 
+void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j)
+{
+	double *L = (double*)calloc(sizeof(double)*dim_i*dim_i);
+	double *L_prime = (double*)calloc(sizeof(double)*dim_i*dim_i);
+	double *Z = (double*)calloc(sizeof(double)*dim_i*dim_j);
+
+	/*Find the cholesky factor of matrix A*/
+	mtx_chol(A, L, dim_i);
+
+	/*Solve the forward substitution (LZ=B)*/
+	lin_solve_triangular_lin_sys(L, Z, B, dim_i, dim_j, 1);
+		
+	/*Solve the backward substitution (L'X=Z)*/
+	/*compute the transpose of L -> L'*/
+	mtx_transpose(L, L_prime, dim_i, dim_i);
+	lin_solve_triangular_lin_sys(L_prime, X, Z, dim_i, dim_j, 0);
+	
+	free(L);
+	free(L_prime);
+	free(Z);
+}
+
+/**
+ * void lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j))
+ * 
+ * @brief Function that implements the linear equation solver for triangular matrices.
+ *        The problem must be presented under the form AX=B, where X is the unknown.
+ *        The last parameter defines whether A is lower (1) or upper (0)
+ * @param A, dim_i x dim_i triangular matrix. 
+ * @param (out)Z, dim_i x dim_j matrix array that will contain the solution to the problem
+ * @param B, dim_i x dim_j matrix array that is on the right side of the equation
+ * @param dim_i, matrices dimension variable (see above)
+ * @param dim_j, matrices dimension variable (see above)
+ * @param lower, flag indicating if the triangular is lower triangular (1) or upper (0)
+ */ 
+void lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower)
+{
+	int i,j;
+	double sub_sum;
+	
+	/*solver for lower triangular matrices*/
+	if(lower){
+		/*Compute the equation*/
+		/*z(n) = (b(n)-a(n,1)*x(1)-a(n,2)*x(2)-...-a(n,n-1)*x(n-1))/a(n,n)*/
+		for(i=0;i<dim_i;i++){	
+			sub_sum = 0.0;
+			for(j=0;j<i;j++){
+				sub_sum -= Z[j]*tri_mtx[dim_i*(j+1)+j];
+			}
+			Z[i] = (B[i]+sub_sum)/tri_mtx[i*dim_i+i];
+		}
+	}
+	/*solver for upper triangular matrices*/
+	else{
+		/*Compute the equation (not generalized)*/
+		/*z(n-2) = (b(n-2)-a(n-2,n-1)*x(n-1)-a(n-2,n)*x(n))/a(n-2,n-2)*/
+		for(i=(dim_i-1);i>=0;i--){	
+			sub_sum = 0.0;
+			for(j=(dim_i-1);j>i;j--){
+				sub_sum -= Z[j]*tri_mtx[(j+1)*(dim_i-1)+j-dim_i+1];
+			}
+			Z[i] = (B[i]+sub_sum)/tri_mtx[i*dim_i+i];
+		}
+	}
+}
+
 
 
 /**
@@ -288,7 +375,8 @@ void mtx_chol(double *A, double *L, int n) {
  *        in Tm is easier and serves as an optimization method for problems in which only a few 
  *        eigenpairs are required.
  * @param A, the matrix on which the procedure is applied. Needs to be square and Hermitian.
- * @param (out)Tm, a m*m tridiagonal square matrix Tm which contains a set of eigenvalues that approximate those found in A...
+ * @param (out)a, elements of the diagonal of the matrix Tm
+ * @param (out)b, elements off diagonal of the matrix Tm
  * @param n, the dimensions of the square matrix A
  * @param m, the number of iterations for the lanczos procedure (and the dimensions of the array returned)
  */ 

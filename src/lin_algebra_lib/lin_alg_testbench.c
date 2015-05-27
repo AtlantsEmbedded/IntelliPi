@@ -14,6 +14,7 @@
 
 void test_basic_vector_op(void);
 void test_basic_mtx_op(void);
+void test_linear_solver(void);
 void test_eigen_solver(void);
 
 int main() {
@@ -23,7 +24,9 @@ int main() {
 	
 	//test_basic_mtx_op();
     
-    test_eigen_solver();
+	test_linear_solver();
+
+    //test_eigen_solver();
     
     
     return 0;
@@ -176,6 +179,19 @@ void test_basic_mtx_op(void)
 	printf("Matrix test results validated using Matlab: \n");
 	printf("All good! 05/15, FS\n");	
 	
+}
+
+void test_linear_solver(void)
+{
+
+	/*Test the lower triangular matrix linear equation solver*/
+	lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower);
+
+	/*Test the upper triangular matrix linear equation solver*/
+	lin_solve_triangular_lin_sys(double *tri_mtx, double *Z, double *B, int dim_i, int dim_j, char lower);
+
+	/*Test the PSD matrix linear equation solver*/
+	lin_solve_PSD(double *A, double *X, double *B, int dim_i, int dim_j, int dim_k);
 }
 
 
