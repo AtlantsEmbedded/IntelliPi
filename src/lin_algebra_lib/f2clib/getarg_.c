@@ -3,6 +3,11 @@
 extern "C" {
 #endif
 
+
+
+int xargc;
+char **xargv;
+
 /*
  * subroutine getarg(k, c)
  * returns the kth unix command argument in fortran character

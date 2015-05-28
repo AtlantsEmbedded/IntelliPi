@@ -26,8 +26,8 @@ include $(TOPDIR)/make.inc
 ## omit -x in the ld line above.
 ## If your system does not have the ld command, comment out
 ## or remove both the ld and mv lines above.
-
-MISC =	f77vers.o i77vers.o main.o s_rnge.o abort_.o exit_.o getarg_.o iargc_.o\
+# main.o
+MISC =	f77vers.o i77vers.o s_rnge.o abort_.o exit_.o getarg_.o iargc_.o\
 	getenv_.o signal_.o s_stop.o s_paus.o system_.o cabs.o ctype.o\
 	derf_.o derfc_.o erf_.o erfc_.o sig_die.o uninit.o
 POW =	pow_ci.o pow_dd.o pow_di.o pow_hh.o pow_ii.o pow_ri.o pow_zi.o pow_zz.o
@@ -69,7 +69,14 @@ TIME =	dtime_.o etime_.o
 OFILES = $(MISC) $(POW) $(CX) $(DCX) $(REAL) $(DBL) $(INT) \
 	$(HALF) $(CMP) $(EFL) $(CHAR) $(I77) $(TIME)
 
-all: f2c.h signal1.h sysdep1.h libf2c.a clapack_install
+all: f2c.h signal1.h sysdep1.h libf2c.so smallapack_install
+
+# For use with "f2c" and "f2c -A":
+f2c.h: f2c.h0
+	cp f2c.h0 f2c.h
+
+
+## Static-library variant: 
 
 libf2c.a: $(OFILES)
 	ar r libf2c.a $?
@@ -96,10 +103,6 @@ i77vers.o: i77vers.c
 hadd: f2c.h0 f2ch.add
 	cat f2c.h0 f2ch.add >f2c.h
 
-# For use with "f2c" and "f2c -A":
-f2c.h: f2c.h0
-	cp f2c.h0 f2c.h
-
 # You may need to adjust signal1.h and sysdep1.h suitably for your system...
 signal1.h: signal1.h0
 	cp signal1.h0 signal1.h
@@ -121,8 +124,8 @@ install: libf2c.a
 	cp libf2c.a $(LIBDIR)
 	-ranlib $(LIBDIR)/libf2c.a
 
-clapack_install: libf2c.a
-	mv libf2c.a ..
+smallapack_install: 
+	mv libf2c.so ..
 
 clean:
 	rm -f libf2c.a *.o arith.h signal1.h sysdep1.h

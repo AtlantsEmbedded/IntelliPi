@@ -13,7 +13,7 @@ SHELL = /bin/sh
 CC        = gcc
 # if no wrapping of the blas library is needed, uncomment next line
 #CC        = gcc -DNO_BLAS_WRAP
-CFLAGS    = -O3 -I$(TOPDIR)/includes
+CFLAGS    = -fPIC -O2 -I$(TOPDIR)/includes
 LOADER    = gcc
 LOADOPTS  =
 NOOPT     = -O0 -I$(TOPDIR)/includes
@@ -27,5 +27,5 @@ RANLIB   = ranlib
 #
 #  Names of generated libraries.
 #
-STEGRLIB    = libstegr.a
-F2CLIB       = libf2c.a
+STEGRLIB    = libstegr.so
+F2CLIB       = libf2c.so
