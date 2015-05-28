@@ -16,7 +16,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/lin_alg
 	SECTION:=libs
 	CATEGORY:=Libraries
-	TITLE:=linear_algebra
+	TITLE:=lin_alg
 	DEPENDS:=+librt
 endef
 
