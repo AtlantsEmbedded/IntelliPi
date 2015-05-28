@@ -79,7 +79,7 @@ first: all
 
 ####### Build rules
 
-all: Makefile  $(TARGET) $(TARGETA)
+all: dependecies Makefile  $(TARGET) $(TARGETA)
 
 $(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)  
 	-$(DEL_FILE) $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -111,6 +111,12 @@ distclean: clean
 
 linear_algebra.o: linear_algebra.c 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o linear_algebra.o linear_algebra.c
+
+####### dependencies
+
+dependecies: 
+	cd f2clib; make
+	cd stegr; make
 
 ####### Install
 
