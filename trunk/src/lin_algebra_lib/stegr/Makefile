@@ -1,8 +1,8 @@
 #############################################################################
-# Library Makefile for building: lin_alg
+# Library Makefile for building: stegr
 # Frédéric Simard, 2014
 #############################################################################
-LIBBASENAME = lin_alg
+LIBBASENAME = stegr
 MAJVER = 1
 MINVER = 0
 PATCHVER = 0
