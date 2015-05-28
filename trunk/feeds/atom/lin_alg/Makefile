@@ -13,23 +13,23 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/lin_alg
+define Package/lin_algebra_lib
 	SECTION:=libs
 	CATEGORY:=Libraries
-	TITLE:=lin_alg
+	TITLE:=lin_algebra_lib
 	DEPENDS:=+librt
 endef
 
-define Package/lin_alg/description
+define Package/lin_algebra_lib/description
 	Linear algebra library
 endef
 
-define Package/lin_alg/install
+define Package/lin_algebra_lib/install
 	$(INSTALL_DIR) $(1)/usr
 	$(INSTALL_DIR) $(1)/usr/lib
 	cp $(PKG_BUILD_DIR)/libf2c.so* $(1)/usr/lib/
 	cp $(PKG_BUILD_DIR)/libstegr.so* $(1)/usr/lib/
-	cp $(PKG_BUILD_DIR)/liblin_alg.so* $(1)/usr/lib/
+	cp $(PKG_BUILD_DIR)/liblin_algebra_lib.so* $(1)/usr/lib/
 endef
 
 define Build/InstallDev 
@@ -38,7 +38,7 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/lib
 	cp $(PKG_BUILD_DIR)/libf2c.so* $(STAGING_DIR)/usr/lib/
 	cp $(PKG_BUILD_DIR)/libstegr.so* $(STAGING_DIR)/usr/lib/
-	cp $(PKG_BUILD_DIR)/liblin_alg.so* $(STAGING_DIR)/usr/lib/
+	cp $(PKG_BUILD_DIR)/liblin_algebra_lib.so* $(STAGING_DIR)/usr/lib/
 	cp $(PKG_BUILD_DIR)/*.h $(STAGING_DIR)/usr/include
 
 endef
