@@ -1,35 +1,131 @@
-TOPDIR=..
-include $(TOPDIR)/make.inc
+#############################################################################
+# Library Makefile for building: lin_alg
+# Frédéric Simard, 2014
+#############################################################################
+LIBBASENAME = lin_alg
+MAJVER = 1
+MINVER = 0
+PATCHVER = 0
+# Dont touch these TARGET definitions  they're needed below
+TARGET        = lib$(LIBBASENAME).so.$(MAJVER).$(MINVER).$(PATCHVER)
+TARGETA       = lib$(LIBBASENAME).a
+TARGETD       = lib$(LIBBASENAME).so.$(MAJVER).$(MINVER).$(PATCHVER)
+TARGET0       = lib$(LIBBASENAME).so
+TARGET1       = lib$(LIBBASENAME).so.$(MAJVER)
+TARGET2       = lib$(LIBBASENAME).so.$(MAJVER).$(MINVER)
 
-# listing of the objects to be included
-ALLOBJ = ieeeck.o ilaenv.o lsame.o scopy.o sisnan.o slae2.o slaebz.o \
-        slaev2.o slaisnan.o slamch.o slaneg.o slanst.o slar1v.o slarnv.o \
-        slarra.o slarrb.o slarrc.o slarrd.o slarre.o slarrf.o slarrj.o \
-        slarrk.o slarrr.o slarrv.o slaruv.o slaset.o slasq2.o slasq3.o \
-        slasq5.o slasq6.o slasrt.o slassq.o sscal.o sstegr.o sstemr.o \
-        sswap.o iparmq.o slasq4.o xerbla.o
+####### Compiler, tools and options
+LD	      := $(CC)
+CC            := $(CC)
+CXX           := $(CXX)
+LEX           := flex
+YACC          := yacc
+CFLAGS        := -Wall -fPIC $(CFLAGS)
+CXXFLAGS      := -Wall -fPIC $(CXXFLAGS)
+LEXFLAGS      := 
+YACCFLAGS     := -d
+INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
+#INCPATH       := -I. -I/include/ -I/usr/include/
+LINK          := $(CC) 
+LFLAGS        := -shared -Wl,-soname,$(TARGET)
+LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
+#LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
+AR            := ar
+AR_ARGS	      := cqs	
+RANLIB        := 
+TAR           = tar -cf
+GZIP	      = gzip -9f
+COPY          = cp -f
+COPY_FILE     = $(COPY)
+COPY_DIR      = $(COPY) -r
+INSTALL_FILE  = $(COPY_FILE)
+INSTALL_DIR   = $(COPY_DIR)
+DEL_FILE      = rm -f
+SYMLINK       = ln -sf
+DEL_DIR       = rmdir
+MOVE          = mv -f
+CHK_DIR_EXISTS= test -d
+MKDIR         = mkdir -p
 
-# call the sequence of etiquettes to get everything done
-all: ../$(STEGRLIB) libstegr.so smallapack_install
+####### Output directory
 
-#this line actually call the %.o : %.c line below
-../$(STEGRLIB): $(ALLOBJ)
+OBJECTS_DIR   = ./
 
-# this will build every object file, from the .c
-%.o: %.c 
-	$(CC) $(CFLAGS) -c $<
+####### Files
 
-# this builds the shared library
-libstegr.so: $(OFILES)
-	cc -shared -o libstegr.so $(ALLOBJ)
+ALLSRCS = ieeeck.c ilaenv.c lsame.c scopy.c sisnan.c slae2.c slaebz.c \
+        slaev2.c slaisnan.c slamch.c slaneg.c slanst.c slar1v.c slarnv.c \
+        slarra.c slarrb.c slarrc.c slarrd.c slarre.c slarrf.c slarrj.c \
+        slarrk.c slarrr.c slarrv.c slaruv.c slaset.c slasq2.c slasq3.c \
+        slasq5.c slasq6.c slasrt.c slassq.c sscal.c sstegr.c sstemr.c \
+        sswap.c iparmq.c slasq4.c xerbla.c
 
-# this copies it to the folder below
-smallapack_install: 
-	mv libstegr.so ..
+SOURCES       = $(ALLSRCS)
 
-clean:
-	rm -f *.o
+OBJECTS       = $(ALLSRCS:.c=.o)
+
+first: all $(OBJECTS)
+####### Implicit rules
+
+.SUFFIXES: .c .o .cpp .cc .cxx .C
+
+.cpp.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+
+.cc.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+
+.cxx.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+
+.C.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+
+%.o: %.c:
+	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
+
+####### Build rules
+
+all: Makefile  $(TARGET) $(TARGETA)
+
+$(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)  
+	-$(DEL_FILE) $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
+	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS) $(OBJCOMP)
+	-ln -s $(TARGET) $(TARGET0)
+	-ln -s $(TARGET) $(TARGET1)
+	-ln -s $(TARGET) $(TARGET2)
+
+staticlib: $(TARGETA)
+
+$(TARGETA):  $(OBJECTS) $(OBJCOMP) 
+	-$(DEL_FILE) $(TARGETA) 
+	$(AR) $(AR_ARGS) $(TARGETA) $(OBJECTS) $(OBJMOC)
+
+yaccclean:
+lexclean:
+clean: 
+	-$(DEL_FILE) $(OBJECTS)
+	-$(DEL_FILE) *~ core *.core *.so*
 
 
+####### Sub-libraries
 
+distclean: clean
+	-$(DEL_FILE) $(TARGET) 
+	-$(DEL_FILE) $(TARGET0) $(TARGET1) $(TARGET2) $(TARGETA)
 
+####### Compile
+
+#linear_algebra.o: linear_algebra.c 
+#	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o linear_algebra.o linear_algebra.c
+
+####### Install
+
+install:  
+	$(MKDIR) $(DESTDIR)/lib/
+	$(COPY_FILE) -a lib$(LIBBASENAME).so* $(DESTDIR)/lib
+	$(COPY_FILE) -a *.h $(DESTDIR)/usr/include/
+
+uninstall:   FORCE
+
+FORCE:
