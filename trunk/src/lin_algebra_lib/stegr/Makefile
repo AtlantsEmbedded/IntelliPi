@@ -24,12 +24,12 @@ CFLAGS        := -Wall -fPIC $(CFLAGS)
 CXXFLAGS      := -Wall -fPIC $(CXXFLAGS)
 LEXFLAGS      := 
 YACCFLAGS     := -d
-#INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
-INCPATH       := -I. -I/include/ -I/usr/include/ -I../includes
+INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
+#INCPATH       := -I. -I/include/ -I/usr/include/ -I../includes
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
-#LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
-LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
+LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
+#LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
 AR            := ar
 AR_ARGS	      := cqs	
 RANLIB        := 
@@ -122,11 +122,11 @@ clean:
 
 ####### Install
 
-#install:  
-#	$(MKDIR) $(DESTDIR)/lib/
-#	$(COPY_FILE) -a lib$(LIBBASENAME).so* $(DESTDIR)/lib
-#	$(COPY_FILE) -a *.h $(DESTDIR)/usr/include/
+install:  
+	$(MKDIR) $(DESTDIR)/lib/
+	$(COPY_FILE) -a lib$(LIBBASENAME).so* $(DESTDIR)/lib
+	$(COPY_FILE) -a *.h $(DESTDIR)/usr/include/
 
-#uninstall:   FORCE
+uninstall:   FORCE
 
-#FORCE:
+FORCE:

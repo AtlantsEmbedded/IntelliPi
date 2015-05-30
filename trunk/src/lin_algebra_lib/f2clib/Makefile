@@ -24,12 +24,12 @@ CFLAGS        := -Wall -fPIC $(CFLAGS)
 CXXFLAGS      := -Wall -fPIC $(CXXFLAGS)
 LEXFLAGS      := 
 YACCFLAGS     := -d
-#INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
-INCPATH       := -I. -I/include/ -I/usr/include/ -I../includes/
+INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
+#INCPATH       := -I. -I/include/ -I/usr/include/ -I../includes/
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
-#LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
-LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
+LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
+#LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
 AR            := ar
 AR_ARGS	      := cqs	
 RANLIB        := 
@@ -120,11 +120,11 @@ $(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)
 	-ln -s $(TARGET) $(TARGET1)
 	-ln -s $(TARGET) $(TARGET2)
 
-staticlib: $(TARGETA)
+#staticlib: $(TARGETA)
 
-$(TARGETA):  $(OBJECTS) $(OBJCOMP) 
-	-$(DEL_FILE) $(TARGETA) 
-	$(AR) $(AR_ARGS) $(TARGETA) $(OBJECTS) $(OBJMOC)
+#$(TARGETA):  $(OBJECTS) $(OBJCOMP) 
+#	-$(DEL_FILE) $(TARGETA) 
+#	$(AR) $(AR_ARGS) $(TARGETA) $(OBJECTS) $(OBJMOC)
 
 yaccclean:
 lexclean:
