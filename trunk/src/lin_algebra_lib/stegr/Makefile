@@ -24,12 +24,12 @@ CFLAGS        := -Wall -fPIC $(CFLAGS)
 CXXFLAGS      := -Wall -fPIC $(CXXFLAGS)
 LEXFLAGS      := 
 YACCFLAGS     := -d
-INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
-#INCPATH       := -I. -I/include/ -I/usr/include/
+#INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
+INCPATH       := -I. -I/include/ -I/usr/include/ -I../includes
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
-LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
-#LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
+#LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
+LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
 AR            := ar
 AR_ARGS	      := cqs	
 RANLIB        := 
@@ -81,12 +81,13 @@ first: all $(OBJECTS)
 .C.o:
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 
-%.o: %.c:
+.c.o:
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
 ####### Build rules
 
-all: Makefile  $(TARGET) $(TARGETA)
+all: Makefile  $(TARGET) 
+#$(TARGETA)
 
 $(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)  
 	-$(DEL_FILE) $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -95,11 +96,11 @@ $(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)
 	-ln -s $(TARGET) $(TARGET1)
 	-ln -s $(TARGET) $(TARGET2)
 
-staticlib: $(TARGETA)
+#staticlib: $(TARGETA)
 
-$(TARGETA):  $(OBJECTS) $(OBJCOMP) 
-	-$(DEL_FILE) $(TARGETA) 
-	$(AR) $(AR_ARGS) $(TARGETA) $(OBJECTS) $(OBJMOC)
+#$(TARGETA):  $(OBJECTS) $(OBJCOMP) 
+#	-$(DEL_FILE) $(TARGETA) 
+#	$(AR) $(AR_ARGS) $(TARGETA) $(OBJECTS) $(OBJMOC)
 
 yaccclean:
 lexclean:
@@ -110,9 +111,9 @@ clean:
 
 ####### Sub-libraries
 
-distclean: clean
-	-$(DEL_FILE) $(TARGET) 
-	-$(DEL_FILE) $(TARGET0) $(TARGET1) $(TARGET2) $(TARGETA)
+#distclean: clean
+#	-$(DEL_FILE) $(TARGET) 
+#	-$(DEL_FILE) $(TARGET0) $(TARGET1) $(TARGET2) $(TARGETA)
 
 ####### Compile
 
@@ -121,11 +122,11 @@ distclean: clean
 
 ####### Install
 
-install:  
-	$(MKDIR) $(DESTDIR)/lib/
-	$(COPY_FILE) -a lib$(LIBBASENAME).so* $(DESTDIR)/lib
-	$(COPY_FILE) -a *.h $(DESTDIR)/usr/include/
+#install:  
+#	$(MKDIR) $(DESTDIR)/lib/
+#	$(COPY_FILE) -a lib$(LIBBASENAME).so* $(DESTDIR)/lib
+#	$(COPY_FILE) -a *.h $(DESTDIR)/usr/include/
 
-uninstall:   FORCE
+#uninstall:   FORCE
 
-FORCE:
+#FORCE:
