@@ -24,12 +24,12 @@ CFLAGS        := -Wall -fPIC $(CFLAGS)
 CXXFLAGS      := -Wall -fPIC $(CXXFLAGS)
 LEXFLAGS      := 
 YACCFLAGS     := -d
-INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
-#INCPATH       := -I. -I/include/ -I/usr/include/
+#INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
+INCPATH       := -I. -I/include/ -I/usr/include/ -I../includes/
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
-LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
-#LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
+#LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
+LIBS	      := -L/lib/ -L/usr/lib -lm -lrt
 AR            := ar
 AR_ARGS	      := cqs	
 RANLIB        := 
@@ -103,14 +103,15 @@ first: all
 .C.o:
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 
-%.o: %.c:
+.c.o:
 	$(CC) -c -DSkip_f2c_Undefs $(CFLAGS) $*.c
 	ld -r -x -o $*.xxx $*.o
 	mv $*.xxx $*.o
 	
 ####### Build rules
 
-all: Makefile  $(TARGET) $(TARGETA)
+all: Makefile f2c.h signal1.h sysdep1.h $(TARGET) 
+#$(TARGETA)
 
 $(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)  
 	-$(DEL_FILE) $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
