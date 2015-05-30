@@ -24,12 +24,12 @@ CFLAGS        := -Wall -fPIC $(CFLAGS)
 CXXFLAGS      := -Wall -fPIC $(CXXFLAGS)
 LEXFLAGS      := 
 YACCFLAGS     := -d
-#INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
-INCPATH       := -I. -I/include/ -I/usr/include/ -I./includes/
+INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include 
+#INCPATH       := -I. -I/include/ -I/usr/include/ -I./includes/
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
-#LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
-LIBS	      := -L/lib/ -L/usr/lib -L./stegr -L./f2clib -lm -lrt
+LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
+#LIBS	      := -L/lib/ -L/usr/lib -L./stegr -L./f2clib -lm -lrt
 AR            := ar
 AR_ARGS	      := cqs	
 RANLIB        := 
@@ -79,8 +79,10 @@ first: all
 
 ####### Build rules
 
-all: dependecies Makefile  $(TARGET) 
+all: dependencies Makefile  $(TARGET) 
 #$(TARGETA)
+
+	@echo "\nBuilding Target------------------------------------\n"
 
 $(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)  
 	-$(DEL_FILE) $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -89,11 +91,11 @@ $(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)
 	-ln -s $(TARGET) $(TARGET1)
 	-ln -s $(TARGET) $(TARGET2)
 
-staticlib: $(TARGETA)
+#staticlib: $(TARGETA)
 
-$(TARGETA):  $(OBJECTS) $(OBJCOMP) 
-	-$(DEL_FILE) $(TARGETA) 
-	$(AR) $(AR_ARGS) $(TARGETA) $(OBJECTS) $(OBJMOC)
+#$(TARGETA):  $(OBJECTS) $(OBJCOMP) 
+#	-$(DEL_FILE) $(TARGETA) 
+#	$(AR) $(AR_ARGS) $(TARGETA) $(OBJECTS) $(OBJMOC)
 
 yaccclean:
 lexclean:
@@ -115,16 +117,17 @@ linear_algebra.o: linear_algebra.c
 
 ####### dependencies
 
-dependecies: 
+dependencies: 
+	@echo "\nBuilding Dependecies------------------------------------\n"
 	cd f2clib; make
 	cd stegr; make
 
 ####### Install
 
 install:  
-#	$(MKDIR) $(DESTDIR)/lib/
-#	$(COPY_FILE) -a lib$(LIBBASENAME).so* $(DESTDIR)/lib
-#	$(COPY_FILE) -a *.h $(DESTDIR)/usr/include/
+	$(MKDIR) $(DESTDIR)/lib/
+	$(COPY_FILE) -a lib$(LIBBASENAME).so* $(DESTDIR)/lib
+	$(COPY_FILE) -a *.h $(DESTDIR)/usr/include/
 
 uninstall:   FORCE
 
