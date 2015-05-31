@@ -36,8 +36,8 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR)/usr
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/lib
-	cp $(PKG_BUILD_DIR)/libf2c.so* $(STAGING_DIR)/usr/lib/
-	cp $(PKG_BUILD_DIR)/libstegr.so* $(STAGING_DIR)/usr/lib/
+	cp $(PKG_BUILD_DIR)/f2clib/libf2clib.so* $(STAGING_DIR)/usr/lib/
+	cp $(PKG_BUILD_DIR)/stegr/libstegr.so* $(STAGING_DIR)/usr/lib/
 	cp $(PKG_BUILD_DIR)/liblin_algebra_lib.so* $(STAGING_DIR)/usr/lib/
 	cp $(PKG_BUILD_DIR)/*.h $(STAGING_DIR)/usr/include
 
