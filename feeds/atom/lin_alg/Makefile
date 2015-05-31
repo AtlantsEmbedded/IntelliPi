@@ -1,5 +1,6 @@
 include $(TOPDIR)/rules.mk
 
+@echo "\nEntering lin alg feeds\n"
 PKG_NAME:=lin_alg
 PKG_VERSION:=2015-28-05
 PKG_RELEASE:=1
@@ -20,6 +21,8 @@ define Package/lin_algebra_lib
 	DEPENDS:=+librt
 endef
 
+@echo "\done with beginning\n"
+
 define Package/lin_algebra_lib/description
 	Linear algebra library
 endef
@@ -32,6 +35,9 @@ define Package/lin_algebra_lib/install
 	cp $(PKG_BUILD_DIR)/liblin_algebra_lib.so* $(1)/usr/lib/
 endef
 
+
+@echo "\done with install\n"
+
 define Build/InstallDev 
 	$(INSTALL_DIR) $(STAGING_DIR)/usr
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/
@@ -42,5 +48,7 @@ define Build/InstallDev
 	cp $(PKG_BUILD_DIR)/*.h $(STAGING_DIR)/usr/include
 
 endef
+
+@echo "\done with installdev\n"
 
 $(eval $(call BuildPackage,lin_algebra_lib))
