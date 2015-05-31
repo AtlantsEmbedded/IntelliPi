@@ -1,6 +1,5 @@
 include $(TOPDIR)/rules.mk
 
-@echo "\nEntering lin alg feeds\n"
 PKG_NAME:=lin_alg
 PKG_VERSION:=2015-28-05
 PKG_RELEASE:=1
