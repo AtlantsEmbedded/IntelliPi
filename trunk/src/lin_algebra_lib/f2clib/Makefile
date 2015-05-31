@@ -1,8 +1,8 @@
 #############################################################################
-# Library Makefile for building: stegr
+# Library Makefile for building: f2clib
 # Frédéric Simard, 2014
 #############################################################################
-LIBBASENAME = stegr
+LIBBASENAME = f2clib
 MAJVER = 1
 MINVER = 0
 PATCHVER = 0
