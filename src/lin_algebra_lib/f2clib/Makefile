@@ -105,12 +105,12 @@ first: all
 
 .c.o:
 	$(CC) -c -DSkip_f2c_Undefs $(CFLAGS) $*.c
-	ld -r -x -o $*.xxx $*.o
-	mv $*.xxx $*.o
+#	ld -r -x -o $*.xxx $*.o
+#	mv $*.xxx $*.o
 	
 ####### Build rules
 
-all: Makefile f2c.h signal1.h sysdep1.h $(TARGET) 
+all: Makefile f2c.h signal1.h sysdep1.h xwsne.o $(TARGET) 
 #$(TARGETA)
 
 $(TARGET):  $(UICDECLS) $(OBJECTS) $(SUBLIBS) $(OBJCOMP)  
@@ -156,6 +156,9 @@ signal1.h: signal1.h0
 sysdep1.h: sysdep1.h0
 	cp sysdep1.h0 sysdep1.h
 	
+xwsne.o:
+	$(CC) -c -DSkip_f2c_Undefs $(CFLAGS) xwsne.c
+
 	
 backspac.o:	fio.h
 close.o:	fio.h
@@ -207,15 +210,15 @@ wsle.o:		fmt.h
 wsle.o:		lio.h
 wsne.o:		fio.h
 wsne.o:		lio.h
-xwsne.o:	fio.h
-xwsne.o:	lio.h
-xwsne.o:	fmt.h
+#xwsne.o:	fio.h
+#xwsne.o:	lio.h
+#xwsne.o:	fmt.h
 
-arith.h: arithchk.c
-	$(CC) $(CFLAGS) -DNO_FPINIT arithchk.c -lm ||\
-	 $(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT arithchk.c -lm
-	./a.out >arith.h
-	rm -f a.out arithchk.o
+#arith.h: arithchk.c
+#	$(CC) $(CFLAGS) -DNO_FPINIT arithchk.c -lm ||\
+#	 $(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT arithchk.c -lm
+#	./a.out >arith.h
+#	rm -f a.out arithchk.o
 	
 ####### Install
 
