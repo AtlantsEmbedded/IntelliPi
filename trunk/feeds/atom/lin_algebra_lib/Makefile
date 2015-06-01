@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=lin_alg
+PKG_NAME:=lin_algebra_lib
 PKG_VERSION:=2015-28-05
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
