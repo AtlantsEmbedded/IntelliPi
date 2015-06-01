@@ -2,7 +2,7 @@
 # Library Makefile for building: lin_alg
 # Frédéric Simard, 2014
 #############################################################################
-LIBBASENAME = lin_alg
+LIBBASENAME = lin_algebra_lib
 MAJVER = 1
 MINVER = 0
 PATCHVER = 0
@@ -28,7 +28,7 @@ INCPATH       := -I$(STAGING_DIR)/include -I$(STAGING_DIR)/usr/include -I./inclu
 #INCPATH       := -I. -I/include/ -I/usr/include/ -I./includes/
 LINK          := $(CC) 
 LFLAGS        := -shared -Wl,-soname,$(TARGET)
-LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2c
+LIBS          :=-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lrt -lstegr -lf2clib
 #LIBS	      := -L/lib/ -L/usr/lib -L./stegr -L./f2clib -lm -lrt
 AR            := ar
 AR_ARGS	      := cqs	
