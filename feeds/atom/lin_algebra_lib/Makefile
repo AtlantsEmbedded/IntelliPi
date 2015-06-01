@@ -27,8 +27,8 @@ endef
 define Package/lin_algebra_lib/install
 	$(INSTALL_DIR) $(1)/usr
 	$(INSTALL_DIR) $(1)/usr/lib
-	cp $(PKG_BUILD_DIR)/libf2c.so* $(1)/usr/lib/
-	cp $(PKG_BUILD_DIR)/libstegr.so* $(1)/usr/lib/
+	cp $(PKG_BUILD_DIR)/f2clib/libf2clib.so* $(1)/usr/lib/
+	cp $(PKG_BUILD_DIR)/stegr/libstegr.so* $(1)/usr/lib/
 	cp $(PKG_BUILD_DIR)/liblin_algebra_lib.so* $(1)/usr/lib/
 endef
 
