@@ -20,6 +20,7 @@
 #include "debug.h"
 #include "main.h"
 #include "muse.h"
+#include "xml.h"
 
 #define BUFSIZE 1024
 
@@ -31,7 +32,7 @@ static int seconds = 0;
  */
 int muse_init_hardware(void *param __attribute__ ((unused)))
 {
-	seconds = 9;
+	seconds = get_appconfig()->keep_time;
 	return (0);
 }
 
@@ -58,7 +59,7 @@ int muse_send_keep_alive_pkt(void *param __attribute__ ((unused)))
 	int status;
 
 	do {
-		status = send(get_socket(), msg, 3, 0);
+		status = send(get_socket_fd(), msg, 3, 0);
 		sleep(seconds);
 	} while (status > 0);
 	return (0);
@@ -74,7 +75,7 @@ int muse_send_pkt(void *param)
 {
 	param_t *param_ptr = (param_t *) param;
 
-	send(get_socket(), param_ptr->ptr, param_ptr->len, 0);
+	send(get_socket_fd(), param_ptr->ptr, param_ptr->len, 0);
 	return (0);
 }
 
@@ -108,7 +109,7 @@ int muse_read_pkt(void *param __attribute__ ((unused)))
 	muse_send_pkt(&param_start_transmission);
 	do {
 		memset(buf, 0, BUFSIZE);
-		bytes_read = recv(get_socket(), buf, sizeof(buf), 0);
+		bytes_read = recv(get_socket_fd(), buf, sizeof(buf), 0);
 
 		if (bytes_read <= 0)
 			fprintf(stdout, "Error reading socket: %d\n", bytes_read);

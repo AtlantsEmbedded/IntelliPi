@@ -2,7 +2,7 @@
  * @file main.c
  * @author Ron Brash (ron.brash@gmail.com) | Atom Embedded
  * @brief Handles the data interface layer which acts as an abstraction
- * interface for BLE/Bluetooth data and converts data into a usable format
+ * interface for BLE/Bluetooth (or other) data and converts data into a usable format
  * for other applications. 
  */
 #include <stdio.h>
@@ -24,7 +24,9 @@
 #include "xml.h"
 #include "debug.h"
 
-int main(int argc, char **argv)
+#define CONFIG_NAME "config/data_config.xml"
+
+int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
 {
 	(void)signal(SIGINT, ctrl_c_handler);
 
@@ -33,35 +35,43 @@ int main(int argc, char **argv)
 
 	uint8_t attempts = CONN_ATTEMPTS;
 	int ret = 0;
-	char *remote_addr = NULL;
 
-	if (argc == 1) {
-		remote_addr = REFERENCE_MUSE_ADDR;
-	} else {
-		remote_addr = argv[1];
+	appconfig_t *config = (appconfig_t *) xml_initialize(CONFIG_NAME);
+	if (config == NULL) {
+		return (-1);
 	}
 
-	printf("Remote target: %s\n",remote_addr);
-	for (attempts = 3; attempts > 0; attempts--) {
+	if (init_hardware(config->device) < 0) {
+		return (-1);
+	}
+
+	printf("Remote target: %s\n", config->remote_addr);
+	for (attempts = 1; attempts >= config->conn_attempts; attempts++) {
 		printf("Connection attempt: %u\n", attempts);
-		ret = setup_socket(remote_addr);
+		ret = setup_socket(config->remote_addr);
 		if (ret == 0) {
 			break;
 		}
+		sleep(1);
 	}
-	if (attempts == 0) {
+	if (attempts >= config->conn_attempts) {
 		printf("Unable to connect to the device\n");
 		return (-1);
 	}
 
 	if (ret == 0) {
 		printf("Connected to device\n");
-
+		
 		iret1 = pthread_create(&readT, NULL, (void *)_RECV_PKT_FC, NULL);
-		iret2 = pthread_create(&writeT, NULL, (void *)_SEND_PKT_FC, NULL);
+		
 
+		if (get_appconfig()->keep_alive) {
+			printf("fuck off");
+			iret2 = pthread_create(&writeT, NULL, (void *)_KEEP_ALIVE_FC, NULL);
+			pthread_join(writeT, NULL);
+			exit(10);
+		}
 		pthread_join(readT, NULL);
-		pthread_join(writeT, NULL);
 
 	} else {
 		printf("Unable to connect to hardware\n");

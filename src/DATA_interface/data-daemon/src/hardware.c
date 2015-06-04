@@ -36,8 +36,9 @@ int init_hardware(char *hardware_type)
 	_RECV_PKT_FC = NULL;
 	_TRANS_PKT_FC = NULL;
 
+	printf("Hardware type: %s\n",hardware_type);
 	if (strcmp(hardware_type, "MUSE") == 0) {
-
+		
 		_INIT_HARDWARE_FC = &muse_init_hardware;
 		_KEEP_ALIVE_FC = &muse_send_keep_alive_pkt;
 		_SEND_PKT_FC = &muse_send_pkt;
