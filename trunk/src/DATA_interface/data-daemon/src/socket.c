@@ -15,15 +15,19 @@
 
 #include "socket.h"
 
-int sock = 0;
+static int sock;
 
 /**
  * get_socket()
  * @param Returns socket to be used to connect to device
  * @return sock
  */ 
-int get_socket(void) {
+int get_socket_fd(void) {
 	return sock;
+}
+
+void set_socket_fd(int fd) {
+	sock = fd;
 }
 
 /**
@@ -31,17 +35,20 @@ int get_socket(void) {
  * @brief Sets up socket file descriptor
  * @return 0 for success, -1 for error
  */ 
-int setup_socket(char addr_mac[]) {
+int setup_socket(unsigned char addr_mac[]) {
 
 	struct sockaddr_rc addr = { 0 };
 	int status;
+	int fd = 0;
 
-	sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+	fd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	addr.rc_family = AF_BLUETOOTH;
 	addr.rc_channel = 1;
-	str2ba(addr_mac, &addr.rc_bdaddr);
+	str2ba((char *)addr_mac, &addr.rc_bdaddr);
+	set_socket_fd(fd);
+	printf("socket id:%d %s\n",get_socket_fd(), addr_mac);
 
-	status = connect(get_socket(), (struct sockaddr *)&addr, sizeof(addr));
+	status = connect(get_socket_fd(), (struct sockaddr *)&addr, sizeof(addr));
 	
 	if (status != 0) {
 		return (-1);
@@ -55,6 +62,6 @@ int setup_socket(char addr_mac[]) {
  */
 void close_sockets(void)
 {
-	close(get_socket());
+	close(get_socket_fd());
 	fprintf(stdout, "Close sockets\n");
 }
