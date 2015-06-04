@@ -41,13 +41,16 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 		return (-1);
 	}
 
-	if (init_hardware(config->device) < 0) {
+	if (init_hardware((char *)config->device) < 0) {
 		return (-1);
 	}
 
-	printf("Remote target: %s\n", config->remote_addr);
-	for (attempts = 1; attempts >= config->conn_attempts; attempts++) {
-		printf("Connection attempt: %u\n", attempts);
+	printf("Remote target: %s \n", config->remote_addr);
+	printf("Attempts: %d\n", config->conn_attempts);
+	printf("Keep alive: %d seconds: %d\n",get_appconfig()->keep_alive, get_appconfig()->keep_time);
+	
+	for (attempts = 0; attempts < config->conn_attempts; attempts++) {
+		printf("Connection attempt: %u\n", attempts+1);
 		ret = setup_socket(config->remote_addr);
 		if (ret == 0) {
 			break;
@@ -64,14 +67,12 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 		
 		iret1 = pthread_create(&readT, NULL, (void *)_RECV_PKT_FC, NULL);
 		
-
 		if (get_appconfig()->keep_alive) {
-			printf("fuck off");
 			iret2 = pthread_create(&writeT, NULL, (void *)_KEEP_ALIVE_FC, NULL);
 			pthread_join(writeT, NULL);
-			exit(10);
 		}
 		pthread_join(readT, NULL);
+		
 
 	} else {
 		printf("Unable to connect to hardware\n");

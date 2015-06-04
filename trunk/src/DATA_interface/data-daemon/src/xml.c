@@ -179,6 +179,14 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 	}
 	app_info->conn_attempts = (uint16_t)atoi(tmp->txt);
 
+	// Get keep_time
+	tmp = ezxml_child(app_attribute, "keep_time");
+	if (tmp == NULL) {
+		printf("appAttributes->keep-time is missing\n");
+		return (-1);
+	}
+	app_info->keep_time = (uint16_t)atoi(tmp->txt);
+
 	// Get output_format
 	tmp = ezxml_child(app_attribute, "output_format");
 	if (tmp == NULL) {

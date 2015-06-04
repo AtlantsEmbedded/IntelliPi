@@ -18,6 +18,9 @@
 		
 #define TRANS_PKT_FC(param) \
 		_TRANS_PKT_FC(param)
+		
+#define PROCESS_PKT_FC(param) \
+		_PROCESS_PKT_FC(param)
 
 typedef int (*functionPtr_t) (void *);
 functionPtr_t _INIT_HARDWARE_FC;
@@ -25,8 +28,11 @@ functionPtr_t _KEEP_ALIVE_FC;
 functionPtr_t _SEND_PKT_FC;
 functionPtr_t _RECV_PKT_FC;
 functionPtr_t _TRANS_PKT_FC;
+functionPtr_t _PROCESS_PKT_FC;
 
 typedef struct param_s{
 	char *ptr;
 	uint16_t len;
 } param_t;
+
+int init_hardware(char *hardware_type);

@@ -29,13 +29,13 @@
  */
 int init_hardware(char *hardware_type)
 {
-
 	_INIT_HARDWARE_FC = NULL;
 	_KEEP_ALIVE_FC = NULL;
 	_SEND_PKT_FC = NULL;
 	_RECV_PKT_FC = NULL;
 	_TRANS_PKT_FC = NULL;
-
+	_PROCESS_PKT_FC = NULL;
+	
 	printf("Hardware type: %s\n",hardware_type);
 	if (strcmp(hardware_type, "MUSE") == 0) {
 		
@@ -44,6 +44,7 @@ int init_hardware(char *hardware_type)
 		_SEND_PKT_FC = &muse_send_pkt;
 		_RECV_PKT_FC = &muse_read_pkt;
 		_TRANS_PKT_FC = &muse_translate_pkt;
+		_PROCESS_PKT_FC = &muse_process_pkt;
 
 	} else if (strcmp(hardware_type, "OPENBCI") == 0) {
 		// OpenBCI stuff (there are several versions though)
@@ -51,6 +52,9 @@ int init_hardware(char *hardware_type)
 		fprintf(stderr, "Unknown hardware type\n");
 		return (-1);
 	}
+	
+	INIT_HARDWARE_FC();
+	
 
 	return (0);
 }

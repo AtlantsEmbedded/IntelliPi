@@ -30,7 +30,7 @@ else ifeq ($(ARCH), x86)
                		-Iinclude
 else 
 	ARCH_LIBS 	  =
-	X86_DEFINES   =-DX86=1
+	X86_DEFINES   =-DX86=1 -g
 	INCPATH       = -I. \
                		-Iinclude
 endif

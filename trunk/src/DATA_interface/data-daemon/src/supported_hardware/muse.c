@@ -24,7 +24,8 @@
 
 #define BUFSIZE 1024
 
-static int seconds = 0;
+int seconds = 0;
+
 
 /**
  * muse_init_hardware()
@@ -33,6 +34,7 @@ static int seconds = 0;
 int muse_init_hardware(void *param __attribute__ ((unused)))
 {
 	seconds = get_appconfig()->keep_time;
+
 	return (0);
 }
 
@@ -74,8 +76,13 @@ int muse_send_keep_alive_pkt(void *param __attribute__ ((unused)))
 int muse_send_pkt(void *param)
 {
 	param_t *param_ptr = (param_t *) param;
+	int status = 0;
 
-	send(get_socket_fd(), param_ptr->ptr, param_ptr->len, 0);
+	status = send(get_socket_fd(), param_ptr->ptr, param_ptr->len, 0);
+
+	if (status < 0) {
+		printf("error sending pkt\n");
+	}
 	return (0);
 }
 
@@ -84,7 +91,7 @@ int muse_send_pkt(void *param)
  * @brief Processes the packet
  * @param param
  */
-static void muse_process_pkt(param_t * param)
+void muse_process_pkt(param_t * param)
 {
 	// Uncompressed or raw at this point
 	fprintf(stdout, "Bytes read = %d\n", param->len);
@@ -104,20 +111,23 @@ int muse_read_pkt(void *param __attribute__ ((unused)))
 	int bytes_read = 0;
 	char buf[BUFSIZE] = { 0 };
 	param_t param_start_transmission = { MUSE_START_TRANSMISSION, 3 };
-	param_t *param_translate_pkt = NULL;
+	param_t param_translate_pkt = { 0 };
 
-	muse_send_pkt(&param_start_transmission);
+	muse_send_pkt((void *)&param_start_transmission);
+
 	do {
-		memset(buf, 0, BUFSIZE);
-		bytes_read = recv(get_socket_fd(), buf, sizeof(buf), 0);
+		
+		bytes_read = recv(sock, buf, BUFSIZE, 0);
 
-		if (bytes_read <= 0)
+		if (bytes_read <= 0) {
 			fprintf(stdout, "Error reading socket: %d\n", bytes_read);
-		continue;
+			continue;
+		}
 
-		param_translate_pkt->ptr = buf;
-		param_translate_pkt->len = bytes_read;
-		muse_process_pkt(param_translate_pkt);
+		param_translate_pkt.ptr = buf;
+		param_translate_pkt.len = bytes_read;
+		PROCESS_PKT_FC(&param_translate_pkt);
+		memset(buf, 0, bytes_read);
 
 	} while (1);
 	return (0);
