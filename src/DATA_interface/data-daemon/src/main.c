@@ -29,15 +29,15 @@
 int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
 {
 	(void)signal(SIGINT, ctrl_c_handler);
-
+	param_t param_ptr = { 0 };
+	uint8_t attempts = CONN_ATTEMPTS;
 	pthread_t readT, writeT;
 	int iret1 __attribute__ ((unused)), iret2 __attribute__ ((unused));
-
-	uint8_t attempts = CONN_ATTEMPTS;
 	int ret = 0;
 
 	appconfig_t *config = (appconfig_t *) xml_initialize(CONFIG_NAME);
 	if (config == NULL) {
+		printf("Error initializing XML configuration\n");
 		return (-1);
 	}
 
@@ -46,12 +46,14 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	}
 
 	printf("Remote target: %s \n", config->remote_addr);
+	param_ptr.ptr = config->remote_addr;
+	
 	printf("Attempts: %d\n", config->conn_attempts);
 	printf("Keep alive: %d seconds: %d\n",get_appconfig()->keep_alive, get_appconfig()->keep_time);
-	
+
 	for (attempts = 0; attempts < config->conn_attempts; attempts++) {
 		printf("Connection attempt: %u\n", attempts+1);
-		ret = setup_socket(config->remote_addr);
+		ret = DEVICE_CONNECTION_FC(&param_ptr);
 		if (ret == 0) {
 			break;
 		}
@@ -78,6 +80,6 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 		printf("Unable to connect to hardware\n");
 	}
 
-	close_sockets();
+	DEVICE_CLEANUP_FC();
 	return 0;
 }

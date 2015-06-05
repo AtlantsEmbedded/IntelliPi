@@ -64,6 +64,7 @@ OBJECTS_DIR   = ./
 SOURCES       = src/main.c \
 				src/xml.c \
 				src/socket.c \
+				src/serial.c \
 				src/hardware.c \
 				src/debug.c \
 				src/data_structure.c \
@@ -73,6 +74,7 @@ SOURCES       = src/main.c \
 OBJECTS       = src/main.o \
 				src/xml.o \
 				src/socket.o \
+				src/serial.o \
 				src/hardware.o \
 				src/debug.o \
 				src/data_structure.o \
@@ -131,7 +133,10 @@ xml.o: src/xml.c
 
 socket.o: src/socket.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o socket.o src/socket.c 
-	
+
+serial.o: src/serial.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o serial.o src/serial.c 
+
 debug.o: src/debug.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o debug.o src/debug.c 
 

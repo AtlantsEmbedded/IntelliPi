@@ -24,3 +24,6 @@ int openbci_read_pkt(void *param);
 int openbci_send_keep_alive_pkt(void *param);
 int openbci_send_pkt(void *param);
 int openbci_translate_pkt(void *param);
+void openbci_process_pkt(param_t * param);
+int openbci_connect_dev(void *param);
+int openbci_cleanup(void *param);
