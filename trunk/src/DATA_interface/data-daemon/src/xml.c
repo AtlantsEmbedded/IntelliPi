@@ -17,32 +17,29 @@
 static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info);
 static int sanity_check_app_attributes(ezxml_t app_attribute);
 
-/**
-    <debug>TRUE</debug>
-    <interface>BLE</interface>
-    <device>MUSE</device>
-    <compression>TRUE</compression>
-    <remote_addr>00:06:66:6C:16:54</remote_addr>
-    <process_data>FALSE</process_data>
-    <buffer>TRUE</buffer>
-    <samples>100</samples>
-    <number_runs>1</number_runs>
-    <output_format>csv</output_format>
- */
-
 const char *XML_app_elements[] =
     { "debug", "interface", "device", "keep_alive", "keep_time", "compression", "remote_addr", "process_data", "buffer",
-"samples","conn_attempts",
+	"samples", "conn_attempts",
 	"number_runs", "output_format"
 };
 
 static appconfig_t *config = NULL;
 
+/**
+ * get_appconfig()
+ * @brief Returns the appconfig
+ * @return appconfig_t
+ */
 inline appconfig_t *get_appconfig()
 {
 	return config;
 }
 
+/**
+ * set_appconfig(appconfig_t * config_obj)
+ * @brief sets appconfig
+ * @param config_obj
+ */
 inline void set_appconfig(appconfig_t * config_obj)
 {
 	config = config_obj;
@@ -161,7 +158,7 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 		printf("appAttributes->samples is missing\n");
 		return (-1);
 	}
-	app_info->samples = (uint16_t)atoi(tmp->txt);
+	app_info->samples = (uint16_t) atoi(tmp->txt);
 
 	// number_runs
 	tmp = ezxml_child(app_attribute, "number_runs");
@@ -169,15 +166,15 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 		printf("appAttributes->number_runs is missing\n");
 		return (-1);
 	}
-	app_info->number_runs = (uint16_t)atoi(tmp->txt);
-	
+	app_info->number_runs = (uint16_t) atoi(tmp->txt);
+
 	// conn_attempts
 	tmp = ezxml_child(app_attribute, "conn_attempts");
 	if (tmp == NULL) {
 		printf("appAttributes->conn_attempts is missing\n");
 		return (-1);
 	}
-	app_info->conn_attempts = (uint16_t)atoi(tmp->txt);
+	app_info->conn_attempts = (uint16_t) atoi(tmp->txt);
 
 	// Get keep_time
 	tmp = ezxml_child(app_attribute, "keep_time");
@@ -185,7 +182,7 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 		printf("appAttributes->keep-time is missing\n");
 		return (-1);
 	}
-	app_info->keep_time = (uint16_t)atoi(tmp->txt);
+	app_info->keep_time = (uint16_t) atoi(tmp->txt);
 
 	// Get output_format
 	tmp = ezxml_child(app_attribute, "output_format");

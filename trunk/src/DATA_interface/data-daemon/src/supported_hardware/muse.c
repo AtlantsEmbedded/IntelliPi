@@ -22,9 +22,27 @@
 #include "muse.h"
 #include "xml.h"
 
-#define BUFSIZE 1024
+static int seconds = 0;
 
-int seconds = 0;
+/**
+ * muse_init_hardware()
+ * @brief Initializes muse hardware related variables
+ */
+int muse_connect_dev(void *param)
+{
+	param_t *param_ptr = (param_t *) param;
+	return setup_socket((unsigned char *)param_ptr->ptr);
+}
+
+/**
+ * muse_cleanup()
+ * @brief Muse cleanup function
+ */
+int muse_cleanup(void *param __attribute__ ((unused)))
+{
+	close_sockets();
+	return (0);
+}
 
 
 /**
@@ -44,7 +62,7 @@ int muse_init_hardware(void *param __attribute__ ((unused)))
  */
 int muse_translate_pkt(void *param)
 {
-	param_t *param_ptr = (param_t *) param;
+	param_t *param_ptr __attribute__ ((unused)) = (param_t *) param ;
 
 	// Do some things to print out the packet
 	return (0);

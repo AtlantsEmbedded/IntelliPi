@@ -1,7 +1,7 @@
 /**
  * @file muse.c
  * @author Ron Brash (ron.brash@gmail.com)
- * @brief Handles all MUSE related function pointers, however, currently
+ * @brief Handles all OpenBCI related function pointers, however, currently
  * only supports the non-research edition 
  */
 #include <stdio.h>
@@ -21,8 +21,6 @@
 #include "main.h"
 #include "openbci.h"
 
-#define BUFSIZE 1024
-
 static int seconds = 0;
 
 /**
@@ -32,6 +30,25 @@ static int seconds = 0;
 int openbci_init_hardware(void *param __attribute__ ((unused)))
 {
 	seconds = 9;
+	return (0);
+}
+
+/**
+ * openbci_init_hardware()
+ * @brief Initializes muse hardware related variables
+ */
+int openbci_connect_dev(void *param)
+{
+	param_t *param_ptr = (param_t *) param;
+	return (0);
+}
+
+/**
+ * openbci_cleanup()
+ * @brief Openbci cleanup function
+ */
+int openbci_cleanup(void *param __attribute__ ((unused)))
+{
 	return (0);
 }
 
@@ -83,7 +100,7 @@ int openbci_send_pkt(void *param)
  * @brief Processes the packet
  * @param param
  */
-static void openbci_process_pkt(param_t * param)
+void openbci_process_pkt(param_t * param)
 {
 	// Uncompressed or raw at this point
 	fprintf(stdout, "Bytes read = %d\n", param->len);
