@@ -14,6 +14,7 @@
 #include <bluetooth/rfcomm.h>
 
 #include "app_signal.h"
+#include "hardware.h"
 #include "socket.h"
 
 /**
@@ -24,6 +25,6 @@
 void ctrl_c_handler(int signal)
 {
 	fprintf(stdout, "Interrupt caught[NO: %d ]\n", signal);
-	close_sockets();
+	DEVICE_CLEANUP_FC();
 	exit(0);
 }

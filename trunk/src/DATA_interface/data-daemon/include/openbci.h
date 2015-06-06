@@ -5,13 +5,12 @@
  */
 
 // Placeholders
-#define OPENBCI_KEEP_ALIVE "k\r\n" // keep alive
-#define OPENBCI_NOTCH_FREQ "g 407c\r\n"	// 60hz filter
-#define OPENBCI_SET_HOST_PLATFORM "r 5\r\n"	//linux
-#define OPENBCI_PRESET "% 10\r\n"	// no accell or battery
-#define OPENBCI_START_TRANSMISSION "s\r\n" // start sending data
-#define OPENBCI_HALT_TRANSMISSION "h\r\n" // halt data transmission
-#define OPENBCI_VERSION "v\r\n" // request device information
+#define OPENBCI_START_TRANSMISSION "b" // start sending data
+#define OPENBCI_HALT_TRANSMISSION "s" // halt data transmission
+#define OPENBCI_RESET "v" // request device information
+
+#define STATUS_PACKET_LENGTH 84
+#define DATA_PACKET_LENGTH 33
 
 typedef enum { OPENBCI_HLDER } openbci_pkt_type_t;
 
@@ -24,6 +23,6 @@ int openbci_read_pkt(void *param);
 int openbci_send_keep_alive_pkt(void *param);
 int openbci_send_pkt(void *param);
 int openbci_translate_pkt(void *param);
-void openbci_process_pkt(param_t * param);
+int openbci_process_pkt(void * param);
 int openbci_connect_dev(void *param);
 int openbci_cleanup(void *param);

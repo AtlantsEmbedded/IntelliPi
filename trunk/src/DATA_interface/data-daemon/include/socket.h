@@ -4,8 +4,6 @@
  * @brief Contains socket header stuff 
  */ 
 
-int sock;
-
 int get_socket_fd();
 void set_socket_fd();
 int setup_socket(unsigned char addr_mac[]);

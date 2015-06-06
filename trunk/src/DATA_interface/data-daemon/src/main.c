@@ -19,6 +19,7 @@
 
 #include "main.h"
 #include "socket.h"
+#include "serial.h"
 #include "app_signal.h"
 #include "hardware.h"
 #include "xml.h"
@@ -26,14 +27,18 @@
 
 #define CONFIG_NAME "config/data_config.xml"
 
+/**
+ * main()
+ * @brief Application main running loop
+ */
 int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
 {
-	(void)signal(SIGINT, ctrl_c_handler);
 	param_t param_ptr = { 0 };
-	uint8_t attempts = CONN_ATTEMPTS;
 	pthread_t readT, writeT;
-	int iret1 __attribute__ ((unused)), iret2 __attribute__ ((unused));
-	int ret = 0;
+	int iret1 __attribute__ ((unused)), iret2 __attribute__ ((unused)), ret = 0, attempts = CONN_ATTEMPTS;
+
+	// Set up ctrl c signal handler
+	(void)signal(SIGINT, ctrl_c_handler);
 
 	appconfig_t *config = (appconfig_t *) xml_initialize(CONFIG_NAME);
 	if (config == NULL) {
@@ -42,19 +47,20 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	}
 
 	if (init_hardware((char *)config->device) < 0) {
+		printf("Error initializing hardware");
 		return (-1);
 	}
 
-	printf("Remote target: %s \n", config->remote_addr);
-	param_ptr.ptr = config->remote_addr;
-	
-	printf("Attempts: %d\n", config->conn_attempts);
-	printf("Keep alive: %d seconds: %d\n",get_appconfig()->keep_alive, get_appconfig()->keep_time);
+	printf("Remote target: %s \n", get_appconfig()->remote_addr);
+	param_ptr.ptr = (char *)get_appconfig()->remote_addr;
+
+	printf("Attempts: %d\n", get_appconfig()->conn_attempts);
+	printf("Keep alive: %d seconds: %d\n", get_appconfig()->keep_alive, get_appconfig()->keep_time);
 
 	for (attempts = 0; attempts < config->conn_attempts; attempts++) {
-		printf("Connection attempt: %u\n", attempts+1);
-		ret = DEVICE_CONNECTION_FC(&param_ptr);
-		if (ret == 0) {
+		printf("Connection attempt: %u\n", attempts + 1);
+		
+		if ((ret = DEVICE_CONNECTION_FC(&param_ptr)) == 0){
 			break;
 		}
 		sleep(1);
@@ -66,15 +72,14 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 
 	if (ret == 0) {
 		printf("Connected to device\n");
-		
+
 		iret1 = pthread_create(&readT, NULL, (void *)_RECV_PKT_FC, NULL);
-		
+
 		if (get_appconfig()->keep_alive) {
 			iret2 = pthread_create(&writeT, NULL, (void *)_KEEP_ALIVE_FC, NULL);
 			pthread_join(writeT, NULL);
 		}
 		pthread_join(readT, NULL);
-		
 
 	} else {
 		printf("Unable to connect to hardware\n");

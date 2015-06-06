@@ -25,5 +25,5 @@ int muse_read_pkt(void *param);
 int muse_send_keep_alive_pkt(void *param);
 int muse_send_pkt(void *param);
 int muse_translate_pkt(void *param);
-void muse_process_pkt(param_t * param);
+int muse_process_pkt(void * param);
 int muse_cleanup(void *param);

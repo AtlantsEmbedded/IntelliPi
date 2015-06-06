@@ -109,14 +109,17 @@ int muse_send_pkt(void *param)
  * @brief Processes the packet
  * @param param
  */
-void muse_process_pkt(param_t * param)
+int muse_process_pkt(void * param)
 {
 	// Uncompressed or raw at this point
-	fprintf(stdout, "Bytes read = %d\n", param->len);
-	hexdump((unsigned char *)param->ptr, param->len);
+	param_t *param_ptr = (param_t *) param;
+	fprintf(stdout, "Bytes read = %d\n", param_ptr->len);
+	hexdump((unsigned char *)param_ptr->ptr, param_ptr->len);
 
 	if (_TRANS_PKT_FC)
 		TRANS_PKT_FC(param);
+	
+	return (0);
 
 }
 
@@ -135,7 +138,7 @@ int muse_read_pkt(void *param __attribute__ ((unused)))
 
 	do {
 		
-		bytes_read = recv(sock, buf, BUFSIZE, 0);
+		bytes_read = recv(get_socket_fd(), buf, BUFSIZE, 0);
 
 		if (bytes_read <= 0) {
 			fprintf(stdout, "Error reading socket: %d\n", bytes_read);
