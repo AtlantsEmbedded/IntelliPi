@@ -6,9 +6,9 @@
     <device>OPENBCI</device>
     <compression>FALSE</compression>
     <keep_alive>FALSE</keep_alive>
-    <keep_time>0</keep_time>
-    <remote_addr>/dev/ttyUSB0</remote_addr>
-    <process_data>TRUE</process_data>
+    <keep_time>9</keep_time>
+    <remote_addr>NONE</remote_addr>
+    <process_data>FALSE</process_data>
     <buffer>TRUE</buffer>
     <samples>100</samples>
     <number_runs>1</number_runs>

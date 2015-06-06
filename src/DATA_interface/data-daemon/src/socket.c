@@ -15,9 +15,10 @@
 
 #include "socket.h"
 
+static int sock;
 
 /**
- * get_socket()
+ * get_socket_fd()
  * @param Returns socket to be used to connect to device
  * @return sock
  */ 
@@ -25,6 +26,10 @@ inline int get_socket_fd(void) {
 	return sock;
 }
 
+/**
+ * set_socket_fd()
+ * @param Sets socket to be used to connect to device
+ */ 
 inline void set_socket_fd(int fd) {
 	sock = fd;
 }
