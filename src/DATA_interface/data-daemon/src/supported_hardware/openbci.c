@@ -20,6 +20,14 @@
 #include "debug.h"
 #include "main.h"
 #include "openbci.h"
+#include "xml.h"
+
+#include <termios.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/signal.h>
+#include <sys/types.h>
 
 /**
  * openbci_init_hardware()
@@ -37,8 +45,8 @@ int openbci_init_hardware(void *param __attribute__ ((unused)))
 int openbci_connect_dev(void *param)
 {
 	param_t *param_ptr = (param_t *) param;
-	setup_serial((unsigned char *)param_ptr->ptr);
-	return (0);
+
+	return setup_serial((unsigned char *)param_ptr->ptr);
 }
 
 /**
@@ -47,6 +55,9 @@ int openbci_connect_dev(void *param)
  */
 int openbci_cleanup(void *param __attribute__ ((unused)))
 {
+	param_t param_stop_transmission = { OPENBCI_HALT_TRANSMISSION, 1 };
+	openbci_send_pkt(&param_stop_transmission);
+	
 	close_serial();
 	return (0);
 }
@@ -105,7 +116,7 @@ int openbci_process_pkt(void *param)
 	hexdump((unsigned char *)param_ptr->ptr, param_ptr->len);
 
 	if (_TRANS_PKT_FC) {
-		TRANS_PKT_FC(param);
+	TRANS_PKT_FC(param);
 	}
 
 	return (0);
@@ -117,26 +128,67 @@ int openbci_process_pkt(void *param)
  */
 int openbci_read_pkt(void *param __attribute__ ((unused)))
 {
-	int bytes_read = 0;
-	char buf[BUFSIZE] = { 0 };
-	param_t param_start_transmission = { OPENBCI_START_TRANSMISSION, 1 };
-	param_t param_translate_pkt = { 0 };
 
+	int bytes_read = 0;
+
+	param_t param_start_transmission = { OPENBCI_START_TRANSMISSION, 1 };
+	param_t param_stop_transmission = { OPENBCI_HALT_TRANSMISSION, 1 };
+	param_t param_translate_pkt = { 0 };
+	char buf[255] = { 0 };
+
+	int fd = get_serial_fd();
+	int check = 0;
+	int i = 0;
+	int num, offset = 0, bytes_expected = 130;
+
+	sleep(7);
+	do {
+		num = read(fd, buf + offset, 255);
+
+		if (((buf + num - 1)) == '$') {
+			printf("check\n");
+			check++;
+			break;
+		}
+
+		offset += num;
+		printf("%d %d\n", offset, num);
+		param_translate_pkt.ptr = buf;
+		param_translate_pkt.len = num;
+		PROCESS_PKT_FC(&param_translate_pkt);
+
+	} while (check > 0);
+
+	printf("Ready prompt\n");
+	sleep(1);
+
+	//openbci_send_pkt(&param_stop_transmission);
+	memset(buf, 0, 255);
 	openbci_send_pkt(&param_start_transmission);
 
+	int samples = 0;
+	bytes_expected = DATA_PACKET_LENGTH;
 	do {
-		memset(buf, 0, BUFSIZE);
-		bytes_read = read(get_serial_fd(), buf, 33);
+		offset = 0;
+		
+		do {
+			offset += read(fd, buf + offset, 1);
 
-		if (bytes_read <= 0) {
+		} while (offset < bytes_expected);
+
+		if (bytes_read < 0) {
 			fprintf(stdout, "Error reading socket: %d\n", bytes_read);
 			continue;
 		}
 
 		param_translate_pkt.ptr = buf;
-		param_translate_pkt.len = 33;
+		param_translate_pkt.len = DATA_PACKET_LENGTH;
+
 		PROCESS_PKT_FC(&param_translate_pkt);
 
-	} while (1);
+		samples++;
+
+	} while (samples < get_appconfig()->samples);
+	printf("samples: %d\n",samples);
 	return (0);
 }

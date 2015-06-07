@@ -8,8 +8,8 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = $(CXX)
-CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
-CXXFLAGS      =  -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CFLAGS        = -pipe -O2 -Wall -W   $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CXXFLAGS      =  -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 LINK          = $(CC)
 LFLAGS        = 
 GLIB2_CC	  = `pkg-config --cflags glib-2.0`
@@ -22,7 +22,7 @@ ifeq ($(ARCH), arm)
                 -Iinclude \
                 -I$(STAGING_DIR)/include \
                 -I$(STAGING_DIR)/usr/include/glib-2.0/
-	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT -fPIE  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
 	X86_DEFINES   =-DX86=1
@@ -30,7 +30,7 @@ else ifeq ($(ARCH), x86)
                		-Iinclude
 else 
 	ARCH_LIBS 	  =
-	X86_DEFINES   =-DX86=1 -g
+	X86_DEFINES   =-DX86=1
 	INCPATH       = -I. \
                		-Iinclude
 endif
