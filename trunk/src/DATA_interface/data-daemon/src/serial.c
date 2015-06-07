@@ -11,10 +11,13 @@
 #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include <sys/socket.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
+
+#include "xml.h"
 
 static int sport;
 
@@ -43,40 +46,44 @@ inline void set_serial_fd(int fd)
  * @brief Setup serial terminal
  * @param dev_name
  * @return 0 for success, else -1 for error
- */ 
+ */
 int setup_serial(unsigned char dev_name[])
 {
-	int fd;
+	int fd, rc;
 
-	fd = open((const char *)dev_name, O_RDWR | O_NOCTTY | O_NDELAY);
+	fd = open((const char *)dev_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (fd == -1) {
 		printf("open_port: Unable to open %s - ", dev_name);
 		return (-1);
-	} else {
-		fcntl(fd, F_SETFL, 0);
-	}
+	} 
 	set_serial_fd(fd);
 
-	// Setup serial port and options
-	struct termios options;
-	tcgetattr(fd, &options);
+	struct termios toptions;
+    cfsetispeed(&toptions, B115200);
+    cfsetospeed(&toptions, B115200);
 
-	cfsetispeed(&options, B115200);
-	cfsetospeed(&options, B115200);
+    // 8N1 & no flow control
+    toptions.c_cflag &= ~PARENB;
+    toptions.c_cflag &= ~CSTOPB;
+    toptions.c_cflag &= ~CSIZE;
+    toptions.c_cflag |= CS8;
+    toptions.c_cflag &= ~CRTSCTS;
 
-	options.c_cflag |= (CLOCAL | CREAD);
+    toptions.c_cflag |= CREAD | CLOCAL;  // turn on READ & ignore ctrl lines
+    toptions.c_iflag &= ~(IXON | IXOFF | IXANY); // turn off s/w flow ctrl
 
-	tcsetattr(fd, TCSANOW, &options);
-	
-	// 8N1 settings
-	options.c_cflag &= ~PARENB;
-	options.c_cflag &= ~CSTOPB;
-	options.c_cflag &= ~CSIZE;
-	options.c_cflag |= CS8;
-	options.c_oflag &= ~OPOST;
-	options.c_lflag = 0;
-	options.c_cc[VTIME] = 0;  // timeout after .1s that isn't working
-	options.c_cc[VMIN] = 33;  // want to read a chunk of 64 bytes at a given time
+    toptions.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // make raw
+    toptions.c_oflag &= ~OPOST; // make raw
+
+    toptions.c_cc[VMIN]  = 0;
+    toptions.c_cc[VTIME] = 0;
+    
+    tcsetattr(fd, TCSANOW, &toptions);
+
+    if((rc = tcsetattr(fd, TCSANOW, &toptions)) < 0){
+        fprintf(stderr, "failed to set attr: %d, %s\n", fd, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
 	return (0);
 }

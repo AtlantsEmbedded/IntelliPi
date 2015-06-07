@@ -66,8 +66,6 @@ int init_hardware(char *hardware_type)
 		return (-1);
 	}
 	
-	INIT_HARDWARE_FC();
-	
 
-	return (0);
+	return INIT_HARDWARE_FC();
 }

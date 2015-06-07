@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <signal.h>
 #include <pthread.h>
 #include <string.h>
@@ -35,7 +36,7 @@ void hexdump(void *mem, unsigned int len)
 
 		/* print hex data */
 		if (i < len) {
-			printf("%02x ", 0xFF & ((char *)mem)[i]);
+			printf("%02x ", 0xFF & ((unsigned char *)mem)[i]);
 		} else {	/* end of block, just aligning for ASCII dump */
 
 			printf("   ");
@@ -46,9 +47,9 @@ void hexdump(void *mem, unsigned int len)
 			for (j = i - (HEXDUMP_COLS - 1); j <= i; j++) {
 				if (j >= len) {	/* end of block, not really printing */
 					putchar(' ');
-				} else if (isprint(((char *)mem)[j])) {	/* printable char */
-					putchar(0xFF & ((char *)mem)[j]);
-				} else {	/* other char */
+				} else if (isprint(((unsigned char *)mem)[j])) {	/* printable unsigned char */
+					putchar(0xFF & ((unsigned char *)mem)[j]);
+				} else {	/* other unsigned char */
 
 					putchar('.');
 				}
