@@ -25,12 +25,12 @@ ifeq ($(ARCH), arm)
 	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
-	X86_DEFINES   =-DX86=1
+	X86_DEFINES   =-DX86=1 -g
 	INCPATH       = -I. \
                		-Iinclude
 else 
 	ARCH_LIBS 	  =
-	X86_DEFINES   =-DX86=1
+	X86_DEFINES   =-DX86=1 -g
 	INCPATH       = -I. \
                		-Iinclude
 endif
