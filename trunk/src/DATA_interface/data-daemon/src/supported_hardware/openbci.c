@@ -57,7 +57,7 @@ int openbci_cleanup(void *param __attribute__ ((unused)))
 {
 	param_t param_stop_transmission = { OPENBCI_HALT_TRANSMISSION, 1 };
 	openbci_send_pkt(&param_stop_transmission);
-	
+
 	close_serial();
 	return (0);
 }
@@ -66,9 +66,10 @@ int openbci_cleanup(void *param __attribute__ ((unused)))
  * openbci_translate_pkt
  * @brief translate MUSE packet
  */
-int openbci_translate_pkt(void *param)
+int openbci_translate_pkt(void *param __attribute__ ((unused)))
 {
-	param_t *param_ptr = (param_t *) param;
+	// Unused for now
+	param_t *param_ptr __attribute__ ((unused)) = (param_t *) param;
 
 	// Do some things to print out the packet
 	return (0);
@@ -81,7 +82,7 @@ int openbci_translate_pkt(void *param)
  */
 int openbci_send_keep_alive_pkt(void *param __attribute__ ((unused)))
 {
-	// Not used
+	// Not used / Not required
 	return (0);
 }
 
@@ -94,8 +95,9 @@ int openbci_send_keep_alive_pkt(void *param __attribute__ ((unused)))
 int openbci_send_pkt(void *param)
 {
 	param_t *param_ptr = (param_t *) param;
+	int ret __attribute__ ((unused));
 
-	write(get_serial_fd(), param_ptr->ptr, param_ptr->len);
+	ret = write(get_serial_fd(), param_ptr->ptr, param_ptr->len);
 
 	return (0);
 }
@@ -116,7 +118,7 @@ int openbci_process_pkt(void *param)
 	hexdump((unsigned char *)param_ptr->ptr, param_ptr->len);
 
 	if (_TRANS_PKT_FC) {
-	TRANS_PKT_FC(param);
+		TRANS_PKT_FC(param);
 	}
 
 	return (0);
@@ -133,36 +135,37 @@ int openbci_read_pkt(void *param __attribute__ ((unused)))
 
 	param_t param_start_transmission = { OPENBCI_START_TRANSMISSION, 1 };
 	param_t param_stop_transmission = { OPENBCI_HALT_TRANSMISSION, 1 };
+	param_t param_reset_transmission = { OPENBCI_RESET, 1 };
 	param_t param_translate_pkt = { 0 };
 	char buf[255] = { 0 };
 
 	int fd = get_serial_fd();
 	int check = 0;
-	int i = 0;
 	int num, offset = 0, bytes_expected = 130;
 
-	sleep(7);
+	// If running lets stop the transmission and reset the device
+	openbci_send_pkt(&param_stop_transmission);
+	openbci_send_pkt(&param_reset_transmission);
+	sleep(2);
+	// If you care about the $$$ prompt
 	do {
 		num = read(fd, buf + offset, 255);
 
-		if (((buf + num - 1)) == '$') {
-			printf("check\n");
+		if (buf[num - 1] == '$') {
 			check++;
 			break;
 		}
 
 		offset += num;
-		printf("%d %d\n", offset, num);
 		param_translate_pkt.ptr = buf;
 		param_translate_pkt.len = num;
 		PROCESS_PKT_FC(&param_translate_pkt);
 
 	} while (check > 0);
 
-	printf("Ready prompt\n");
 	sleep(1);
 
-	//openbci_send_pkt(&param_stop_transmission);
+	// Now restart the communication
 	memset(buf, 0, 255);
 	openbci_send_pkt(&param_start_transmission);
 
@@ -170,7 +173,7 @@ int openbci_read_pkt(void *param __attribute__ ((unused)))
 	bytes_expected = DATA_PACKET_LENGTH;
 	do {
 		offset = 0;
-		
+
 		do {
 			offset += read(fd, buf + offset, 1);
 
@@ -189,6 +192,7 @@ int openbci_read_pkt(void *param __attribute__ ((unused)))
 		samples++;
 
 	} while (samples < get_appconfig()->samples);
-	printf("samples: %d\n",samples);
+	openbci_send_pkt(&param_stop_transmission);
+	printf("Samples taken: %d\n", samples);
 	return (0);
 }
