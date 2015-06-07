@@ -2,13 +2,13 @@
 <appConfig>
   <appAttributes>
     <debug>TRUE</debug>
-    <interface>SERIAL</interface>
-    <device>OPENBCI</device>
+    <interface>BLE</interface>
+    <device>MUSE</device>
     <compression>FALSE</compression>
-    <keep_alive>FALSE</keep_alive>
-    <keep_time>0</keep_time>
-    <remote_addr>/dev/ttyUSB0</remote_addr>
-    <process_data>TRUE</process_data>
+    <keep_alive>TRUE</keep_alive>keep_alive>
+    <keep_time>9</keep_time>
+    <remote_addr>00:06:66:6F:84:FF</remote_addr>
+    <process_data>FALSE</process_data>
     <buffer>TRUE</buffer>
     <samples>100</samples>
     <number_runs>1</number_runs>
