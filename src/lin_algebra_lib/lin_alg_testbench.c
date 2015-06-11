@@ -16,7 +16,7 @@ void test_basic_vector_op(void);
 void test_basic_mtx_op(void);
 void test_linear_solver(void);
 void test_eigen_solver(void);
-
+void test_pca(void);
 int main() {
 
 
@@ -24,10 +24,10 @@ int main() {
 	
 	//test_basic_mtx_op();
     
-	test_linear_solver();
+	//test_linear_solver();
 
     //test_eigen_solver();
-    
+    test_pca();
     
     return 0;
 }
@@ -343,3 +343,142 @@ void test_eigen_solver(void)
 	printf("\n\n");
 	
 }
+
+void test_pca(void){
+	
+	
+	int DIM_I = 6;
+	int DIM_J=6;
+	int i;
+	double a[36]= {	3.5712, 1.4007, 2.5214,35.7680,12.5698,34.5678,
+					1.4007, 84.9129, 2.7030, 64.5638,4.5645,56.4523,
+					2.5214, 2.7030, 93.3993,32.4563,56.4322,24.4678,
+					35.7680,64.5638,32.4563,43.2345,21.3456,32.5476,
+					12.5698,4.5645,56.4322,21.3456,78.4356,65.4356,
+					34.5678,56.4523,24.4678,32.5476,65.4356,21.4567
+					};
+	double lancz_trans_mtx[36];				
+	double *mean = (double*)calloc(sizeof(double),DIM_J);
+	double *b = (double*)calloc(sizeof(double),(DIM_J*DIM_I));
+	double *b_prime = (double*)calloc(sizeof(double),(DIM_J*DIM_I));
+	double *cov= (double*)calloc(sizeof(double),(DIM_J*DIM_I));
+	double *eigenvalues=(double*)calloc(sizeof(double),(DIM_J));
+	double *Identity = (double*)calloc(sizeof(double),(DIM_J*DIM_I));
+	double *mtx_diag= (double*)calloc(sizeof(double),(DIM_J*DIM_I));
+	double *mtx_off_diag= (double*)calloc(sizeof(double),(DIM_J*DIM_I));
+	double *ident_eigen= (double*)calloc(sizeof(double),(DIM_J*DIM_I));
+	show_matrix(a,DIM_I,DIM_J);
+	
+	
+		
+	stat_mean(a,mean,DIM_I,DIM_J);
+	
+	printf("\nexpected mean matrix \n"
+	"15.06650 35.76620 35.33000 38.31930 39.79720 39.15460");
+	printf("\n\nMean matrix \n");
+	
+	show_matrix(mean,1,DIM_J);
+	printf("\nexpected derivation from the mean matrix\n"
+	"-11.49528 -34.36550 -32.80860 -2.55130 -27.22742 -4.58683\n"
+	"-13.66578 49.14670 -32.62700 26.24450 -35.23272 17.29767\n"
+	"-12.54508 -33.06320 58.06930 -5.86300 16.63498 -14.68683\n"
+	"20.70152 28.79760 -2.87370 4.91520 -18.45162 -6.60703\n"
+	"-2.49668 -31.20170 21.10220 -16.97370 38.63838 26.28097\n"
+	"19.50132 20.68610 -10.86220 -5.77170 25.63838 -17.69793\n");
+			
+	printf("\n Derivation from the mean matrix \n");
+	
+	mtx_deriv_mean(b,a,mean,DIM_I,DIM_J);
+	show_matrix(b,DIM_I,DIM_J);
+	printf("\n");
+
+	printf("Expected transpose matrix \n""-11.49528 -13.66578 -12.54508 20.70152 -2.49668 19.50132\n" 
+"-34.36550 49.14670 -33.06320 28.79760 -31.20170 20.68610\n" 
+"-32.80860 -32.62700 58.06930 -2.87370 21.10220 -10.86220\n" 
+"-2.55130 26.24450 -5.86300 4.91520 -16.97370 -5.77170\n" 
+"-27.22742 -35.23272 16.63498 -18.45162 38.63838 25.63838\n" 
+"-4.58683 17.29767 -14.68683 -6.60703 26.28097 -17.69793\n"); 
+	printf("\n\n Transpose matrix \n");
+	
+	mtx_transpose(b,b_prime,DIM_I,DIM_J);
+	show_matrix(b_prime,DIM_J,DIM_I);
+	
+	printf("\nExpected multiplication prior to covariance matrix (b*b')\n"
+	"3158.41375 351.58407 -995.33304 -613.17658 -720.63631 -1180.85189\n" 
+"351.58407 5896.00026 -4342.15094 1890.97606 -3540.04502 -256.36445\n" 
+"-995.33304 -4342.15094 5149.39843 -1617.44056 2644.62062 -839.09450\n" 
+"-613.17658 1890.97606 -1617.44056 1674.38695 -1980.86959 646.12372\n"
+"-720.63631 -3540.04502 2644.62062 -1980.86959 3896.80272 -299.87242\n" 
+"-1180.85189 -256.36445 -839.09450 646.12372 -299.87242 1930.05954\n");
+	
+	printf("\n\n Multiplication prior to covariance matrix (b*b')\n");
+	
+	mtx_mult(b,b_prime,cov,DIM_I,DIM_J,DIM_I);
+	show_matrix(cov,DIM_I,DIM_I);
+	
+	for (i=0;i<DIM_I*DIM_I;i++)
+		cov[i] /= DIM_I;
+	
+	printf("\nExpected covarianc matrix\n"
+	"526.40229 58.59735 -165.88884 -102.19610 -120.10605 -196.80865\n" 
+"58.59735 982.66671 -723.69182 315.16268 -590.00750 -42.72741\n" 
+"-165.88884 -723.69182 858.23307 -269.57343 440.77010 -139.84908\n" 
+"-102.19610 315.16268 -269.57343 279.06449 -330.14493 107.68729\n" 
+"-120.10605 -590.00750 440.77010 -330.14493 649.46712 -49.97874\n" 
+"-196.80865 -42.72741 -139.84908 107.68729 -49.97874 321.67659\n");
+
+	printf("\nCovariance matrix\n");
+	
+	show_matrix(cov,DIM_I,DIM_I);
+
+	//a[0]*= 1000;	
+	
+	//mtx_lanczos_procedure(a,mtx_diag, mtx_off_diag,DIM_I,6);
+	
+
+	//show_matrix(Identity,DIM_I,DIM_I);
+	//printf("\n Show the eigenvalues \n");
+	//mtx_mrrr(mtx_diag, mtx_off_diag,eigenvalues,6);
+	//show_matrix(eigenvalues,1,6);
+	
+	//mtx_lanczos_procedure(a,mtx_diag, mtx_off_diag,DIM_I,5);
+	
+
+	//show_matrix(Identity,DIM_I,DIM_I);
+	//printf("\n Show the eigenvalues \n");
+	//mtx_mrrr(mtx_diag, mtx_off_diag,eigenvalues,6);
+	//show_matrix(eigenvalues,1,6);
+	
+
+	
+	//mtx_lanczos_procedure(a,mtx_diag, mtx_off_diag,DIM_I,3);
+	
+
+	//show_matrix(Identity,DIM_I,DIM_I);
+	//printf("\n Show the eigenvalues \n");
+	//mtx_mrrr(mtx_diag, mtx_off_diag,eigenvalues,3);
+	//show_matrix(eigenvalues,1,3);
+	
+	
+	//	printf("\nElements of the diagonal\n");
+		
+	//show_matrix(mtx_diag,1,DIM_J);
+	
+		
+	//	printf("\nElements off the diagonal\n");
+	//show_matrix(mtx_off_diag,1,DIM_J);	
+			//printf("\nIdentity matrix \n");
+	
+	//mtx_ident(Identity,DIM_I);
+	
+	//mtx_mult(eigenvalues,Identity,ident_eigen,1,3,3);
+	//printf("\n Show the multiplication of eigen values with the matrix identity \n");
+	//show_matrix(ident_eigen,3,3);
+	
+	//vect_sub(a,ident_eigen,(DIM_I*DIM_J));
+	//printf("\n Show the substraction of a with the matrix identity* eigenvalues \n");
+	//show_matrix(a,3,3);
+	
+	
+	}
+
