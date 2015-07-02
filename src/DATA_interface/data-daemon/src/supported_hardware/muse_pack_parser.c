@@ -16,8 +16,127 @@
 #include "muse_pack_parser.h"
 
 int compute_quantization(int quantizations);
-void printbits(unsigned char v);
+void print_char_bits(unsigned char v);
+void print_int_bits(unsigned int v);
 
+/**
+ * int preparse_packet(char* raw_packet_header, char **packet_headers)
+ * 
+ * @brief find the beginning of soft packets in the raw packet
+ * @param raw_packet_header, pointer to the beginning of the packet
+ * @param (out)soft_packet_headers, pointers to the beginning of the soft packets
+ * @return number of packets found
+ */ 
+ 
+ 
+#define COMP_BITLENGTH_OFFSET 6
+ 
+
+int preparse_packet(char* raw_packet_header, int packet_length, int *soft_packet_headers, int *soft_packet_types);int preparse_packet(char* raw_packet_header, int packet_length, int *soft_packet_headers, int *soft_packet_types)
+{
+	int position = 0;
+	int nb_packets = 0;
+	int bitlength = 0;
+	
+	/*until we reach the end of the raw packet*/
+	while(position<packet_length){
+		
+		printf("position:%i\n",position);
+		printf("packet_length:%i\n",packet_length);
+		printf("nb_packets:%i\n",nb_packets);
+
+		soft_packet_headers[nb_packets] = position;
+		
+		printf("nxt_packet_type:%i\n",get_packet_type(raw_packet_header[position]));
+
+		/*check the packet type, figure out its length and jump to the next*/
+		switch(get_packet_type(raw_packet_header[position]))
+		{
+			/*sync packet is 4 bytes*/
+			case MUSE_SYNC_PKT:
+				position += 4;
+				soft_packet_types[nb_packets] = MUSE_SYNC_PKT;
+			break;
+			
+			/*uncompressed size is 1+(2)+5, the 2 only if flag is true*/
+			case MUSE_UNCOMPRESS_PKT:
+			
+				if(get_flag_value(raw_packet_header[position]))
+					position += 8;
+				else
+					position += 6;
+					
+				soft_packet_types[nb_packets] = MUSE_UNCOMPRESS_PKT;
+			break;
+			
+			/*error size is 5*/
+			case MUSE_ERR_PKT:
+				position += 5;
+				soft_packet_types[nb_packets] = MUSE_ERR_PKT;
+			break;
+			
+			/*compressed size is encoded in the packet*/
+			case MUSE_COMPRESSED_PKT:
+			
+				printf("%i\n",COMP_BITLENGTH_OFFSET+position);
+				bitlength = compressed_parse_bit_length(&(raw_packet_header[COMP_BITLENGTH_OFFSET+position]));
+				
+				printf("bitlength:%i\n",bitlength);
+				position+=8;
+				position+=(int)(bitlength/8);
+				printf("position:%i\n",position);
+				if(bitlength%8)
+					position+=1;
+				
+				printf("position:%i\n",position);
+				soft_packet_types[nb_packets] = MUSE_COMPRESSED_PKT;
+			break;
+			
+			/*battery size is 9*/
+			case MUSE_BATT_PKT:
+				position += 9;
+				soft_packet_types[nb_packets] = MUSE_BATT_PKT;
+			break;
+			
+			/*uncompressed size is 1+(2)+4, the 2 only if flag is true*/
+			case MUSE_ACC_PKT:
+				if(get_flag_value(raw_packet_header[position]))
+					position += 7;
+				else
+					position += 5;
+					
+				soft_packet_types[nb_packets] = MUSE_ACC_PKT;
+			break;
+			
+			case MUSE_DRLREF_PKT:
+				position += 4;
+				soft_packet_types[nb_packets] = MUSE_DRLREF_PKT;
+			break;
+			
+			case MUSE_INVALID:
+			default:
+				printf("Parsing error!\n");
+				return;
+		}
+	
+	
+		nb_packets = nb_packets+1;
+		
+	}
+	
+	return nb_packets;
+}
+
+inline int get_packet_type(unsigned char first_byte)
+{
+	return (first_byte>>4);
+}
+
+
+inline int get_flag_value(unsigned char first_byte)
+{
+	return (first_byte&0x08)>0;
+}
 /**
  * void compressed_parse_medians(char* medians_header, int* quantizations, int* medians)
  * 
@@ -26,7 +145,7 @@ void printbits(unsigned char v);
  * @param (out)quantizations, quantizations array
  * @param (out)medians, medians array
  */ 
-void compressed_parse_medians(char* medians_header, int* quantizations, int* medians)
+void compressed_parse_medians(unsigned char* medians_header, int* quantizations, int* medians)
 {
 	/*medians occupy 6 bits and quantization 4 bits for a total of 10 bits*/
 	/*Here's a mapping of the bits, but refer to documentation for details*/
@@ -103,7 +222,7 @@ int compute_quantization(int quantizations)
  * @param bit_length_header, the byte array
  * @return length in bits
  */ 
-int compressed_parse_bit_length(char* bit_length_header)
+int compressed_parse_bit_length(unsigned char* bit_length_header)
 {
 	return (int)(bit_length_header[0]<<8 | (bit_length_header[1]&0xFF));
 }
@@ -120,7 +239,7 @@ int compressed_parse_bit_length(char* bit_length_header)
  * @param (out)deltas, the deltas array
  * @return length parsed in bits
  */ 
-int compressed_parse_deltas(char* bits_header, int* median, int* quantization, int* deltas)
+int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quantization, int* deltas)
 {
 	/*Variables that navigates in loops and in char array*/
 	/*loops iterator*/
@@ -548,13 +667,50 @@ int compressed_parse_deltas(char* bits_header, int* median, int* quantization, i
 	return byteshift*8+bitshift;
 }
 
+
 /**
- * void printbits(unsigned char v)
+ * void uncompressed_parse_values(char* values_header, int* values)
+ * 
+ * @brief parse out the eeg signal values out of an uncompressed packet
+ * @param values_header, pointer to the beginning of the values in the packet
+ * @param (out)values, eeg values parsed out of the packet
+ */ 
+void uncompressed_parse_values(unsigned char* values_header, int* values)
+{
+	/*values are represented in the packet the following way:*/
+	/*XXXX XXXX*/
+	/*YYYY YYXX*/
+	/*XXXX YYYY*/
+	/*YYXX XXXX*/
+	/*YYYY YYYY*/
+	
+	/*For each, mask the necessary bits, shift them in place and OR them into an integer*/
+	values[0] = (int)(((values_header[1]&0x03)<<8)|values_header[0]);
+	values[1] = (int)(((values_header[2]&0x0F)<<6)|((values_header[1]&0xFC)>>2));
+	values[2] = (int)(((values_header[3]&0x3F)<<4)|(values_header[2]&0xF0)>>4);
+	values[3] = (int)((values_header[4]<<2)|((values_header[3]&0xC0)>>6));	
+	
+}
+
+
+
+/**
+ * void print_char_bits(unsigned char v)
  * 
  * @brief prints the bits of a char onscreen
  * @param v, char to be printed
  */ 
-void printbits(unsigned char v) {
+void print_char_bits(unsigned char v) {
   int i; // for C89 compatability
   for(i = 7; i >= 0; i--) putchar('0' + ((v >> i) & 1));
+}
+/**
+ * void printbits(unsigned char v)
+ * 
+ * @brief prints the bits of an int onscreen
+ * @param v, char to be printed
+ */ 
+void print_int_bits(unsigned int v) {
+  int i; // for C89 compatability
+  for(i = 31; i >= 0; i--) putchar('0' + ((v >> i) & 1));
 }
