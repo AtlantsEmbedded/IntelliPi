@@ -13,10 +13,12 @@
 #include "stats.h"
 void show_matrix(double *A, int dim_i, int dim_j);
 void test_stats();
-int main() {
+void test_randn();
+void write_data(double *mtx,int dim_i,int dim_j);
+int main(void) {
 
-test_stats();
-    
+//test_stats();
+test_randn();
     return 0;
 }
 
@@ -70,4 +72,44 @@ void test_stats(){
 	
 	
 	}
+void test_randn(){
+	int DIM_I = 900;
+	int DIM_J=900;
+	double sample;
+	double *mtx;
+	double *mean;
+	int i,j;
+	mtx = (double*)calloc(DIM_I*DIM_J,sizeof(double));
+	mean = (double*)calloc(DIM_J,sizeof(double));
 
+	sample = randn();
+	printf("\n\n%lf\n",sample);
+	
+	randn_mtx(mtx,DIM_I,DIM_J);
+	show_matrix(mtx,DIM_I,DIM_J);
+	
+	modify_mean_stddev(mtx,5.0,2.0,DIM_I,DIM_J);
+		
+	printf("\n\n");
+	show_matrix(mtx,DIM_I,DIM_J);
+	
+	write_data(mtx,DIM_I,DIM_J);
+	stat_mean(mtx,mean,DIM_I,DIM_J);
+	show_matrix(mean,1,DIM_J);
+	}
+
+void write_data(double *mtx,int dim_i,int dim_j){
+	FILE *f_in;
+	int i,j;
+	f_in=fopen("data_normally_distributed.txt","w");
+	
+	for (i=0;i<dim_i;i++){
+		for (j=0;j<dim_j;j++){
+			fprintf(f_in,"%lf ",mtx[i*dim_i+j]);
+			
+			}
+		fprintf(f_in,"\n","");
+		}
+		
+	
+	}
