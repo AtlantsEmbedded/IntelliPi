@@ -30,16 +30,15 @@
 #define MUSE_DRLREF_PKT  0x9	 //DRL/REF
 #define MUSE_INVALID  0x0	 //Invalid
 
+#define MAX_NB_SOFT_PACKETS 10
+
 int get_packet_type(unsigned char packet_header);
 
-int preparse_packet(char* raw_packet_header, int packet_length, int *soft_packet_headers, int *soft_packet_types);
+int preparse_packet(unsigned char* raw_packet_header, int packet_length, int *soft_packet_headers, int *soft_packet_types);
 
-int parse_compressed_packet(unsigned char* packet_header, char* deltas);
-void compressed_parse_medians(unsigned char* medians_header, int* quantizations, int* medians);
-int compressed_parse_bit_length(unsigned char* bit_length_header);
-int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quantization, int* deltas);
+int parse_compressed_packet(unsigned char* packet_header, int* deltas);
 
-void uncompressed_parse_values(unsigned char* values_header, int* values);
+void parse_uncompressed_packet(unsigned char* values_header, int* values);
 
 inline int get_flag_value(unsigned char first_byte);
 
