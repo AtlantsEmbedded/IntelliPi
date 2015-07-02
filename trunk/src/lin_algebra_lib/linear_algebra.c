@@ -731,63 +731,6 @@ void convert_double_to_real_array(double* double_array, real* real_array, int n)
 
 
 /**
- * void mtx_deriv_mean(double *b, double *a, double *mean, int dim_i, int dim_j)
- * @brief Function to calculate the matrix of derivation from the mean
- * @param double *b , the resulting derivation from the mean matrix
- * @param double *a , the matrix contraining the original elements
- * @param double *mean, the matrix containing the mean of the columns of *a
- * @param int dim_i, the number of rows in the matrix
- * @param int dim_j, the number of colomns in the matrix
- */ 
-
- void mtx_deriv_mean(double *b, double *a, double *mean, int dim_i, int dim_j){
-	 
-	 int i,j;
-	 for (i=0;i<dim_i;i++){
-        for (j=0;j<dim_j;j++){
-            b[i*dim_j+j] = a[i*dim_j+j]-mean[j];
-            
-	}
-	 
-	 
-	 
-		}
-}
-/**
- * void stat_mean(double *a, double *mean, int dim_i, int dim_j)
- * @brief Function to calculate the mean matrix
- * @param double *a , the matrix containing the original matrix
- * @param double *mean , the matrix contraining the mean of each column of *a
- * @param int dim_i, the number of rows in the matrix
- * @param int dim_j, the number of colomns in the matrix
- */
-void stat_mean(double *a, double *mean, int dim_i, int dim_j){
-   int i,j,n;
-   
-   
-  //printf("\n\n%f\n\n",mean[2]); 
-  
-   n=0;
-/*Sum over each column*/
-for(i=0;i<dim_i;i++){
-     n = i*dim_j;
-     for (j=0;j<dim_j;j++){
-            mean[j] += a[j+n];
-     }
- }
-
-
-  //printf("\n\n%f\n\n",mean[2]); 
-
-/*Divide to get average*/
-for (j=0;j<dim_j;j++){
-    mean[j] /= dim_i;
-   
-}
-  //printf("\n\n%f\n\n",mean[2]); 
-  
-}
-/**
  * void mtx_ident(double *I,int n)
  * @brief Utility function to to generate an identity matrix
  * @param *I, identity matrix generated

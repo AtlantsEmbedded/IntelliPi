@@ -78,9 +78,6 @@ void mtx_mrrr(double *a,double *b, double *eigvalues, int n);
 
 void mtx_ident(double *I,int n);
 
-void stat_mean(double *a, double *mean, int dim_i, int dim_j);
-
-void mtx_deriv_mean(double *b, double *a, double *mean, int dim_i, int dim_j);
 
 void compute_eigen_problem(double *eigenvalues, double Identity, int dim_i, int dim_j);
 #endif
