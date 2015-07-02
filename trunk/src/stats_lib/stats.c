@@ -41,7 +41,8 @@
  * @param int dim_i, the number of rows in the matrix
  * @param int dim_j, the number of colomns in the matrix
  */ 
-
+ #include "stats.h"
+ 
 void remove_mean_col(double *b, double *a, double *mean, int dim_i, int dim_j){
 	 
 	 int i,j;
@@ -113,4 +114,50 @@ void show_matrix(double *A, int dim_i, int dim_j) {
         printf("\n");
     }
 }
- 
+/**
+ * double randn()
+ * @brief Utility function to generate a normally distributed number
+ */ 
+double randn(){
+	double Twopi = (6.2831853071795864769252867665590057683943387987502); /* 2 * pi */
+	double randmax = RAND_MAX;
+	double random = rand();
+	double randnorm;
+	random/=randmax;
+	 randnorm= (sqrt(-2.0*log(random)));
+	randnorm*=cos(Twopi*random);
+	
+	
+	return randnorm;
+}
+/**
+ * void randn_mtx(double *mtx, int dim_i, int dim_j)
+ * 
+ * @brief Utility function to generate a matrix containing normally 
+ * distributed numbers
+ * @param mtx, IxJ double array, the matrix containing the normally
+ * distributed numbers
+ * @param dim_i, the value of I.
+ * @param dim_j, the value of J.
+ */ 
+void randn_mtx(double *mtx, int dim_i, int dim_j){
+	int i,j;
+	for (i=0;i<dim_i;i++){
+		for (j=0;j<dim_j;j++){
+			mtx[i*dim_j+j]=randn();
+			
+			}
+		
+		}
+	}
+
+void modify_mean_stddev(double *mtx,double new_mean,double new_stddev,int dim_i, int dim_j){
+	int i,j;
+	for (i=0;i<dim_i;i++){
+		for (j=0;j<dim_j;j++){
+			mtx[i*dim_i+j]= (mtx[i*dim_j+j]*new_stddev)+new_mean;
+			
+			}
+		}
+	
+	}	
