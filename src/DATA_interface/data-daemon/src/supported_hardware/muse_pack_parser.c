@@ -15,9 +15,19 @@
  */
 #include "muse_pack_parser.h"
 
-int compute_quantization(int quantizations);
+#define MEDIAN_OFFSET 1 /*byte offset of the medians in the compressed packet*/
+#define DELTAS_OFFSET 8 /*byte offset of the deltas in the compressed packet*/
+
+/*utils to display bits*/
 void print_char_bits(unsigned char v);
 void print_int_bits(unsigned int v);
+
+/*sub routines to parse the compressed packets*/
+int compute_quantization(int quantizations);
+void compressed_parse_medians(unsigned char* medians_header, int* quantizations, int* medians);
+int compressed_parse_bit_length(unsigned char* bit_length_header);
+int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quantization, int* deltas);
+
 
 /**
  * int preparse_packet(char* raw_packet_header, char **packet_headers)
@@ -32,23 +42,17 @@ void print_int_bits(unsigned int v);
 #define COMP_BITLENGTH_OFFSET 6
  
 
-int preparse_packet(char* raw_packet_header, int packet_length, int *soft_packet_headers, int *soft_packet_types);int preparse_packet(char* raw_packet_header, int packet_length, int *soft_packet_headers, int *soft_packet_types)
+int preparse_packet(unsigned char* raw_packet_header, int packet_length, int *soft_packet_headers, int *soft_packet_types)
 {
 	int position = 0;
 	int nb_packets = 0;
 	int bitlength = 0;
 	
 	/*until we reach the end of the raw packet*/
-	while(position<packet_length){
+	while(position<packet_length & nb_packets<MAX_NB_SOFT_PACKETS){
 		
-		printf("position:%i\n",position);
-		printf("packet_length:%i\n",packet_length);
-		printf("nb_packets:%i\n",nb_packets);
-
 		soft_packet_headers[nb_packets] = position;
 		
-		printf("nxt_packet_type:%i\n",get_packet_type(raw_packet_header[position]));
-
 		/*check the packet type, figure out its length and jump to the next*/
 		switch(get_packet_type(raw_packet_header[position]))
 		{
@@ -78,17 +82,13 @@ int preparse_packet(char* raw_packet_header, int packet_length, int *soft_packet
 			/*compressed size is encoded in the packet*/
 			case MUSE_COMPRESSED_PKT:
 			
-				printf("%i\n",COMP_BITLENGTH_OFFSET+position);
 				bitlength = compressed_parse_bit_length(&(raw_packet_header[COMP_BITLENGTH_OFFSET+position]));
 				
-				printf("bitlength:%i\n",bitlength);
 				position+=8;
 				position+=(int)(bitlength/8);
-				printf("position:%i\n",position);
 				if(bitlength%8)
 					position+=1;
 				
-				printf("position:%i\n",position);
 				soft_packet_types[nb_packets] = MUSE_COMPRESSED_PKT;
 			break;
 			
@@ -115,10 +115,9 @@ int preparse_packet(char* raw_packet_header, int packet_length, int *soft_packet
 			
 			case MUSE_INVALID:
 			default:
-				printf("Parsing error!\n");
+				printf("Pre-Parsing error!\n");
 				return;
 		}
-	
 	
 		nb_packets = nb_packets+1;
 		
@@ -127,16 +126,54 @@ int preparse_packet(char* raw_packet_header, int packet_length, int *soft_packet
 	return nb_packets;
 }
 
+/**
+ * inline int get_packet_type(unsigned char first_byte)
+ * 
+ * @brief extracts the packet type from the byte
+ * @param first_byte, first byte of the packet
+ * @return packet type shifted to 0xF
+ */ 
 inline int get_packet_type(unsigned char first_byte)
 {
-	return (first_byte>>4);
+	return (first_byte>>4)&0x0F;
 }
 
 
+/**
+ * inline int get_flag_value(unsigned char first_byte)
+ * 
+ * @brief extracts the dropped packet flag value
+ * @param first_byte, first byte of the packet
+ * @return binary value of the flag
+ */ 
 inline int get_flag_value(unsigned char first_byte)
 {
 	return (first_byte&0x08)>0;
 }
+
+
+/**
+ * int parse_compressed_packet(unsigned char* packet_header, char* deltas)
+ * 
+ * @brief extracts the dropped packet flag value
+ * @param packet_header, address to the first byte of the packet
+ * @param (out)deltas, array containing the deltas extracted from the packet must be 16*4 sizeof(int) in size
+ * @return success or fail
+ */ 
+int parse_compressed_packet(unsigned char* packet_header, int* deltas)
+{
+	int medians[4];
+	int quantizations[4];
+	
+	/*parse out the medians and quantizations*/
+	compressed_parse_medians(&(packet_header[MEDIAN_OFFSET]), quantizations, medians);
+	
+	/*parse out the deltas*/
+	compressed_parse_deltas(&(packet_header[DELTAS_OFFSET]), medians, quantizations, deltas);
+	
+	return EXIT_SUCCESS;
+}
+
 /**
  * void compressed_parse_medians(char* medians_header, int* quantizations, int* medians)
  * 
@@ -669,13 +706,13 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 
 
 /**
- * void uncompressed_parse_values(char* values_header, int* values)
+ * void parse_uncompressed_packet(char* values_header, int* values)
  * 
  * @brief parse out the eeg signal values out of an uncompressed packet
  * @param values_header, pointer to the beginning of the values in the packet
  * @param (out)values, eeg values parsed out of the packet
  */ 
-void uncompressed_parse_values(unsigned char* values_header, int* values)
+void parse_uncompressed_packet(unsigned char* values_header, int* values)
 {
 	/*values are represented in the packet the following way:*/
 	/*XXXX XXXX*/

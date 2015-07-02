@@ -21,6 +21,7 @@
 #include "main.h"
 #include "muse.h"
 #include "xml.h"
+#include "muse_pack_parser.h"
 
 static int seconds = 0;
 
@@ -111,41 +112,44 @@ int muse_send_pkt(void *param)
  */
 int muse_process_pkt(void *param)
 {
+	int i=0;
+	int nb_of_soft_packets;
+	int soft_packets_headers[MAX_NB_SOFT_PACKETS];		
+	int soft_packets_types[MAX_NB_SOFT_PACKETS];		
+	
 	// Uncompressed or raw at this point
 	param_t *param_ptr = (param_t *) param;
 	muse_raw_pkt_t *muse_raw_pkt_ptr = NULL;
 
-	uint8_t shim = 1;	// Header - type + flag == one byte
 	fprintf(stdout, "Bytes read = %d\n", param_ptr->len);
 	hexdump((unsigned char *)param_ptr->ptr, param_ptr->len);
+	
 	if (param_ptr->len >= 6) {
+		
+		/*get the pointer on the beginning of the packet*/
 		muse_raw_pkt_ptr = (muse_raw_pkt_t *) param_ptr->ptr;
-		if ((muse_raw_pkt_ptr->flag >> 4) == 0x8) {
-			shim += 2;
-		}
-		printf("type: %01x\n", muse_raw_pkt_ptr->type & 0x0F);
-		switch ( muse_raw_pkt_ptr->type & 0x0F) {
-		case MUSE_UNCOMPRESS_PKT:
-			//~ muse_raw_pkt_ptr->ch1 = muse_raw_pkt_ptr + shim;
-			//~ muse_raw_pkt_ptr->ch2 = muse_raw_pkt_ptr + shim + 1;
-			//~ muse_raw_pkt_ptr->ch3 = muse_raw_pkt_ptr + shim + 2;
-			//~ muse_raw_pkt_ptr->ch4 = muse_raw_pkt_ptr + shim + 3;
-			//~ printf("ch1: %x\n", muse_raw_pkt_ptr->ch1);
-			//~ printf("ch2: %x\n", muse_raw_pkt_ptr->ch2);
-			//~ printf("ch3: %x\n", muse_raw_pkt_ptr->ch3);
-			//~ printf("ch4: %x\n", muse_raw_pkt_ptr->ch4);
-
-			printf("got a eeg pkt\n");
-			break;
-		case MUSE_COMPRESSED_PKT:
-			printf("got a compressed eeg pkt\n");
-			break;
-		default:
+		
+		/*pre-parse the bluetooth packet to know how many soft packets*/
+		/*are present*/	
+		nb_of_soft_packets = preparse_packet((unsigned char *)muse_raw_pkt_ptr, param_ptr->len, soft_packets_headers, soft_packets_types);
+	
+		/*process each individual packet*/
+		for(i=0;i<nb_of_soft_packets;i++){
+			       
+			switch(soft_packets_types[i]){
+				case MUSE_UNCOMPRESS_PKT:
+					printf("got an uncompressed eeg pkt\n");
+				break;
+		
+				case MUSE_COMPRESSED_PKT:	
+					printf("got a compressed eeg pkt\n");
+				break;
+			}
 			
-			return (0);
-			break;
 		}
-
+		
+		
+		
 	} else {
 		printf("Invalid packet - too small\n");
 	}

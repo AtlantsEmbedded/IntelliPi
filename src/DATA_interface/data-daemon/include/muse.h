@@ -12,8 +12,6 @@
 #define MUSE_HALT_TRANSMISSION "h\r\n"	// halt data transmission
 #define MUSE_VERSION "v 2\r\n"	// request device information
 
-
-
 #define MUSE_SYNC_PKT 0xF	 //First nibble of sync packet
 #define MUSE_UNCOMPRESS_PKT 0xE	 //Uncompressed EEG
 #define MUSE_ERR_PKT 0xD	 //Error Flags
@@ -22,6 +20,8 @@
 #define MUSE_ACC_PKT 0xA	 //Accelerometer
 #define MUSE_DRLREF_PKT  0x9	 //DRL/REF
 #define MUSE_INVALID  0x0	 //Invalid
+
+//#define MUSE_MAX_NB_PACKETS 10
 
 typedef enum { MUSE_RAW_EEG, MUSE_COMP_MUSE_EEG, MUSE_UNCOMP_MUSE_EEG, MUSE_SYNC, MUSE_DRL_REF, MUSE_ERROR, 
 	MUSE_ACCEL, MUSE_BATT } muse_pkt_type_t;
