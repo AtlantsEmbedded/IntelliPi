@@ -340,15 +340,13 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 		{
 			
 			/*if median below 14*/
-			if(median[i]<=14){
+			//if(median[i]<=14){
 				
 				/******************/
 				/* Unary Encoding */
 				/******************/
 				/*for all deltas*/
 				for(j=0;j<16;j++){
-					
-					printf("%i\n",byteshift*8+bitshift);
 					
 					/******************/
 					/* Quotient       */
@@ -520,6 +518,7 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 					deltas[j+i*16] = (quotient_value * median[i] + remainder_value) * sign_value * quantization[i];
 					
 				}
+#if 0				
 			}
 			else
 			{
@@ -529,8 +528,6 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 				/***********************************/
 				/*for all deltas*/
 				for(j=0;j<16;j++){
-					
-					printf("%i\n",byteshift*8+bitshift);
 			
 					/***********************************/
 					/* SKIP THE ONES                   */
@@ -706,6 +703,7 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 						
 				}
 			}
+#endif
 		}
 	}
 	
