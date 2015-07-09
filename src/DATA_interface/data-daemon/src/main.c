@@ -22,6 +22,7 @@
 #include "serial.h"
 #include "app_signal.h"
 #include "hardware.h"
+#include "data_storage.h"
 #include "xml.h"
 #include "debug.h"
 
@@ -40,12 +41,14 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	// Set up ctrl c signal handler
 	(void)signal(SIGINT, ctrl_c_handler);
 
+	/*read the config from the xml*/
 	appconfig_t *config = (appconfig_t *) xml_initialize(CONFIG_NAME);
 	if (config == NULL) {
 		printf("Error initializing XML configuration\n");
 		return (-1);
 	}
 
+	/*init the hardware*/
 	if (init_hardware((char *)config->device) < 0) {
 		printf("Error initializing hardware");
 		return (-1);
@@ -56,6 +59,14 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 
 	printf("Attempts: %d\n", get_appconfig()->conn_attempts);
 	printf("Keep alive: %d seconds: %d\n", get_appconfig()->keep_alive, get_appconfig()->keep_time);
+	
+	/*init the data storage*/
+	if (init_data_storage((char)config->output_format)==EXIT_FAILURE){
+		printf("Error initializing data storage");
+		return (-1);
+	}
+	
+	printf("Data storage initialized\n");
 
 	for (attempts = 0; attempts < config->conn_attempts; attempts++) {
 		printf("Connection attempt: %u\n", attempts + 1);
@@ -73,9 +84,12 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	if (ret == 0) {
 		printf("Connected to device\n");
 
+		/*init the function that picks up the bluetooth packets*/
 		iret1 = pthread_create(&readT, NULL, (void *)_RECV_PKT_FC, NULL);
 
+		/*if keep_alive*/
 		if (get_appconfig()->keep_alive) {
+			/*init the function that implements the watchdog*/
 			iret2 = pthread_create(&writeT, NULL, (void *)_KEEP_ALIVE_FC, NULL);
 			pthread_join(writeT, NULL);
 		}
@@ -86,5 +100,6 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	}
 
 	DEVICE_CLEANUP_FC();
+	TERMINATE_DATA_STORAGE_FC();
 	return 0;
 }

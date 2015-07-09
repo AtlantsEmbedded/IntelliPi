@@ -35,7 +35,7 @@ else
                		-Iinclude
 endif
 
-LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lbluetooth -lglib-2.0 $(ARCH_LIBS)
+LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread -lezxml -lbluetooth -lglib-2.0 $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -66,9 +66,11 @@ SOURCES       = src/main.c \
 				src/socket.c \
 				src/serial.c \
 				src/hardware.c \
+				src/data_storage.c \
 				src/debug.c \
-				src/data_structure.c \
 				src/app_signal.c \
+				src/supported_hardware/muse_pack_parser.c \
+				src/supported_data_storage/csv_file.c \
 				src/supported_hardware/muse.c \
 				src/supported_hardware/openbci.c
 OBJECTS       = src/main.o \
@@ -76,9 +78,11 @@ OBJECTS       = src/main.o \
 				src/socket.o \
 				src/serial.o \
 				src/hardware.o \
+				src/data_storage.o \
 				src/debug.o \
-				src/data_structure.o \
 				src/app_signal.o \
+				src/supported_hardware/muse_pack_parser.o \
+				src/supported_data_storage/csv_file.o \
 				src/supported_hardware/muse.o \
 				src/supported_hardware/openbci.o
 DIST          = 
@@ -139,18 +143,24 @@ serial.o: src/serial.c
 
 debug.o: src/debug.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o debug.o src/debug.c 
-
-data_structure.o: src/data_structure.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o data_structure.o src/data_structure.c 
 	
 app_signal.o: src/app_signal.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o app_signal.o src/app_signal.c 
+	
+muse_pack_parser.o: src/supported_hardware/muse_pack_parser.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o muse.o src/supported_hardware/muse_pack_parser.c
+	
+csv_file.o: src/supported_data_storage/csv_file.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o csv_file.o src/supported_data_storage/csv_file.c
 	
 muse.o: src/supported_hardware/muse.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o muse.o src/supported_hardware/muse.c
 	
 hardware.o: src/hardware.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o hardware.o src/hardware.c 
+	
+data_storage.o: src/data_storage.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o data_storage.o src/data_storage.c 
 
 openbci.o: src/supported_hardware/openbci.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o openbci.o src/supported_hardware/openbci.c

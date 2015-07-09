@@ -1,6 +1,6 @@
 /**
  * @file muse_pack_parser.c
- * @author Frédéric Simard, Atlans embedded
+ * @author Frédéric Simard, Atlans embedded (frederic.simard.1@outlook.com)
  * @date June, 2015
  * @brief This file implements the function required to parse a packet
  *        sent by the muse. The following packets types can be parsed:
@@ -12,6 +12,10 @@
  * 
  * And the general description of the Muse bluetooth protocol:
  * https://sites.google.com/a/interaxon.ca/muse-developer-site/muse-communication-protocol/data-streaming-protocol
+ * 
+ * Parts of the decompression algorithm were adapted from:
+ * https://github.com/DavidVivancos/MuseDotNet
+ * Thanks dude!
  */
 #include "muse_pack_parser.h"
 
@@ -344,6 +348,8 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 				/*for all deltas*/
 				for(j=0;j<16;j++){
 					
+					printf("%i\n",byteshift*8+bitshift);
+					
 					/******************/
 					/* Quotient       */
 					/******************/
@@ -523,6 +529,8 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 				/***********************************/
 				/*for all deltas*/
 				for(j=0;j<16;j++){
+					
+					printf("%i\n",byteshift*8+bitshift);
 			
 					/***********************************/
 					/* SKIP THE ONES                   */
