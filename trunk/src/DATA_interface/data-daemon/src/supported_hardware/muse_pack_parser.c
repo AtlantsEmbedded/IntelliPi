@@ -726,12 +726,19 @@ void parse_uncompressed_packet(unsigned char* values_header, int* values)
 	/*XXXX YYYY*/
 	/*YYXX XXXX*/
 	/*YYYY YYYY*/
+	int i;
 	
 	/*For each, mask the necessary bits, shift them in place and OR them into an integer*/
 	values[0] = (int)(((values_header[1]&0x03)<<8)|values_header[0]);
 	values[1] = (int)(((values_header[2]&0x0F)<<6)|((values_header[1]&0xFC)>>2));
 	values[2] = (int)(((values_header[3]&0x3F)<<4)|(values_header[2]&0xF0)>>4);
-	values[3] = (int)((values_header[4]<<2)|((values_header[3]&0xC0)>>6));	
+	values[3] = (int)((values_header[4]<<2)|((values_header[3]&0xC0)>>6));
+
+	/*check for sign bit (two's complement coding)*/
+	for(i=0;i<4;i++){		
+		if(values[i]&0x0200)
+			values[i] = values[i]|0xFE00;
+	}
 	
 }
 

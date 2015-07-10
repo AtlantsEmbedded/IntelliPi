@@ -12,7 +12,7 @@
 		_TERMINATE_DATA_STORAGE_FC(NULL)
 		
 
-typedef enum { UINT32, UINT8 } data_type_t;
+typedef enum { INT32, UINT32, UINT8 } data_type_t;
 		
 
 typedef int (*functionPtr_t) (void *);

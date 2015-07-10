@@ -72,7 +72,7 @@ int muse_translate_pkt(void *param)
 	static int cur_eeg_values[MUSE_NB_CHANNELS];
 	
 	data_t data_struct;
-	data_struct.type = UINT32;
+	data_struct.type = INT32;
 	data_struct.nb_data = MUSE_NB_CHANNELS;
 	data_struct.ptr = (unsigned char*)cur_eeg_values;
 
