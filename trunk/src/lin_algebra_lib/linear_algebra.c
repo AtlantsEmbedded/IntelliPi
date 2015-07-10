@@ -750,6 +750,39 @@ void mtx_ident(double *I,int n){
 void compute_eigen_problem(double *eigenvalues, double Identity, int dim_i, int dim_j ){
 	
 	
-	
+double *conv(double *A, double *B, int lenA, int lenB, int *lenC)
+{
+    int nconv;
+    int i, j, i1;
+    double tmp;
+    double *C;
+ 
+    //allocated convolution array   
+    nconv = lenA+lenB-1;
+    C = (double*) calloc(nconv, sizeof(double));
+ 
+    //convolution process
+    for (i=0; i<nconv; i++)
+    {
+        i1 = i;
+        tmp = 0.0;
+        for (j=0; j<lenB; j++)
+        {
+            if(i1>=0 && i1<lenA)
+                tmp = tmp + (A[i1]*B[j]);
+ 
+            i1 = i1-1;
+            C[i] = tmp;
+        }
+    }
+ 
+    //get length of convolution array   
+    (*lenC) = nconv;
+ 
+    //return convolution array
+    return(C);
+}
 	
 	}
+
+
