@@ -50,7 +50,7 @@ int csv_write_in_file(void *param){
 	/*check which type of data is coming in*/
 	switch(data->type){
 		/*32 bits unsigned integer*/
-		case UINT32:
+		case INT32:
 			/*recast the pointer*/
 			uint32_buf = (int*)data->ptr;
 			for(i=0;i<data->nb_data;i++){
@@ -58,7 +58,7 @@ int csv_write_in_file(void *param){
 			}
 		break;
 		
-		/*8 bits integer (unsigned char)*/
+		/*8 bits integer (unsigned char) not used*/
 		case UINT8:
 			/*good to go*/
 			for(i=0;i<data->nb_data;i++){
