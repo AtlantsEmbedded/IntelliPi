@@ -80,6 +80,12 @@ void mtx_ident(double *I,int n);
 
 
 void compute_eigen_problem(double *eigenvalues, double Identity, int dim_i, int dim_j);
+
+
+
+/**************************************************/
+/*Convolution function*/
+float *conv(float *A, float *B, int lenA, int lenB, int *lenC);
 #endif
 
 
