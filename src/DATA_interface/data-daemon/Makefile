@@ -66,7 +66,7 @@ SOURCES       = src/main.c \
 				src/socket.c \
 				src/serial.c \
 				src/hardware.c \
-				src/data_storage.c \
+				src/data_output.c \
 				src/debug.c \
 				src/app_signal.c \
 				src/supported_hardware/muse_pack_parser.c \
@@ -78,7 +78,7 @@ OBJECTS       = src/main.o \
 				src/socket.o \
 				src/serial.o \
 				src/hardware.o \
-				src/data_storage.o \
+				src/data_output.o \
 				src/debug.o \
 				src/app_signal.o \
 				src/supported_hardware/muse_pack_parser.o \
