@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "data_storage.h"
+#include "data_output.h"
 #include "csv_file.h"
 
 static FILE* fp;
