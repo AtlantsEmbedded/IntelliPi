@@ -22,7 +22,7 @@
 #include "muse.h"
 #include "xml.h"
 #include "muse_pack_parser.h"
-#include "data_storage.h"
+#include "data_output.h"
 
 static int seconds = 0;
 
@@ -68,7 +68,7 @@ int muse_translate_pkt(void *param)
 	muse_translt_pkt_t *muse_trslt_pkt_ptr = (muse_translt_pkt_t *) param;
 	
 	/*new samples might be relative to last sample, we keep the current*/
-	/*eeg data in a persistent storage, until it's being replaced.*/
+	/*eeg data in a persistent output, until it's being replaced.*/
 	static int cur_eeg_values[MUSE_NB_CHANNELS];
 	
 	data_t data_struct;
@@ -86,7 +86,7 @@ int muse_translate_pkt(void *param)
 				cur_eeg_values[i] = muse_trslt_pkt_ptr->eeg_data[i];
 			}
 					
-			/*Write the new sample in the buffer*/
+			/*Push the new sample in the output*/
 			COPY_DATA_IN(&data_struct);
 			
 			break;
@@ -103,7 +103,7 @@ int muse_translate_pkt(void *param)
 					cur_eeg_values[j] = cur_eeg_values[j]+muse_trslt_pkt_ptr->eeg_data[delta_offset+j];
 				}
 				
-				/*push it in the buffer*/	
+				/*Push the new sample in the output*/
 				COPY_DATA_IN(&data_struct);
 				
 			}
@@ -194,7 +194,7 @@ int muse_process_pkt(void *param)
 
 					/*Extract EEG values*/
 					nb_bits = parse_uncompressed_packet(&(param_ptr->ptr[soft_packets_headers[i]]), eeg_data_buffer);
-#if 0					
+#if 1					
 						/*Send them to the translator*/
 						param_translate_pkt.type = MUSE_UNCOMPRESS_PKT;
 						TRANS_PKT_FC(&param_translate_pkt);
@@ -206,7 +206,7 @@ int muse_process_pkt(void *param)
 
 					/*Extract delta values values*/
 					parse_compressed_packet(&(param_ptr->ptr[soft_packets_headers[i]]), eeg_data_buffer);
-#if 0					
+#if 1					
 					/*Send them to the translator*/
 					param_translate_pkt.type = MUSE_COMPRESSED_PKT;
 					TRANS_PKT_FC(&param_translate_pkt);
@@ -222,14 +222,6 @@ int muse_process_pkt(void *param)
 	} else {
 		printf("Invalid packet - too small\n");
 	}
-
-	//~ param_ob.ptr = muse_raw_pkt_ptr;
-
-
-
-	//~ if (_TRANS_PKT_FC) {
-	//~ TRANS_PKT_FC(&param_ob);
-	//~ }
 
 	return (0);
 }

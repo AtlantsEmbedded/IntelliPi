@@ -70,7 +70,7 @@ SOURCES       = src/main.c \
 				src/debug.c \
 				src/app_signal.c \
 				src/supported_hardware/muse_pack_parser.c \
-				src/supported_data_storage/csv_file.c \
+				src/supported_data_output/csv_file.c \
 				src/supported_hardware/muse.c \
 				src/supported_hardware/openbci.c
 OBJECTS       = src/main.o \
@@ -82,7 +82,7 @@ OBJECTS       = src/main.o \
 				src/debug.o \
 				src/app_signal.o \
 				src/supported_hardware/muse_pack_parser.o \
-				src/supported_data_storage/csv_file.o \
+				src/supported_data_output/csv_file.o \
 				src/supported_hardware/muse.o \
 				src/supported_hardware/openbci.o
 DIST          = 
@@ -150,8 +150,8 @@ app_signal.o: src/app_signal.c
 muse_pack_parser.o: src/supported_hardware/muse_pack_parser.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o muse.o src/supported_hardware/muse_pack_parser.c
 	
-csv_file.o: src/supported_data_storage/csv_file.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o csv_file.o src/supported_data_storage/csv_file.c
+csv_file.o: src/supported_data_output/csv_file.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o csv_file.o src/supported_data_output/csv_file.c
 	
 muse.o: src/supported_hardware/muse.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o muse.o src/supported_hardware/muse.c
