@@ -22,7 +22,7 @@
 #include "serial.h"
 #include "app_signal.h"
 #include "hardware.h"
-#include "data_storage.h"
+#include "data_output.h"
 #include "xml.h"
 #include "debug.h"
 
@@ -60,13 +60,13 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	printf("Attempts: %d\n", get_appconfig()->conn_attempts);
 	printf("Keep alive: %d seconds: %d\n", get_appconfig()->keep_alive, get_appconfig()->keep_time);
 	
-	/*init the data storage*/
-	if (init_data_storage((char)config->output_format)==EXIT_FAILURE){
-		printf("Error initializing data storage");
+	/*init the data output*/
+	if (init_data_output((char)config->output_format)==EXIT_FAILURE){
+		printf("Error initializing data output");
 		return (-1);
 	}
 	
-	printf("Data storage initialized\n");
+	printf("Data output initialized\n");
 
 	for (attempts = 0; attempts < config->conn_attempts; attempts++) {
 		printf("Connection attempt: %u\n", attempts + 1);
@@ -100,6 +100,6 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	}
 
 	DEVICE_CLEANUP_FC();
-	TERMINATE_DATA_STORAGE_FC();
+	TERMINATE_DATA_OUTPUT_FC();
 	return 0;
 }
