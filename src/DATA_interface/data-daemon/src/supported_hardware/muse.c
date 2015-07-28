@@ -1,6 +1,7 @@
 /**
  * @file muse.c
  * @author Ron Brash (ron.brash@gmail.com)
+ *         Frederic Simard (frederic.simard.1@outlook.com) || Atlants Embedded
  * @brief Handles all MUSE related function pointers, however, currently
  * only supports the non-research edition 
  */
@@ -193,7 +194,7 @@ int muse_process_pkt(void *param)
 				case MUSE_UNCOMPRESS_PKT:
 
 					/*Extract EEG values*/
-					nb_bits = parse_uncompressed_packet(&(param_ptr->ptr[soft_packets_headers[i]]), eeg_data_buffer);
+					parse_uncompressed_packet(&(param_ptr->ptr[soft_packets_headers[i]]), eeg_data_buffer);
 #if 1					
 						/*Send them to the translator*/
 						param_translate_pkt.type = MUSE_UNCOMPRESS_PKT;

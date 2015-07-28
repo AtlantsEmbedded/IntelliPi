@@ -12,8 +12,9 @@
 #include <stdint.h>
 
 #define CSV_OUTPUT 1
+#define SHM_OUTPUT 4  
 #define BINARY_OUTPUT 2
-#define MMAP_OUTPUT 3  
+#define MMAP_OUTPUT 3
 
 typedef struct appconfig_s {
 	unsigned char interface[8];
