@@ -34,7 +34,6 @@ define Package/DATA_interface/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/data_interface $(1)/atom/data
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/data $(1)/etc/init.d/
 endef
 
 $(eval $(call BuildPackage,DATA_interface))
