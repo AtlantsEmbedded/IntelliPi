@@ -1,5 +1,5 @@
 #############################################################################
-# Makefile for building: data_interface 
+# Makefile for building: data_processing 
 #############################################################################
 
 MAKEFILE      = Makefile
@@ -35,7 +35,7 @@ else
                		-Iinclude
 endif
 
-LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread -lezxml -lbluetooth -lglib-2.0 $(ARCH_LIBS)
+LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -62,36 +62,16 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = src/main.c \
-				src/xml.c \
-				src/socket.c \
-				src/serial.c \
-				src/hardware.c \
-				src/data_output.c \
-				src/debug.c \
+				src/data_input.c \
 				src/app_signal.c \
-				src/supported_hardware/muse_pack_parser.c \
-				src/supported_data_output/csv_file.c \
-				src/supported_data_output/shm_wrt_buf.c \
-				src/supported_hardware/muse.c \
-				src/supported_hardware/fake_muse.c \
-				src/supported_hardware/openbci.c
+				src/supported_data_input/shm_rd_buf.c
 OBJECTS       = src/main.o \
-				src/xml.o \
-				src/socket.o \
-				src/serial.o \
-				src/hardware.o \
-				src/data_output.o \
-				src/debug.o \
+				src/data_input.o \
 				src/app_signal.o \
-				src/supported_hardware/muse_pack_parser.o \
-				src/supported_data_output/csv_file.o \
-				src/supported_data_output/shm_wrt_buf.o \
-				src/supported_hardware/muse.o \
-				src/supported_hardware/fake_muse.o \
-				src/supported_hardware/openbci.o
+				src/supported_data_input/shm_rd_buf.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = data_interface
+TARGET        = data_processing
 
 
 first: all
@@ -136,45 +116,15 @@ dist:
 main.o: src/main.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o src/main.c
 
-xml.o: src/xml.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o xml.o src/xml.c 
-
-socket.o: src/socket.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o socket.o src/socket.c 
-
-serial.o: src/serial.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o serial.o src/serial.c 
-
-debug.o: src/debug.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug.o src/debug.c 
+shm_rd_buf.o: src/supported_data_input/shm_rd_buf.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o shm_rd_buf.o src/supported_data_input/shm_rd_buf.c
 	
+data_input.o: src/data_input.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o data_input.o src/data_input.c 
+
 app_signal.o: src/app_signal.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o app_signal.o src/app_signal.c 
 	
-muse_pack_parser.o: src/supported_hardware/muse_pack_parser.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o muse.o src/supported_hardware/muse_pack_parser.c
-	
-csv_file.o: src/supported_data_output/csv_file.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o csv_file.o src/supported_data_output/csv_file.c
-	
-shm_wrt_buf.o: src/supported_data_output/shm_wrt_buf.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o shm_wrt_buf.o src/supported_data_output/shm_wrt_buf.c
-	
-muse.o: src/supported_hardware/muse.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o muse.o src/supported_hardware/muse.c
-	
-fake_muse.o: src/supported_hardware/fake_muse.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o fake_muse.o src/supported_hardware/fake_muse.c
-	
-hardware.o: src/hardware.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o hardware.o src/hardware.c 
-	
-data_output.o: src/data_output.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o data_output.o src/data_output.c 
-
-openbci.o: src/supported_hardware/openbci.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o openbci.o src/supported_hardware/openbci.c
-
 ####### Install
 
 install:   FORCE
