@@ -1,10 +1,10 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=DATA_interface
+PKG_NAME:=DATA_preprocessing
 PKG_VERSION:=2015-07-28
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
-PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/DATA_interface
+PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/DATA_preprocessing
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
@@ -13,28 +13,28 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/DATA_interface
-	SECTION:=Interfaces
+define Package/DATA_preprocessing
+	SECTION:=Analysis
 	CATEGORY:=Atom
-	TITLE:=DATA_interface
-	SUBMENU:=Interfaces
-	DEPENDS:=wiringPi +libpthread +libezxml +glib2 +bluez-libs
+	TITLE:=DATA_preprocessing
+	SUBMENU:=preprocessing
+	DEPENDS:=libpthread +libezxml +glib2
 endef
 
-define Package/DATA_interface/description
-	Application which will act as the interface for gathering \
- data to be used for analysis - this includes Bluetooth EEGs
+define Package/DATA_preprocessing/description
+	Application which applies the preprocessing stage \
+ on data received through the DATA_interface
 endef
 
-define Package/DATA_interface/install
+define Package/DATA_preprocessing/install
 	$(INSTALL_DIR) $(1)/atom
 	$(INSTALL_DIR) $(1)/atom/data
 	$(INSTALL_DIR) $(1)/atom/data/config
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/config/data_config.xml $(1)/atom/data/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/data_interface $(1)/atom/data
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/data_preprocessing $(1)/atom/data
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/data $(1)/etc/init.d/
 endef
 
-$(eval $(call BuildPackage,DATA_interface))
+$(eval $(call BuildPackage,DATA_preprocessing))
