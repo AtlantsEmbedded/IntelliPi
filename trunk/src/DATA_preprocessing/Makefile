@@ -1,3 +1,2 @@
 all:
-	cd preprocess-daemon
-	make
+	cd preprocess-daemon; make

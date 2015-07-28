@@ -71,7 +71,7 @@ OBJECTS       = src/main.o \
 				src/supported_data_input/shm_rd_buf.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = data_processing
+TARGET        = data_preprocessing
 
 
 first: all
