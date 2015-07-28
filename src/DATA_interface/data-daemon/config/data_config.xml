@@ -3,16 +3,16 @@
   <appAttributes>
     <debug>TRUE</debug>
     <interface>BLE</interface>
-    <device>MUSE</device>
-    <compression>FALSE</compression>
+    <device>FAKE_MUSE</device>
+    <compression>TRUE</compression>
     <keep_alive>TRUE</keep_alive>keep_alive>
     <keep_time>9</keep_time>
-    <remote_addr>00:06:66:6F:84:FF</remote_addr>
+    <remote_addr>00:06:66:6C:16:54</remote_addr>
     <process_data>FALSE</process_data>
     <buffer>TRUE</buffer>
-    <samples>100</samples>
-    <number_runs>1</number_runs>
+    <samples>0</samples>
+    <number_runs>0</number_runs>
     <conn_attempts>3</conn_attempts>
-    <output_format>csv</output_format>
+    <output_format>SHM</output_format>
   </appAttributes>
  </appConfig>
