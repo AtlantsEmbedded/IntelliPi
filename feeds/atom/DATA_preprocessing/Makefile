@@ -30,8 +30,7 @@ define Package/DATA_preprocessing/install
 	$(INSTALL_DIR) $(1)/atom
 	$(INSTALL_DIR) $(1)/atom/data
 	$(INSTALL_DIR) $(1)/atom/data/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/config/data_config.xml $(1)/atom/data/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/data_preprocessing $(1)/atom/data
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/preprocess-daemon/data_preprocessing $(1)/atom/data
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 endef

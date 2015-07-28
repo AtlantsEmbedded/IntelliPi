@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openssl
-PKG_VERSION:=1.0.2a
+PKG_VERSION:=1.0.2d
 PKG_RELEASE:=0
 PKG_USE_MIPS16:=0
 
