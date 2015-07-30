@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @author Ron Brash (ron.brash@gmail.com) | Atom Embedded
+ * @author Ron Brash (ron.brash@gmail.com), Frederic Simard (frederic.simard.1@outlook.com) | Atlants Embedded 2015
  * @brief Handles the data interface layer which acts as an abstraction
  * interface for BLE/Bluetooth (or other) data and converts data into a usable format
  * for other applications. 

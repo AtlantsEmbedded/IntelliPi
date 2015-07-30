@@ -1,6 +1,6 @@
 /**
  * @file xml.h
- * @author Ron Brash (ron.brash@gmail.com)
+ * @author Ron Brash (ron.brash@gmail.com), Frederic Simard (frederic.simard.1@outlook.com) | Atlants Embedded 2015
  * @brief Header for xml functions and structures
  */
 #include <stdio.h>
@@ -12,19 +12,21 @@
 #include <stdint.h>
 
 #define CSV_OUTPUT 1
-#define SHM_OUTPUT 4  
 #define BINARY_OUTPUT 2
 #define MMAP_OUTPUT 3
+#define SHM_OUTPUT 4  
+
+#define MAX_CHAR_FIELD_LENGTH 18
 
 typedef struct appconfig_s {
-	unsigned char interface[8];
-	unsigned char device[8];
-	unsigned char remote_addr[18];
+	unsigned char interface[MAX_CHAR_FIELD_LENGTH];
+	unsigned char device[MAX_CHAR_FIELD_LENGTH];
+	unsigned char remote_addr[MAX_CHAR_FIELD_LENGTH];
 	uint32_t compression:1;
 	uint32_t keep_alive:1;
 	uint32_t process_data:1;
 	uint32_t buffer:1;
-	uint32_t output_format:2;
+	uint32_t output_format:3;
 	uint16_t samples;
 	uint16_t number_runs;
 	uint16_t keep_time;
