@@ -25,8 +25,6 @@ int init_data_output(char output_type){
 	_INIT_DATA_OUTPUT_FC = NULL;
 	_COPY_DATA_IN = NULL;
 	_TERMINATE_DATA_OUTPUT_FC = NULL;
-
-	output_type = SHM_OUTPUT;
 		
 	/*output to colum separated values file (only for debug purpose for now)*/
 	if(output_type == CSV_OUTPUT) {

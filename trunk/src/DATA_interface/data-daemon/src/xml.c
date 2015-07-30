@@ -69,23 +69,23 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 		printf("appAttributes->interface is missing\n");
 		return (-1);
 	}
-	memcpy(app_info->interface, tmp->txt, 8);
+	memcpy(app_info->interface, tmp->txt, MAX_CHAR_FIELD_LENGTH);
 
 	/*Get appAttributes/device*/
 	tmp = ezxml_child(app_attribute, "device");
 	if (tmp == NULL) {
-		printf("appAttributes->text is missing\n");
+		printf("appAttributes->device is missing\n");
 		return (-1);
 	}
-	memcpy(app_info->device, tmp->txt, 8);
-
+	memcpy(app_info->device, tmp->txt, MAX_CHAR_FIELD_LENGTH);
+	
 	/*Get appAttributes/remote_addr*/
 	tmp = ezxml_child(app_attribute, "remote_addr");
 	if (tmp == NULL) {
 		printf("appAttributes->remote_addr is missing\n");
 		return (-1);
 	}
-	memcpy(app_info->remote_addr, tmp->txt, 18);
+	memcpy(app_info->remote_addr, tmp->txt, MAX_CHAR_FIELD_LENGTH);
 
 	/*Get appAttributes/compression*/
 	tmp = ezxml_child(app_attribute, "compression");
@@ -182,6 +182,8 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 		return (-1);
 	}
 
+	printf("%s\n",tmp->txt);
+
 	/*Interpret value*/
 	if (strncmp((const char *)tmp->txt, "CSV", 3) == 0) {
 		app_info->output_format = CSV_OUTPUT;
@@ -189,6 +191,8 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 		app_info->output_format = BINARY_OUTPUT;
 	} else if (strncmp((const char *)tmp->txt, "MMAP", 4) == 0) {
 		app_info->output_format = MMAP_OUTPUT;
+	} else if (strncmp((const char *)tmp->txt, "SHM", 3) == 0) {
+		app_info->output_format = SHM_OUTPUT;
 	} else {
 		app_info->output_format = 0;
 	}
