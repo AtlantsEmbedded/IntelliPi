@@ -28,7 +28,7 @@
  */
 void setup_mindbx(void)
 {
-	  int i ;
+	  int i;
 
 	  /*check if root*/
 	  if (geteuid () != 0)
