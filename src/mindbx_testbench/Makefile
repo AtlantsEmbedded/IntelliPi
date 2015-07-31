@@ -19,7 +19,6 @@ ifeq ($(ARCH), arm)
 	INCPATH       = -I. \
                 -Iinclude \
                 -I$(STAGING_DIR)/include \
-                -I$(STAGING_DIR)/usr/include/glib-2.0/
 	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
@@ -112,7 +111,7 @@ main.o: src/main.c
 
 mindbx_lib.o: src/mindbx_lib.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c
-	
+
 ####### Install
 
 install:   FORCE
