@@ -11,8 +11,7 @@ CXX           = $(CXX)
 CFLAGS        = -pipe -O2 -Wall -W   $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 CXXFLAGS      =  -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 LINK          = $(CC)
-LFLAGS        =
-CFLAGS        =
+LFLAGS        = 
 
 ifeq ($(ARCH), arm)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
@@ -60,9 +59,11 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = src/main.c \
-				src/mindbx_lib.c
+				src/mindbx_lib.c 
+
 OBJECTS       = src/main.o \
-				src/mindbx_lib.o
+				src/mindbx_lib.o 
+
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = mindbx_testbench
@@ -112,7 +113,7 @@ main.o: src/main.c
 
 mindbx_lib.o: src/mindbx_lib.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c
-
+	
 ####### Install
 
 install:   FORCE
