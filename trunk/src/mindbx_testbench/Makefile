@@ -60,11 +60,9 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = src/main.c \
-				src/mindbx_lib.c \
-				src/app_signal.c
+				src/mindbx_lib.c
 OBJECTS       = src/main.o \
-				src/mindbx_lib.o \
-				src/app_signal.o
+				src/mindbx_lib.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = mindbx_testbench
@@ -114,9 +112,6 @@ main.o: src/main.c
 
 mindbx_lib.o: src/mindbx_lib.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c
-
-app_signal.o: src/app_signal.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o app_signal.o src/app_signal.c 
 	
 ####### Install
 
