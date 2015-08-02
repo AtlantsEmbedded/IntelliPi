@@ -1,5 +1,5 @@
 #############################################################################
-# Makefile for building: MindBX_testbench 
+# Makefile for building: mindbx_testbench 
 #############################################################################
 
 MAKEFILE      = Makefile
@@ -18,7 +18,7 @@ ifeq ($(ARCH), arm)
 	RASPI_DEFINES  =-DRASPI=1
 	INCPATH       = -I. \
                 -Iinclude \
-                -I$(STAGING_DIR)/include \
+                -I$(STAGING_DIR)/include 
 	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
@@ -32,7 +32,7 @@ else
                		-Iinclude
 endif
 
-LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread -lezxml $(ARCH_LIBS)
+LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -60,10 +60,8 @@ OBJECTS_DIR   = ./
 
 SOURCES       = src/main.c \
 				src/mindbx_lib.c 
-
 OBJECTS       = src/main.o \
 				src/mindbx_lib.o 
-
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = mindbx_testbench
@@ -111,9 +109,9 @@ dist:
 main.o: src/main.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o src/main.c
 
-mindbx_lib.o: src/mindbx_lib.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c
-	
+mindbx_lib.o: src/mindbx_lib.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c 
+
 ####### Install
 
 install:   FORCE
