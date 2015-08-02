@@ -39,9 +39,9 @@ define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR)/devLib \
 	LINUX="$(LINUX_DIR)" \
 	CC="$(TARGET_CC)" \
-	CFLAGS="$(TARGET_CFLAGS) -I$(PKG_BUILD_DIR)/bluez" \
+	CFLAGS="$(TARGET_CFLAGS) -I$(PKG_BUILD_DIR)" \
 	STAGING_DIR="$(STAGING_DIR)" \
-	LDFLAGS="$(TARGET_LDFLAGS) -L$(PKG_BUILD_DIR)/bluez -L$(PKG_BUILD_DIR)/devLib -L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib"
+	LDFLAGS="$(TARGET_LDFLAGS) -L$(PKG_BUILD_DIR) -L$(PKG_BUILD_DIR)/devLib -L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib"
 endef
 
 define Package/wiringPi/install
