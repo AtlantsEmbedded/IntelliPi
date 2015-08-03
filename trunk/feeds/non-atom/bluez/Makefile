@@ -25,7 +25,7 @@ define Package/bluez
 	CATEGORY:=Atom-GPL
 	TITLE:=Bluetooth library
 	URL:=http://www.bluez.org/
-	DEPENDS:=+udev +glib2 +dbus +ical +readline
+	DEPENDS:=+udev +glib2 +dbus +ical +readline +systemd
 endef
 
 CONFIGURE_ARGS += \
