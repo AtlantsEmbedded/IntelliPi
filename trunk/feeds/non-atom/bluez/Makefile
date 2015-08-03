@@ -23,7 +23,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/bluez
   SECTION:=libs
   CATEGORY:=Libraries
-  TITLE:=Bluetooth library
+  TITLE:=Bluez-5
   URL:=http://www.bluez.org/
 endef
 
