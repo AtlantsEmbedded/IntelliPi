@@ -17,8 +17,8 @@ define Package/DATA_interface
 	SECTION:=Interfaces
 	CATEGORY:=Atom
 	TITLE:=DATA_interface
-	SUBMENU:=bluetooth
-	DEPENDS:=wiringPi +libpthread +libezxml +glib2 +bluez-libs
+	SUBMENU:=Interfaces
+	DEPENDS:=+wiringPi +libpthread +libezxml +glib2 +bluez
 endef
 
 define Package/DATA_interface/description
