@@ -18,7 +18,7 @@ define Package/DATA_preprocessing
 	CATEGORY:=Atom
 	TITLE:=DATA_preprocessing
 	SUBMENU:=preprocessing
-	DEPENDS:=libpthread +libezxml +glib2
+	DEPENDS:=+libpthread +libezxml +glib2
 endef
 
 define Package/DATA_preprocessing/description
