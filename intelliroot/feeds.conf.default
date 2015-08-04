@@ -14,4 +14,3 @@ src-git oldpackages http://git.openwrt.org/14.07/packages.git
 #src-link custom /usr/src/openwrt/custom-feed
 src-svn nonatom http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/non-atom
 src-svn atom http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/atom
-src-git systemd https://github.com/jdub/openwrt-systemd.git

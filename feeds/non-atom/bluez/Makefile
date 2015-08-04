@@ -8,8 +8,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bluez
-PKG_VERSION:=5.33
-PKG_RELEASE:=5
+PKG_VERSION:=4.101
+PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.kernel.org/pub/linux/bluetooth/
@@ -25,7 +25,7 @@ define Package/bluez
 	CATEGORY:=Atom-GPL
 	TITLE:=Bluetooth library
 	URL:=http://www.bluez.org/
-	DEPENDS:=+udev +glib2 +dbus +ical +readline +systemd
+	DEPENDS:=+udev +glib2 +dbus
 endef
 
 CONFIGURE_ARGS += \
