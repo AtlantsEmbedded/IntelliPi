@@ -21,7 +21,7 @@ PKG_BUILD_DEPENDS:=perl, expat
 
 PKG_SOURCE_DIR:=$(BUILD_DIR)/$(PERL_PACKAGENAME)-$(PKG_VERSION)
 PKG_BUILD_DIR:=$(BUILD_DIR)/perl-xml-parser-$(PKG_VERSION)
-PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/ipkg-install
+PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/dpkg-install
 
 include $(INCLUDE_DIR)/package.mk
 
