@@ -13,7 +13,7 @@ PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.kernel.org/pub/linux/bluetooth/
-PKG_MD5SUM:=e7f479e6820b93a63fef56b560f2d975
+PKG_MD5SUM:=fb42cb7038c380eb0e2fa208987c96ad
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
