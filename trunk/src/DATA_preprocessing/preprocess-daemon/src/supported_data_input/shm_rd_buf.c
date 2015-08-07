@@ -21,6 +21,7 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 
+#include "data_structure.h"
 #include "data_input.h"
 #include "shm_rd_buf.h"
 
@@ -33,8 +34,6 @@ static char* shm_buf; /*pointer to the beginning of the shared buffer*/
 static int semid; /*id of semaphore set*/
 struct sembuf *sops; /* pointer to operations to perform */
 
-static FILE* fp; /*for debug purpose only*/
-
 /**
  * int shm_rd_init(void *param)
  * @brief Setups the shared memory input (memory and semaphores linkage)
@@ -44,16 +43,18 @@ static FILE* fp; /*for debug purpose only*/
  */
 int shm_rd_init(void *param __attribute__ ((unused))){
 	
+	printf("\n**************\nInit SHM Input\n**************\n\n");
+	
     /*
      * initialise the shared memory array
      */
-	printf("\nshmget: setup shared memory space\n");
-    if ((shmid = shmget(SHM_KEY, SHM_BUF_SIZE, 0666)) < 0) {
+	printf("shmget: setup shared memory space\n");
+    if ((shmid = shmget(SHM_KEY, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
         perror("shmget");
         return EXIT_FAILURE;
     }
     else 
-		printf("shmget succeeded\n");
+		printf("shmget succeeded\n\n");
 		
     /*
      * Now we attach it to our data space.
@@ -64,18 +65,18 @@ int shm_rd_init(void *param __attribute__ ((unused))){
         return EXIT_FAILURE;
     }
     else 
-		printf("nshmat succeeded\n");
+		printf("shmat succeeded\n\n");
     
     /*
      * Access the semaphore array.
      */
-    printf("\nsemget: setting up the semaphore array\n");
-	if ((semid = semget(SEM_KEY, NB_SEM, 0666)) == -1) {
+    printf("semget: setting up the semaphore array\n");
+	if ((semid = semget(SEM_KEY, NB_SEM, IPC_CREAT | 0666)) == -1) {
 		perror("semget failed\n");
 		return EXIT_FAILURE;
     } 
     else 
-		printf("semget succeeded\n");
+		printf("semget succeeded\n\n");
 	
 	/*allocate the memory for the pointer to semaphore operations*/
 	sops = (struct sembuf *) malloc(sizeof(struct sembuf));
@@ -89,10 +90,9 @@ int shm_rd_init(void *param __attribute__ ((unused))){
 	sops->sem_op = NB_PAGE; /*increment of the number of pages*/
 	sops->sem_flg = SEM_UNDO | IPC_NOWAIT; /*undo if fails and non-blocking call*/	
 	semop(semid, sops, 1);
-	
-	/*for debug purpose only*/
-	fp = fopen("eeg_data.csv","w");
 
+
+	printf("\n**************\nSuccess\n**************\n\n");
 	return EXIT_SUCCESS;
 }
 
@@ -106,11 +106,12 @@ int shm_rd_init(void *param __attribute__ ((unused))){
  */
 int shm_rd_read_from_buf(void *param){
 	
-	//data_t *data = (data_t *) param;
 	int read_ptr;
 	int i,j;
 	int integer_read;
 	
+	double* data_buf = (double*)((data_t *)param)->ptr;
+					
 	/*check if the page is not opened*/
 	if(!page_opened){
 		/*check if the current page is available (semaphore)*/
@@ -128,20 +129,20 @@ int shm_rd_read_from_buf(void *param){
 	if(page_opened){
 		printf("page opened\n");
 		
-		/*compute the write location*/
+		/*compute the read location*/
 		read_ptr = SHM_PAGE_SIZE*current_page;
 		
 		/*read all data in the page*/
 		for(i=0;i<NB_SAMPLES_PER_PAGE;i++){
 			for(j=0;j<NB_FEATURES;j++){
 				
-				memcpy((void*)&integer_read, (void*)&shm_buf[read_ptr+FEATURE_SIZE*j+i*SAMPLE_SIZE],sizeof(int));
-				fprintf(fp,"%i;",integer_read); /*patch just to see if it works*/
+				/*read and convert*/
+				data_buf[i*NB_FEATURES+j] = (double)shm_buf[read_ptr+FEATURE_SIZE*j+i*SAMPLE_SIZE];
+				
 			}
-			fprintf(fp,"\n"); /*patch just to see if it works*/
 		}
 		
-		/*code that should run once everything is ready*/
+		/*code that should run once everything is ready (not used since conversion embedded in buffer copy)*/
 		//data->type = INT32;
 		//data->nb_data = NB_SAMPLES_PER_PAGE;
 		//memcpy(data->ptr,&shm_buf[read_ptr],sizeof(int)*NB_SAMPLES_PER_PAGE);
@@ -175,9 +176,6 @@ int shm_rd_cleanup(void *param __attribute__ ((unused))){
 	
 	/* Detach the shared memory segment. */
 	shmdt(shm_buf);
-	
-	/*for debug purpose only*/
-	fclose(fp);
 	
 	return EXIT_SUCCESS;
 }

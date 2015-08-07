@@ -16,7 +16,7 @@ GLIB2_CC	  = `pkg-config --cflags glib-2.0`
 GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
 ifeq ($(ARCH), arm)
-	ARCH_LIBS = 
+	ARCH_LIBS = -lwiringPi -lwiringPiDev
 	RASPI_DEFINES  =-DRASPI=1
 	INCPATH       = -I. \
                 -Iinclude \
@@ -63,12 +63,24 @@ OBJECTS_DIR   = ./
 
 SOURCES       = src/main.c \
 				src/data_input.c \
+				src/feature_output.c \
 				src/app_signal.c \
-				src/supported_data_input/shm_rd_buf.c
+				src/preprocess_core.c \
+				src/xml.c \
+				src/supported_data_input/fake_data_generator.c \
+				src/supported_data_input/shm_rd_buf.c \
+				src/supported_feature_output/shm_wrt_buf.c \
+				src/supported_feature_output/csv_file.c
 OBJECTS       = src/main.o \
 				src/data_input.o \
 				src/app_signal.o \
-				src/supported_data_input/shm_rd_buf.o
+				src/feature_output.o \
+				src/preprocess_core.o \
+				src/xml.o \
+				src/supported_data_input/fake_data_generator.o \
+				src/supported_data_input/shm_rd_buf.o \
+				src/supported_feature_output/shm_wrt_buf.o \
+				src/supported_feature_output/csv_file.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = data_preprocessing
@@ -115,15 +127,33 @@ dist:
 
 main.o: src/main.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o src/main.c
-
-shm_rd_buf.o: src/supported_data_input/shm_rd_buf.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o shm_rd_buf.o src/supported_data_input/shm_rd_buf.c
 	
 data_input.o: src/data_input.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o data_input.o src/data_input.c 
 
 app_signal.o: src/app_signal.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o app_signal.o src/app_signal.c 
+	
+feature_output.o: src/feature_output.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o feature_output.o src/feature_output.c 
+	
+preprocess_core.o: src/preprocess_core.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o preprocess_core.o src/preprocess_core.c 
+	
+xml.o: src/xml.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o xml.o src/xml.c 
+	
+shm_rd_buf.o: src/supported_data_input/shm_rd_buf.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o shm_rd_buf.o src/supported_data_input/shm_rd_buf.c
+	
+fake_data_generator.o: src/supported_data_input/fake_data_generator.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o fake_data_generator.o src/supported_data_input/fake_data_generator.c 
+	
+shm_wrt_buf.o: src/supported_feature_output/shm_wrt_buf.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o fake_data_generator.o src/supported_feature_output/shm_wrt_buf.c 
+	
+csv_file.o: src/supported_feature_output/csv_file.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o csv_file.o src/supported_feature_output/csv_file.c 
 	
 ####### Install
 

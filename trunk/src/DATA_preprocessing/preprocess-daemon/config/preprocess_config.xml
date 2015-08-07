@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appConfig>
+  <appAttributes>
+    <debug>TRUE</debug>
+    <data_source>FAKE_DATA</data_source>
+    <nb_channels>4</nb_channels>
+    <buffer_depth>110</buffer_depth>
+    <feature_dest>CSV</feature_dest>
+    <timeseries>FALSE</timeseries>
+    <fft>FALSE</fft>
+    <power_alpha>TRUE</power_alpha>
+    <power_beta>FALSE</power_beta>
+    <power_gamma>FALSE</power_gamma>
+  </appAttributes>
+ </appConfig>
