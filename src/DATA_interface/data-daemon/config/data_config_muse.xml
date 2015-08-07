@@ -2,10 +2,10 @@
 <appConfig>
   <appAttributes>
     <debug>TRUE</debug>
-    <interface>SERIAL</interface>
-    <device>OPENBCI</device>
-    <compression>FALSE</compression>
-    <keep_alive>FALSE</keep_alive>
+    <interface>BLE</interface>
+    <device>MUSE</device>
+    <compression>TRUE</compression>
+    <keep_alive>TRUE</keep_alive>
     <keep_time>9</keep_time>
     <remote_addr>NONE</remote_addr>
     <process_data>FALSE</process_data>
@@ -13,6 +13,6 @@
     <samples>100</samples>
     <number_runs>1</number_runs>
     <conn_attempts>3</conn_attempts>
-    <output_format>csv</output_format>
+    <output_format>shm</output_format>
   </appAttributes>
  </appConfig>
