@@ -3,11 +3,11 @@
   <appAttributes>
     <debug>TRUE</debug>
     <interface>BLE</interface>
-    <device>FAKE_MUSE</device>
+    <device>MUSE</device>
     <compression>TRUE</compression>
     <keep_alive>TRUE</keep_alive>keep_alive>
     <keep_time>9</keep_time>
-    <remote_addr>00:06:66:6C:16:54</remote_addr>
+    <remote_addr>00:06:66:6C:20:1E</remote_addr>
     <process_data>FALSE</process_data>
     <buffer>TRUE</buffer>
     <samples>0</samples>

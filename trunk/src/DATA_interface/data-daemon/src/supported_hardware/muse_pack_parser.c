@@ -20,6 +20,7 @@
 #include "muse_pack_parser.h"
 
 #define MEDIAN_OFFSET 1 /*byte offset of the medians in the compressed packet*/
+#define BITLENGTH_OFFSET 6 /*byte offset of the bit length in the compressed packet*/
 #define DELTAS_OFFSET 8 /*byte offset of the deltas in the compressed packet*/
 
 /*utils to display bits*/
@@ -69,10 +70,13 @@ int preparse_packet(unsigned char* raw_packet_header, int packet_length, int *so
 			/*uncompressed size is 1+(2)+5, the 2 only if flag is true*/
 			case MUSE_UNCOMPRESS_PKT:
 			
-				if(get_flag_value(raw_packet_header[position]))
+				if(get_flag_value(raw_packet_header[position])){
 					position += 8;
-				else
+					printf("Samples were dropped!\n");
+				}
+				else{
 					position += 6;
+				}
 					
 				soft_packet_types[nb_packets] = MUSE_UNCOMPRESS_PKT;
 			break;
@@ -168,12 +172,18 @@ int parse_compressed_packet(unsigned char* packet_header, int* deltas)
 {
 	int medians[4];
 	int quantizations[4];
+	int expected_bits_length = 0;
+	int parsed_bits_length = 0;
 	
 	/*parse out the medians and quantizations*/
 	compressed_parse_medians(&(packet_header[MEDIAN_OFFSET]), quantizations, medians);
-	
+	/*parse out the bitlength*/
+	expected_bits_length = compressed_parse_bit_length(&(packet_header[BITLENGTH_OFFSET]));
 	/*parse out the deltas*/
-	compressed_parse_deltas(&(packet_header[DELTAS_OFFSET]), medians, quantizations, deltas);
+	parsed_bits_length = compressed_parse_deltas(&(packet_header[DELTAS_OFFSET]), medians, quantizations, deltas);
+	
+	if(expected_bits_length!=parsed_bits_length)
+		printf("error, parsing compressed packet\n");
 	
 	return EXIT_SUCCESS;
 }
@@ -211,6 +221,8 @@ void compressed_parse_medians(unsigned char* medians_header, int* quantizations,
 	/*extract fourth median and fourth quantization bits*/
 	medians[3] = (int)((medians_header[3]&0xc0)>>6 | (medians_header[4]&0x0f)<<2);
 	quantizations[3] = (int)(medians_header[4]&0xf0)>>4;
+	
+	printf("%i, %i, %i, %i\n",medians[0],medians[1],medians[2],medians[3]);
 	
 	/*Convert the bit values of the quantizations to integers*/
 	quantizations[0] = compute_quantization(quantizations[0]);
@@ -728,18 +740,24 @@ void parse_uncompressed_packet(unsigned char* values_header, int* values)
 	/*YYYY YYYY*/
 	int i;
 	
+	memset((void*)values,0,sizeof(int)*4);
+		
 	/*For each, mask the necessary bits, shift them in place and OR them into an integer*/
 	values[0] = (int)(((values_header[1]&0x03)<<8)|values_header[0]);
 	values[1] = (int)(((values_header[2]&0x0F)<<6)|((values_header[1]&0xFC)>>2));
 	values[2] = (int)(((values_header[3]&0x3F)<<4)|(values_header[2]&0xF0)>>4);
 	values[3] = (int)((values_header[4]<<2)|((values_header[3]&0xC0)>>6));
 
+#if 0
 	/*check for sign bit (two's complement coding)*/
 	for(i=0;i<4;i++){		
-		if(values[i]&0x0200)
-			values[i] = values[i]|0xFE00;
+		if(values[i]&0x0200){
+			print_int_bits(values[i]);
+			values[i] = values[i]&0x000003FF;
+			//values[i] = values[i]|0xFFFFFC00; // activate for 
+		}
 	}
-	
+#endif	
 }
 
 

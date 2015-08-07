@@ -86,6 +86,8 @@ int muse_translate_pkt(void *param)
 			for(i=0;i<MUSE_NB_CHANNELS;i++){
 				cur_eeg_values[i] = muse_trslt_pkt_ptr->eeg_data[i];
 			}
+			
+			cur_eeg_values[3] = 1; 
 					
 			/*Push the new sample in the output*/
 			COPY_DATA_IN(&data_struct);
@@ -103,6 +105,8 @@ int muse_translate_pkt(void *param)
 				for(j=0;j<MUSE_NB_CHANNELS;j++){
 					cur_eeg_values[j] = cur_eeg_values[j]+muse_trslt_pkt_ptr->eeg_data[delta_offset+j];
 				}
+				
+				cur_eeg_values[3] = 0; 
 				
 				/*Push the new sample in the output*/
 				COPY_DATA_IN(&data_struct);
@@ -178,8 +182,8 @@ int muse_process_pkt(void *param)
 	
 	int nb_bits = 0;
 
-	fprintf(stdout, "Bytes read = %d\n", param_ptr->len);
-	hexdump((unsigned char *)param_ptr->ptr, param_ptr->len);
+	//fprintf(stdout, "Bytes read = %d\n", param_ptr->len);
+	//hexdump((unsigned char *)param_ptr->ptr, param_ptr->len);
 	
 	if (param_ptr->len >= 6) {
 		
@@ -194,7 +198,7 @@ int muse_process_pkt(void *param)
 				case MUSE_UNCOMPRESS_PKT:
 
 					/*Extract EEG values*/
-					parse_uncompressed_packet(&(param_ptr->ptr[soft_packets_headers[i]]), eeg_data_buffer);
+					parse_uncompressed_packet(&(param_ptr->ptr[soft_packets_headers[i]+1]), eeg_data_buffer);
 #if 1					
 						/*Send them to the translator*/
 						param_translate_pkt.type = MUSE_UNCOMPRESS_PKT;

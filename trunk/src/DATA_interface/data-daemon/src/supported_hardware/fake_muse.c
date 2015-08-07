@@ -11,6 +11,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "hardware.h"
 #include "main.h"
@@ -66,6 +67,9 @@ int fake_muse_translate_pkt(void *param)
 	data_struct.type = INT32;
 	data_struct.nb_data = MUSE_NB_CHANNELS;
 	data_struct.ptr = (unsigned char*)cur_eeg_values;
+	
+	
+	printf("check translate pkt\n");
 
 	/*Check the type of eeg samples we are receiving*/
 	switch(muse_trslt_pkt_ptr->type){
@@ -147,6 +151,8 @@ int fake_muse_process_pkt(void *param)
 {
 	int i=0;
 	
+	printf("check process pkt\n");
+	
 	/*This buffer will temporaly keep the decoded eeg data, 
 	  while it is being translated and put in a permanent
 	  container. Make sure the content stays valid until the 
@@ -159,7 +165,8 @@ int fake_muse_process_pkt(void *param)
 	
 	/*fill with random values*/
 	for(i=0;i<MUSE_NB_CHANNELS;i++){
-		eeg_data_buffer[i] = rand();
+		//eeg_data_buffer[i] = rand();
+		eeg_data_buffer[i] = i;
 	}
 	
 	/*one packet*/
@@ -174,9 +181,15 @@ int fake_muse_process_pkt(void *param)
  */
 int fake_muse_read_pkt(void *param __attribute__ ((ubufnused)))
 {
+    struct timespec interpacket_time;
+    
+    interpacket_time.tv_sec = 0;
+    interpacket_time.tv_nsec = 100000000; /*sleep for 4 milliseconds*/
+	
 	do {
 
-		//sleep(0.004);
+		nanosleep(&interpacket_time,NULL);
+		printf("check read pkt %i\n",rand());
 		
 		/*call for packet processing*/
 		PROCESS_PKT_FC(NULL);

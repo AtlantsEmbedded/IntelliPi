@@ -33,6 +33,15 @@ static char* shm_buf; /*pointer to the beginning of the shared buffer*/
 static int semid; /*id of semaphore set*/
 struct sembuf *sops; /* pointer to operations to perform */
 
+/* arg for semctl system calls. */
+union semun {
+		int val;                /* value for SETVAL */
+		struct semid_ds *buf;   /* buffer for IPC_STAT & IPC_SET */
+		ushort *array;          /* array for GETALL & SETALL */
+		struct seminfo *__buf;  /* buffer for IPC_INFO */
+		void *__pad;
+};
+
 /**
  * int shm_wrt_init(void *param)
  * @brief Setups the shared memory output (memory allocation, linking and semaphores)
@@ -41,6 +50,8 @@ struct sembuf *sops; /* pointer to operations to perform */
  */
 int shm_wrt_init(void *param __attribute__ ((unused))){
 	
+	union semun semopts;    
+		        
     /*initialise the shared memory array*/
 	printf("\nshmget: setup shared memory space\n");
     if ((shmid = shmget(SHM_KEY, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
@@ -61,12 +72,16 @@ int shm_wrt_init(void *param __attribute__ ((unused))){
     
     /*Access the semaphore array*/
     printf("\nsemget: setting up the semaphore array\n");
-	if ((semid = semget(SHM_BUF_SIZE, NB_SEM, IPC_CREAT | 0666)) == -1) {
+	if ((semid = semget(SEM_KEY, NB_SEM, IPC_CREAT | 0666)) == -1) {
 		perror("semget failed\n");
 		return EXIT_FAILURE;
     } 
     else 
 		printf("semget succeeded\n");
+
+    semopts.val = 0;
+    semctl( semid, 0, SETVAL, semopts);
+    semctl( semid, 1, SETVAL, semopts);
 	
 	/*allocate the memory for the pointer to semaphore operations*/
 	sops = (struct sembuf *) malloc(sizeof(struct sembuf));
@@ -94,6 +109,9 @@ int shm_wrt_write_in_buf(void *param){
 	data_t *data = (data_t *) param;
 	int write_ptr;
 	
+	
+	printf("check write to shm, before page opened\n");
+	
 	/*check if the page is not opened*/
 	if(!page_opened){
 		/*if not opened*/
@@ -109,6 +127,9 @@ int shm_wrt_write_in_buf(void *param){
 	
 	/*if the page is opened*/
 	if(page_opened){
+		
+		printf("check page opened\n");
+		
 		/*compute the write location*/
 		write_ptr = SHM_PAGE_SIZE*current_page+SAMPLE_SIZE*samples_count;
 		
@@ -129,6 +150,8 @@ int shm_wrt_write_in_buf(void *param){
 		/*check if the page is full*/
 		if(samples_count>NB_SAMPLES_PER_PAGE){
 			
+			printf("sem set\n");
+		
 			/*close the page*/
 			page_opened = 0x00;
 			/*change the page*/
