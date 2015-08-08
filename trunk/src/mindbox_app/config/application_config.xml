@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appConfig>
+  <appAttributes>
+    <debug>TRUE</debug>
+    <feature_source>FAKE_FEATURE</feature_source>
+    <nb_features>4</nb_features>
+    <training_set_size>20</training_set_size>
+  </appAttributes>
+ </appConfig>
