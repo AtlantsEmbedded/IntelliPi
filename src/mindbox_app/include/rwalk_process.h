@@ -16,7 +16,7 @@ int init_rwalk_process(rwalk_options_t options);
 int reset_rwalk_process();
 
 
-int integrate_rwalk_process(double drift_rate);
+char iterate_rwalk_process(double drift_rate);
 
 
 
