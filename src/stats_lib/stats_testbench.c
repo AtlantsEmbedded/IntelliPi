@@ -21,10 +21,12 @@ int main(void) {
 test_randn();
     return 0;
 }
-
+/**
+ * void test_stats()
+ * @brief Utility function to test the functions related to basic operations on matrixes
+*/
 void test_stats(){
 	
-		
 	int DIM_I = 6;
 	int DIM_J=6;
 	double a[36]= {	3.5712, 1.4007, 2.5214,35.7680,12.5698,34.5678,
@@ -33,7 +35,7 @@ void test_stats(){
 					35.7680,64.5638,32.4563,43.2345,21.3456,32.5476,
 					12.5698,4.5645,56.4322,21.3456,78.4356,65.4356,
 					34.5678,56.4523,24.4678,32.5476,65.4356,21.4567
-					};
+				  };
 				
 	double *mean = (double*)calloc(sizeof(double),DIM_J);
 	double *b = (double*)calloc(sizeof(double),(DIM_J*DIM_I));
@@ -69,9 +71,14 @@ void test_stats(){
 	//Shows the mean with the matrix removed	
 	printf("\n Derivation from the mean matrix \n");
 	show_matrix(b,DIM_I,DIM_J);
-	
-	
-	}
+}
+/**
+ * void randn_mtx(double *mtx, int dim_i, int dim_j)
+ * @brief Utility function to test the operations 
+ * related to the generation of random normally
+ * distributed numbers and to write these values
+ * in a text file
+**/
 void test_randn(){
 	int DIM_I = 900;
 	int DIM_J=900;
@@ -82,22 +89,39 @@ void test_randn(){
 	mtx = (double*)calloc(DIM_I*DIM_J,sizeof(double));
 	mean = (double*)calloc(DIM_J,sizeof(double));
 
+	/*Test to generated a normally distributed number*/
 	sample = randn();
 	printf("\n\n%lf\n",sample);
 	
+	/*Test to generate a matrix of normally distributed 
+	 * random numbers*/
 	randn_mtx(mtx,DIM_I,DIM_J);
 	show_matrix(mtx,DIM_I,DIM_J);
 	
+	/*Test to modify the mean and the standard
+	 * deviation of the matrix above*/
 	modify_mean_stddev(mtx,5.0,2.0,DIM_I,DIM_J);
 		
 	printf("\n\n");
 	show_matrix(mtx,DIM_I,DIM_J);
 	
+	/*Test to check if the values are written
+	 * in the text file*/
 	write_data(mtx,DIM_I,DIM_J);
+	
+	/*Test to see if the mean has been correctly
+	 * modified*/
 	stat_mean(mtx,mean,DIM_I,DIM_J);
 	show_matrix(mean,1,DIM_J);
-	}
-
+}
+/**
+ * void write_data(double *mtx, int dim_i, int dim_j)
+ * @brief Utility function to write the values of the matrix
+ * in a text file.
+ * @param mtx, IxJ double array, the matrix containing the values
+ * @param dim_i, the value of I.
+ * @param dim_j, the value of J.
+ */ 
 void write_data(double *mtx,int dim_i,int dim_j){
 	FILE *f_in;
 	int i,j;
@@ -107,9 +131,9 @@ void write_data(double *mtx,int dim_i,int dim_j){
 		for (j=0;j<dim_j;j++){
 			fprintf(f_in,"%lf ",mtx[i*dim_i+j]);
 			
-			}
-		fprintf(f_in,"\n","");
 		}
+		fprintf(f_in,"\n","");
+	}
 		
 	
-	}
+}
