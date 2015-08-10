@@ -12,15 +12,24 @@
 #include <wiringPi.h>
 
 #include "mindbx_lib.h"
+#include "pthread.h"
 
-#define	SOLENOID		0
-#define	LED_STRIP		1
-#define	TEST_BUTTON		2
-#define	COIN_ACCEPTOR	3
+#define	LED_STRIP_RED	0
+#define	LED_STRIP_GREEN	1
+#define	LED_STRIP_BLUE	2
+#define	SOLENOID		3
+#define	COIN_ACCEPTOR	4
+#define	TEST_BUTTON		5
 
-#define FIRST_UNUSED_GPIO 4
+#define FIRST_UNUSED_GPIO 6
 #define TOT_NB_GPIO 8
 
+static char ls_flashing_latch = 0x00; 
+static int ls_flashing_half_period = 0;
+static char ls_flashing_color_on = 0x00;
+static char ls_flashing_color_off = 0x00; 
+
+void* led_strip_flash(void* param);
 
 /**
  * setup_mindbx(void)
@@ -46,14 +55,16 @@ void setup_mindbx(void)
 	  fflush(stdout);
 	  
 	  /*define the pins functions*/
+	  pinMode(LED_STRIP_RED, OUTPUT);
+	  pinMode(LED_STRIP_GREEN, OUTPUT);
+	  pinMode(LED_STRIP_BLUE, OUTPUT);
 	  pinMode(SOLENOID, OUTPUT);
-	  pinMode(LED_STRIP, PWM_OUTPUT);
 	  pinMode(TEST_BUTTON, INPUT);
 	  pinMode(COIN_ACCEPTOR, INPUT);
 	  
 	  /*set default output values*/
 	  digitalWrite (SOLENOID, 0);
-	  set_led_strip_intensity(0);
+	  set_led_strip_color(OFF);
 
 	  /*set other pins as output*/
 	  for (i=FIRST_UNUSED_GPIO ; i<TOT_NB_GPIO ; i++)
@@ -77,7 +88,7 @@ void wait_for_coin_insertion(void)
 	  
 	  /*wait for coin acceptor to be activated*/
 	  while (digitalRead(COIN_ACCEPTOR)==LOW)
-		delay(100);
+		delay(50);
 	  
 	  /*inform user*/
 	  printf("Coin accepted!\n");
@@ -94,23 +105,22 @@ void wait_for_test_button(void)
 	  
 	  /*wait for test button to be activated*/
 	  while (digitalRead(TEST_BUTTON)==LOW)
-		delay(100);
+		delay(50);
 	  
 	  /*inform user*/
 	  printf("Test button pressed!\n");
 }
 
 /**
- * set_led_strip_intensity(void)
+ * set_led_strip_color(void)
  * @brief sets the value of the PWM driving the led strip
  * @param intensity, {0,1024}
  */
-void set_led_strip_intensity(int intensity)
+void set_led_strip_color(char rgb)
 {
-  printf ("Set led PWM to: %i\n",intensity); 
-  fflush (stdout);
-
-  pwmWrite(LED_STRIP, intensity);
+  digitalWrite(LED_STRIP_RED, rgb & RED ? 1 : 0);
+  digitalWrite(LED_STRIP_GREEN, rgb & GREEN ? 1 : 0);
+  digitalWrite(LED_STRIP_BLUE, rgb & BLUE ? 1 : 0);
 }
 
 /**
@@ -122,9 +132,61 @@ void open_door(void)
 
   /*open the door*/
   digitalWrite(SOLENOID, 1);
-  printf ("Door opened!\n") ;
+  printf ("Door opened!\n");
   delay(5000);
   digitalWrite(SOLENOID, 0);
-  printf ("Can close door now\n") ;
+  printf ("Can close door now\n");
 
+}
+
+/**
+ * set_led_strip_flash_state(void)
+ * @brief 
+ * @param 
+ */
+void set_led_strip_flash_state(char rgb_on, char rgb_off, int half_period){
+
+	pthread_t thread;
+	pthread_attr_t attr;
+	
+	ls_flashing_half_period = half_period;
+	ls_flashing_color_on = rgb_on;
+	ls_flashing_color_off = rgb_off;
+	
+	if(!ls_flashing_latch){
+		ls_flashing_latch = 0x01;
+		
+		pthread_attr_init(&attr);
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		pthread_create(&thread, &attr, led_strip_flash, (void*) NULL); 
+		pthread_attr_destroy(&attr);
+	}
+}
+
+/**
+ * set_led_strip_flash_state(void)
+ * @brief 
+ * @param 
+ */
+void* led_strip_flash(void* param){
+
+	printf ("Starts LED flashing\n");
+  
+	while(ls_flashing_latch){ 
+		set_led_strip_color(ls_flashing_color_on); 
+		delay(ls_flashing_half_period);
+		set_led_strip_color(ls_flashing_color_off); 
+		delay(ls_flashing_half_period);
+	}
+	
+	return NULL;
+}
+
+/**
+ * reset_led_strip_flash_state(void)
+ * @brief 
+ */
+void reset_led_strip_flash_state(void){
+	printf ("Stops LED flashing\n");
+	ls_flashing_latch = 0x00;
 }

@@ -18,23 +18,27 @@ int main(int argc, char **argv){
 	/*configure the mind box*/
 	setup_mindbx();
 	
-	/*open the door 5 times*/
+	/*flash the LEDs RED and BLUE*/
+	set_led_strip_flash_state(RED,BLUE,500);
+	
+	/*wait for test button*/
+	wait_for_test_button();
+	
+	/*flash the LEDs GREEN and YELLOW faster*/
+	set_led_strip_flash_state(GREEN,YELLOW,150);
+	
+	/*wait for coin acceptor*/
+	wait_for_coin_insertion();
+	
+	/*turn off led flashing*/
+	reset_led_strip_flash_state();
+
+	/*and open the door 5 times*/
 	for(i=0;i<5;i++){
 		open_door();
 		delay(2000);
 	}
 	
-	/*wait for test button*/
-	wait_for_test_button();
-	
-	/*wait for coin acceptor*/
-	wait_for_coin_insertion();
-	
-	/*play with led strip*/
-	for(i=0;i<1024;i++){
-		set_led_strip_intensity(i);
-		delay(125);
-	}
 	
 	exit(0);
 }
