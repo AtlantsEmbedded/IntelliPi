@@ -13,8 +13,6 @@
  * 9012
  * */
 
-
-
 #ifndef STATS_H
 #define STATS_H
 
@@ -23,12 +21,23 @@
 #include <string.h>
 #include <math.h>
 
-
-double randn();
+/**Calculates the mean of each column of a matrix*/
 void stat_mean(double *a, double *mean, int dim_i, int dim_j);
-void remove_mean_col(double *b, double *a, double *mean, int dim_i, int dim_j);
-void show_matrix(double *A, int dim_i, int dim_j);
-void randn_mtx(double *mtx, int dim_i, int dim_j);
+
+/**Removes the mean from each value depending of their column in the matrix*/
+void remove_mean_col(double *a, double *mean,double *b, int dim_i, int dim_j);
+
+/**Modifies the mean and the standard deviation of each column of a matrix with values
+ * decided by the user.*/
 void modify_mean_stddev(double *mtx,double new_mean,double new_stddev,int dim_i, int dim_j);
+
+/**Generates a normally distributed random number*/
+double randn();
+
+/**Generates a matrix of normally distributed random number*/
+void randn_mtx(double *mtx, int dim_i, int dim_j);
+
+/**Shows the matrix to the user on the screen*/
+void show_matrix(double *A, int dim_i, int dim_j);
 
 #endif
