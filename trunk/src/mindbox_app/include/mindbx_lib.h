@@ -33,7 +33,7 @@ void set_led_strip_color(char rgb);
 /*opens mindbx door*/
 void open_door(void);
 
-/*sets the LED strip to flash between rgb_on and rgb_off, changing every half period*/
+/*sets the LED strip to flash between rgb_on and rgb_off, changing every half period (ms)*/
 void set_led_strip_flash_state(char rgb_on, char rgb_off, int half_period);
 
 /*stops the flashing LED strip*/
