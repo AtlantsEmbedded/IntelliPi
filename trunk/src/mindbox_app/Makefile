@@ -141,8 +141,8 @@ rwalk_process.o: src/rwalk_process.c
 feature_processing.o: src/train_set_acq.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o train_set_acq.o src/feature_processing.c 
 
-features_input.o: src/features_input.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o features_input.o src/features_input.c 
+feature_input.o: src/feature_input.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o feature_input.o src/feature_input.c 
 	
 mindbx_lib.o: src/mindbx_lib.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c 
