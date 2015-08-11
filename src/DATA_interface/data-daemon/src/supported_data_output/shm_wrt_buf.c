@@ -116,7 +116,7 @@ int shm_wrt_write_in_buf(void *param){
 	if(!page_opened){
 		/*if not opened*/
 		/*check if the current page is available (semaphore)*/
-		sops->sem_num = WRITE_READY_SEM; /*sem that indicates that a page is free to write to*/
+		sops->sem_num = PREPROC_IN_READY; /*sem that indicates that a page is free to write to*/
 		sops->sem_op = -1; /*decrement semaphore*/
 		sops->sem_flg = SEM_UNDO | IPC_NOWAIT; /*undo if fails and non-blocking call*/	
 		if(semop(semid, sops, 1) == 0){
@@ -160,7 +160,7 @@ int shm_wrt_write_in_buf(void *param){
 			samples_count = 0; 
 			
 			/*post the semaphore*/
-			sops->sem_num = DATA_SENT_SEM;  /*sem that indicates that a page has been written to*/
+			sops->sem_num = INTERFACE_OUT_READY;  /*sem that indicates that a page has been written to*/
 			sops->sem_op = 1; /*increment semaphore of one*/
 			sops->sem_flg = SEM_UNDO | IPC_NOWAIT; /*undo if fails and non-blocking call*/
 			semop(semid, sops, 1);
