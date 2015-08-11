@@ -31,6 +31,11 @@ typedef struct appconfig_s {
 	/**/
 	int training_set_size;
 	
+	double threshold;
+	double noise_std_dev;
+	double test_duration;
+	double time_period;
+	
 } appconfig_t;
 
 appconfig_t *xml_initialize(char *filename);

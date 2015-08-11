@@ -13,11 +13,11 @@
 
 #define SHM_KEY 7803
 
-#define NB_FEATURES 4 // should be part of app init
-#define FEATURE_SIZE 8 // should be part of app init
-#define FEATURE_VECT_SIZE NB_FEATURES*FEATURE_SIZE // should be part of app init 
-#define BUFFER_DEPTH 25 // should be part of app init
-#define SHM_BUF_SIZE FEATURE_VECT_SIZE*BUFFER_DEPTH // should be part of app init
+#define NB_FEATURES 4
+#define FEATURE_SIZE 8 
+#define SAMPLE_SIZE NB_FEATURES*FEATURE_SIZE 
+#define BUFFER_DEPTH 2 /*nb of samples in the buffer*/
+#define SHM_BUF_SIZE BUFFER_DEPTH*SAMPLE_SIZE
 
 /*this list must be shared between the following processes:
  * - DATA_interface

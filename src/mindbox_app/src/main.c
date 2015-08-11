@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <wiringPi.h>
 
+#include "rwalk_process.h"
 #include "feature_processing.h"
 #include "ipc_status_comm.h"
 #include "feature_input.h"
@@ -23,9 +24,19 @@ appconfig_t* app_config;
 int main(int argc, char **argv){
 	
 	int i;
+	char winner = 0x00;
+	double decision_var_value = 0.0;
+	double threshold = 0.0;
+	char test_running = 0x00;
+	feat_proc_options_t feat_proc_opts;
+	rwalk_options_t rwalk_opts;
+	feature_t feature_vect;
+	double* feature_array;
 	
 	/*read the xml*/
 	app_config = xml_initialize(CONFIG_NAME);
+	
+	threshold = app_config->threshold;
 	
 	/*configure the feature input*/
 	init_feature_input(app_config->feature_source);
@@ -34,69 +45,99 @@ int main(int argc, char **argv){
 	ipc_comm_init();
 	
 	/*configure the mind box*/
-	//setup_mindbx();
+	setup_mindbx();
+	
+	/*set LED strip to pairing mode*/
+	set_led_strip_flash_state(WHITE, OFF, 1);
 	
 	/*if required, wait for eeg hardware to be present*/
 	if(app_config->eeg_hardware_required){
-		/*set the LED signal*/
-		printf("wait for harware\n");
-		//set_led_strip_flash_state(BLUE,OFF,750);
-		/*and wait*/
 		ipc_wait_for_harware();
 	}
+	
+	feat_proc_opts.nb_train_samples = app_config->training_set_size;
+	feat_proc_opts.nb_features = app_config->nb_features;
+	init_feat_processing(feat_proc_opts);
+	
+	rwalk_opts.drift_rate_std = app_config->noise_std_dev;
+	rwalk_opts.dt = app_config->time_period;
+	init_rwalk_process(rwalk_opts);
+	
+	feature_vect.nb_features = app_config->nb_features;
+	feature_vect.ptr = (unsigned char*)malloc(sizeof(double)*feature_vect.nb_features);
+	
+	feature_array = (double*)feature_vect.ptr;
 	
 	/*while application is alive*/
 	while(1){
 	
+		
+		printf("check\n");
+	
+		/*set LED strip to wait mode*/
+		set_led_strip_flash_state(PINK, OFF, 1);
+	
 		/*wait for a coin*/
-		//wait_for_coin_insertion();
+		wait_for_coin_insertion();
 		
-		printf("wait for data in\n");
-	
+		/*set LED strip to train mode*/
+		set_led_strip_flash_state(GREEN, OFF, 1);
+		
+		/*wait 3 seconds*/
+		sleep(3);
+		
 		/*build training set*/
-		READ_FEAT_FC(NULL);
-	
-		sleep(5);
-	
-		/*run the test*/
-	
-	
-		/*apply the result of the test*/
+		train_feat_processing();
 		
+		/*reset random walk process*/
+		reset_rwalk_process();
+	
+		test_running = 0x01;
+		
+		/*set LED strip to test mode*/
+		set_led_strip_flash_state(BLUE, RED, 1);
+
+		/*wait 3 seconds*/
+		sleep(3);
+		
+		/*run the test*/
+		while(test_running){
+		
+			/*get a normalized sample*/
+			get_normalized_sample(&feature_vect);
+			
+			
+			printf("Drift rate:%f\n",feature_array[0]);
+			
+			/*push it to to noisy integrator*/
+			decision_var_value = iterate_rwalk_process(feature_array[0]);
+			
+			printf("DV:%f\n",decision_var_value);
+			
+			/*update flash frequency*/
+			set_led_strip_flash_state(BLUE, RED, ((threshold-decision_var_value)/threshold)*1000);
+		
+			/*check if one of the stop conditions is met*/
+			if(decision_var_value>threshold){
+				test_running = 0x00;
+			}
+		}
+		
+		if(decision_var_value>threshold){
+			/*if we have a winner*/
+			/*open the door*/
+			open_door();
+		}
 		
 	}
 	
-	
+	printf("check\n");
 	
 	ipc_comm_cleanup();
-	
-	
-	
-	
-	
-	/*wait for test button*/
-	wait_for_test_button();
-	
-	/*flash the LEDs GREEN and YELLOW faster*/
-	set_led_strip_flash_state(GREEN,YELLOW,150);
-	
-	/*delay to prevent double detection of test button*/
-	delay(3000);
-	
-	/*wait for coin acceptor*/
-	wait_for_coin_insertion();
-	
-	/*turn off led flashing*/
 	reset_led_strip_flash_state();
-	
-	/*turn off the LED strip*/
 	set_led_strip_color(OFF);
-
-	/*and open the door 5 times*/
-	for(i=0;i<5;i++){
-		open_door();
-		delay(2000);
-	}
+	
+	free(feature_vect.ptr);
 	
 	exit(0);
 }

@@ -6,19 +6,14 @@
 
 typedef struct rwalk_options_s{
 	double drift_rate_std;
-	double decision_threshold;
 	double dt;
 }rwalk_options_t;
 
 int init_rwalk_process(rwalk_options_t options);
 
-
 int reset_rwalk_process();
 
-
-char iterate_rwalk_process(double drift_rate);
-
-
+double iterate_rwalk_process(double drift_rate);
 
 
 #endif

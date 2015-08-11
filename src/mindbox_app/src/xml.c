@@ -19,7 +19,7 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info);
 static int sanity_check_app_attributes(ezxml_t app_attribute);
 
 const char *XML_app_elements[] =
-    { "debug", "feature_source", "nb_features", "training_set_size", "eeg_harware_present"};
+    { "debug", "feature_source", "nb_features", "training_set_size", "eeg_harware_present","threshold","noise_std_dev","test_duration","time_period"};
 
 static appconfig_t *config = NULL;
 
@@ -111,7 +111,36 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 	} else {
 		app_info->eeg_hardware_required = 0;
 	}
+	
+	
+	tmp = ezxml_child(app_attribute, "threshold");
+	if (tmp == NULL) {
+		printf("appAttributes->threshold is missing\n");
+		return (-1);
+	}
+	app_info->threshold = atof(tmp->txt);	
 		
+	tmp = ezxml_child(app_attribute, "noise_std_dev");
+	if (tmp == NULL) {
+		printf("appAttributes->noise_std_dev is missing\n");
+		return (-1);
+	}
+	app_info->noise_std_dev = atof(tmp->txt);
+	
+	tmp = ezxml_child(app_attribute, "test_duration");
+	if (tmp == NULL) {
+		printf("appAttributes->test_duration is missing\n");
+		return (-1);
+	}
+	app_info->test_duration = atof(tmp->txt);
+		
+	tmp = ezxml_child(app_attribute, "time_period");
+	if (tmp == NULL) {
+		printf("appAttributes->time_period is missing\n");
+		return (-1);
+	}
+	app_info->time_period = atof(tmp->txt);
+	
 	return (0);
 }
 

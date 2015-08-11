@@ -4,7 +4,6 @@
 #include "feature_structure.h"
 
 typedef struct feat_proc_options_s{
-	int nb_dropped_samples;
 	int nb_train_samples;
 	int nb_features;
 }feat_proc_options_t; 
