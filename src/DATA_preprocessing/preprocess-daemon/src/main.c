@@ -61,7 +61,7 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	init_preprocess_core(config);
 	
 	/*Begin data processing*/
-	for(i=0;i<10;i++)
+	while(1)
 	{
 		/*read data*/
 		READ_DATA_FC(&data_input);

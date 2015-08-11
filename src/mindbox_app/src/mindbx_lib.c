@@ -86,8 +86,8 @@ void wait_for_coin_insertion(void)
 	  printf("Waiting for a coin... "); 
 	  fflush(stdout);
 	  
-	  /*wait for coin acceptor to be activated*/
-	  while (digitalRead(COIN_ACCEPTOR)==HIGH)
+	  /*wait for coin acceptor or test button to be activated*/
+	  while (digitalRead(COIN_ACCEPTOR)==HIGH && digitalRead(TEST_BUTTON)==HIGH)
 		delay(50);
 	  
 	  /*inform user*/

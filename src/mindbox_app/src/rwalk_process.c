@@ -10,14 +10,19 @@ rwalk_options_t v_options;
 
 int init_rwalk_process(rwalk_options_t options){
 	v_options = options;
+	
+	return EXIT_SUCCESS;
 }
 
 int reset_rwalk_process(){
-	decision_value = 0.0;
+	v_decision_value = 0.0;
+	
+	return EXIT_SUCCESS;
 }
 
-char integrate_rwalk_process(double drift_rate){
+char iterate_rwalk_process(double drift_rate){
 	
+#if 0
 	/*add a step to the decision value by*/
 	/*getting a normaly distributed random number*/
 	/*with average equal to drift rate and deviation*/
@@ -31,6 +36,13 @@ char integrate_rwalk_process(double drift_rate){
 	else
 		/*no, not done yet*/
 		return GOING;
+#endif
+	if(rand()<drift_rate)
+		return DONE;
+	else
+		return GOING;
+		
+	
 }
 
 

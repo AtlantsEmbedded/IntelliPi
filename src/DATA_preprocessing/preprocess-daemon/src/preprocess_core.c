@@ -53,9 +53,11 @@ int cleanup_preprocess_core(){
 
 int preprocess_data(data_t* data_input, data_t* feature_output){
 	
-	int i,j;
+	int i;
 	double* signals_array = (double*)data_input->ptr;
 	double* features_array = (double*)feature_output->ptr;
+	
+	printf("preprocessing a sample\n");
 	
 	/*compute the average of each signal*/
 	stat_mean(signals_array, signals_avg_vector, nb_samples, nb_channels);

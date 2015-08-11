@@ -2,10 +2,10 @@
 <appConfig>
   <appAttributes>
     <debug>TRUE</debug>
-    <data_source>FAKE_DATA</data_source>
+    <data_source>SHM</data_source>
     <nb_channels>4</nb_channels>
     <buffer_depth>110</buffer_depth>
-    <feature_dest>CSV</feature_dest>
+    <feature_dest>SHM</feature_dest>
     <timeseries>FALSE</timeseries>
     <fft>FALSE</fft>
     <power_alpha>TRUE</power_alpha>

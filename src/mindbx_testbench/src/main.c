@@ -32,13 +32,15 @@ int main(int argc, char **argv){
 	
 	/*turn off led flashing*/
 	reset_led_strip_flash_state();
+	
+	/*turn off the LED strip*/
+	set_led_strip_color(OFF);
 
 	/*and open the door 5 times*/
 	for(i=0;i<5;i++){
 		open_door();
 		delay(2000);
 	}
-	
 	
 	exit(0);
 }

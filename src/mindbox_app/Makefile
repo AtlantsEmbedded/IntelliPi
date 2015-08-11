@@ -65,16 +65,20 @@ SOURCES       = src/main.c \
 				src/xml.c \
 				src/app_signal.c \
 				src/rwalk_process.c \
-				src/train_set_acq.c \
+				src/feature_processing.c \
 				src/feature_input.c \
+				src/mindbx_lib.c \
+				src/ipc_status_comm.c \
 				src/supported_feature_input/fake_feature_generator.c \
 				src/supported_feature_input/shm_rd_buf.c
 OBJECTS       = src/main.o \
 				src/xml.o \
 				src/app_signal.o \
 				src/rwalk_process.o \
-				src/train_set_acq.o \
+				src/feature_processing.o \
 				src/feature_input.o \
+				src/mindbx_lib.o \
+				src/ipc_status_comm.o \
 				src/supported_feature_input/fake_feature_generator.o \
 				src/supported_feature_input/shm_rd_buf.o
 DIST          = 
@@ -134,11 +138,17 @@ app_signal.o: src/app_signal.c
 rwalk_process.o: src/rwalk_process.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o rwalk_process.o src/rwalk_process.c
 	
-train_set_acq.o: src/train_set_acq.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o train_set_acq.o src/train_set_acq.c 
+feature_processing.o: src/train_set_acq.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o train_set_acq.o src/feature_processing.c 
 
 features_input.o: src/features_input.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o features_input.o src/features_input.c 
+	
+mindbx_lib.o: src/mindbx_lib.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c 
+
+ipc_status_comm.o: src/ipc_status_comm.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o ipc_status_comm.o src/ipc_status_comm.c 
 	
 fake_feature_generator.o: src/supported_feature_input/fake_feature_generator.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o fake_feature_generator.o src/supported_feature_input/fake_feature_generator.c 
