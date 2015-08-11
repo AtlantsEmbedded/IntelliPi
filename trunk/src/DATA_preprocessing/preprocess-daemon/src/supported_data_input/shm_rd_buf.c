@@ -26,9 +26,7 @@
 #include "shm_rd_buf.h"
 
 static int shmid; /*id of the shared memory array*/
-static int samples_count; /*keeps track of the number of samples that have been written in the page*/
 static int current_page; /*keeps track of the page to be written into*/
-static char page_opened; /*flags indicate if the page is being written into*/
 static char* shm_buf; /*pointer to the beginning of the shared buffer*/
 
 static int semid; /*id of semaphore set*/
@@ -81,16 +79,7 @@ int shm_rd_init(void *param __attribute__ ((unused))){
 	/*allocate the memory for the pointer to semaphore operations*/
 	sops = (struct sembuf *) malloc(sizeof(struct sembuf));
 	
-	samples_count = 0;
 	current_page = 0;
-	page_opened = 0x00;
-
-	/*indicate to the data sender that the buffer is available*/
-	sops->sem_num = WRITE_READY_SEM; /*sem that indicates that a page is free to write to*/
-	sops->sem_op = NB_PAGE; /*increment of the number of pages*/
-	sops->sem_flg = SEM_UNDO | IPC_NOWAIT; /*undo if fails and non-blocking call*/	
-	semop(semid, sops, 1);
-
 
 	printf("\n**************\nSuccess\n**************\n\n");
 	return EXIT_SUCCESS;
@@ -108,61 +97,34 @@ int shm_rd_read_from_buf(void *param){
 	
 	int read_ptr;
 	int i,j;
-	int integer_read;
 	
 	double* data_buf = (double*)((data_t *)param)->ptr;
 					
-	/*check if the page is not opened*/
-	if(!page_opened){
-		/*check if the current page is available (semaphore)*/
-		sops->sem_num = DATA_SENT_SEM; /*sem that indicates that a page is free to write to*/
-		sops->sem_op = -1; /*decrement semaphore*/
-		sops->sem_flg = SEM_UNDO | IPC_NOWAIT; /*undo if fails and non-blocking call*/	
-		
-		if(semop(semid, sops, 1) == 0){
-			/*yes, open the page*/
-			page_opened = 0x01;
-		}
+	/*wait for data to be ready for preprocessing*/
+	sops->sem_num = INTERFACE_OUT_READY; /*sem that indicates that a page is free to write to*/
+	sops->sem_op = -1; /*decrement semaphore*/
+	sops->sem_flg = SEM_UNDO; /*undo if fails and blocking call*/	
+	
+	if(semop(semid, sops, 1) != 0){
+		return EXIT_FAILURE;
 	}
 	
-	/*if the page is opened*/
-	if(page_opened){
-		printf("page opened\n");
-		
-		/*compute the read location*/
-		read_ptr = SHM_PAGE_SIZE*current_page;
-		
-		/*read all data in the page*/
-		for(i=0;i<NB_SAMPLES_PER_PAGE;i++){
-			for(j=0;j<NB_FEATURES;j++){
-				
-				/*read and convert*/
-				data_buf[i*NB_FEATURES+j] = (double)shm_buf[read_ptr+FEATURE_SIZE*j+i*SAMPLE_SIZE];
-				
-			}
-		}
-		
-		/*code that should run once everything is ready (not used since conversion embedded in buffer copy)*/
-		//data->type = INT32;
-		//data->nb_data = NB_SAMPLES_PER_PAGE;
-		//memcpy(data->ptr,&shm_buf[read_ptr],sizeof(int)*NB_SAMPLES_PER_PAGE);
+	/*compute the read location*/
+	read_ptr = SHM_PAGE_SIZE*current_page;
+	
+	/*read all data in the page*/
+	for(i=0;i<NB_SAMPLES_PER_PAGE;i++){
+		for(j=0;j<NB_FEATURES;j++){
 			
-		/*close the page*/
-		page_opened = 0x00;
-		/*change the page*/
-		current_page = (current_page+1)%NB_PAGE;
-		
-		/*post on the semaphore*/
-		sops->sem_num = WRITE_READY_SEM;  /*sem that indicates that a page has been written to*/
-		sops->sem_op = 1; /*increment semaphore of one*/
-		sops->sem_flg = SEM_UNDO | IPC_NOWAIT; /*undo if fails and non-blocking call*/
-		semop(semid, sops, 1);
-		
+			/*read and convert*/
+			data_buf[i*NB_FEATURES+j] = (double)shm_buf[read_ptr+FEATURE_SIZE*j+i*SAMPLE_SIZE];
+			
+		}
 	}
-	else{
-		/*else drop the sample*/
-	}
-	
+			
+	/*change the page*/
+	current_page = (current_page+1)%NB_PAGE;
+		
 	return EXIT_SUCCESS;
 }
 

@@ -103,7 +103,7 @@ int shm_wrt_write_to_buf(void *param){
 		/*yes, write a feature vector:*/
 		
 		/*-compute the write location*/
-		write_ptr = FEATURE_VECT_SIZE*feature_vect_count;
+		write_ptr = SAMPLE_SIZE*feature_vect_count;
 		
 		/*-write data*/
 		memcpy((void*)&(shm_buf[write_ptr]),(void*)data->ptr, data->nb_data*sizeof(double));

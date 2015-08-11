@@ -24,6 +24,7 @@
 #include "hardware.h"
 #include "data_output.h"
 #include "xml.h"
+#include "ipc_status_comm.h"
 #include "debug.h"
 
 #define CONFIG_NAME "config/data_config.xml"
@@ -36,7 +37,7 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 {
 	param_t param_ptr = { 0 };
 	pthread_t readT, writeT;
-	int iret1 __attribute__ ((unused)), iret2 __attribute__ ((unused)), ret = 0, attempts = CONN_ATTEMPTS;
+	int iret1 __attribute__ ((unused)), iret2 __attribute__ ((unused)), ret = 0, attempts = 0;
 
 	// Set up ctrl c signal handler
 	(void)signal(SIGINT, ctrl_c_handler);
@@ -47,6 +48,9 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 		printf("Error initializing XML configuration\n");
 		return (-1);
 	}
+	
+	/*init inter-process status communication channel*/
+	ipc_comm_init();
 
 	/*init the hardware*/
 	if (init_hardware((char *)config->device) < 0) {
@@ -68,14 +72,19 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	
 	printf("Data output initialized\n");
 
-	for (attempts = 0; attempts < config->conn_attempts; attempts++) {
-		printf("Connection attempt: %u\n", attempts + 1);
+	for (;;) {
+		attempts++;
+		printf("Connection attempt: %u\n", attempts);
 		
 		if ((ret = DEVICE_CONNECTION_FC(&param_ptr)) == 0){
 			break;
 		}
 		sleep(1);
 	}
+	
+	/*tell app that hardware is present*/
+	ipc_tell_harware_is_on();
+	
 	if (attempts >= config->conn_attempts) {
 		printf("Unable to connect to the device\n");
 		return (-1);
@@ -99,6 +108,7 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 		printf("Unable to connect to hardware\n");
 	}
 
+	ipc_comm_cleanup();
 	DEVICE_CLEANUP_FC();
 	TERMINATE_DATA_OUTPUT_FC();
 	return 0;

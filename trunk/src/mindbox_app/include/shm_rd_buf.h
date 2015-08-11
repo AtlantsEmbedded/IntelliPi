@@ -15,12 +15,12 @@
  *        dropping newest...
  */
 
-#define SHM_KEY 5678
+#define SHM_KEY 7803
 
 #define NB_FEATURES 4
 #define FEATURE_SIZE 8 
 #define SAMPLE_SIZE NB_FEATURES*FEATURE_SIZE 
-#define BUFFER_DEPTH 10 /*nb of samples in the buffer*/
+#define BUFFER_DEPTH 2 /*nb of samples in the buffer*/
 #define SHM_BUF_SIZE BUFFER_DEPTH*SAMPLE_SIZE
  
 /*this list must be shared between the following processes:
@@ -29,7 +29,7 @@
  * - application software
  */
 #define SEM_KEY 1234 /*key to sem array*/
-#define NB_SEM 6/*2 semaphore, one posted for data avail, one posted for data read*/
+#define NB_SEM 6
 
 #define INTERFACE_OUT_READY 0 //sem posted when interface has written data
 #define PREPROC_IN_READY 1 //sem posted when preprocess ready for new data

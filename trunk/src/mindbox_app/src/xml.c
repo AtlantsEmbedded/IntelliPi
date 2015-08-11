@@ -19,7 +19,7 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info);
 static int sanity_check_app_attributes(ezxml_t app_attribute);
 
 const char *XML_app_elements[] =
-    { "debug", "feature_source", "nb_features", "training_set_size"};
+    { "debug", "feature_source", "nb_features", "training_set_size", "eeg_harware_present"};
 
 static appconfig_t *config = NULL;
 
@@ -93,7 +93,7 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 	}
 	app_info->nb_features = atoi(tmp->txt);
 
-	/*Get appAttributes/data_source*/
+	/*Get appAttributes/training_set_size*/
 	tmp = ezxml_child(app_attribute, "training_set_size");
 	if (tmp == NULL) {
 		printf("appAttributes->training_set_size is missing\n");
@@ -101,6 +101,16 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 	}
 	app_info->training_set_size = atoi(tmp->txt);
 	
+	tmp = ezxml_child(app_attribute, "eeg_harware_present");
+	if (tmp == NULL) {
+		printf("appAttributes->eeg_harware_present is missing\n");
+		return (-1);
+	}
+	if (strncmp(tmp->txt, "TRUE", 4) == 0) {
+		app_info->eeg_hardware_required = 1;
+	} else {
+		app_info->eeg_hardware_required = 0;
+	}
 		
 	return (0);
 }

@@ -25,6 +25,9 @@ typedef struct appconfig_s {
 	char feature_source;
     int nb_features;
 	
+	/*data source config*/
+	char eeg_hardware_required;
+	
 	/**/
 	int training_set_size;
 	
