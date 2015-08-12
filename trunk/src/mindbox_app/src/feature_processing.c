@@ -28,7 +28,7 @@ int init_feat_processing(feat_proc_options_t init_struct){
 	
 	v_feature_vect.ptr = (unsigned char*)malloc(sizeof(double)*v_feat_proc_options.nb_features);
 	v_feature_vect.nb_features = v_feat_proc_options.nb_features;
-	v_feature_array = v_feature_vect.ptr;
+	v_feature_array = (double*)v_feature_vect.ptr;
 	
 	return EXIT_SUCCESS;
 }
@@ -47,6 +47,12 @@ int train_feat_processing(){
 			v_training_set[i*v_feat_proc_options.nb_features+j] = v_feature_array[j];
 		}
 	
+	}
+	for(i=0;i<v_feat_proc_options.nb_train_samples;i++){
+		for(j=0;j<v_feat_proc_options.nb_features;j++){
+			printf("%f",v_training_set[i*v_feat_proc_options.nb_features+j]);
+		}
+		printf("\n");
 	}
 	
 	/*extract the training set parameters:*/
@@ -147,9 +153,13 @@ void stat_std(double *a, double *mean, double *std, int dim_i, int dim_j){
 		}
 	}
 
+	for(j=0;j<dim_j;j++){
+		printf("%i:%f\n",j,std[j]);
+	}
+
 	/*Divide to get average*/
 	for (j=0;j<dim_j;j++){
-		std[j] /= dim_i;
+		std[j] /= (double)dim_i;
 		std[j] = sqrt(std[j]);
 	} 
 }

@@ -53,7 +53,7 @@ int cleanup_preprocess_core(){
 
 int preprocess_data(data_t* data_input, data_t* feature_output){
 	
-	int i;
+	int i,k;
 	double* signals_array = (double*)data_input->ptr;
 	double* features_array = (double*)feature_output->ptr;
 	
@@ -71,11 +71,15 @@ int preprocess_data(data_t* data_input, data_t* feature_output){
 	/*compute abs power-dft for each each channel*/
 	for(i=0;i<nb_channels;i++){
 		/*squared dft values*/
-		abs_powerdft_interval(&(signals_transposed[i*nb_samples]), dft_vector, 110, 9, 12);
+		abs_powerdft_interval(&(signals_transposed[i*nb_samples]), dft_vector, 110, 4, 6);
 		
 		/*average squared dft values and*/
 		/*store in feature vector*/
 		features_array[i] = stat_vect_mean(dft_vector, 3);
+	}
+	
+	for(i=0;i<nb_channels;i++){
+		printf("features_array[i]: %f\n",features_array[i]);
 	}
 	
 	return EXIT_SUCCESS;

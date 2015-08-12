@@ -199,11 +199,11 @@ int muse_process_pkt(void *param)
 
 					/*Extract EEG values*/
 					parse_uncompressed_packet(&(param_ptr->ptr[soft_packets_headers[i]+1]), eeg_data_buffer);
-#if 1					
+					
 						/*Send them to the translator*/
 						param_translate_pkt.type = MUSE_UNCOMPRESS_PKT;
 						TRANS_PKT_FC(&param_translate_pkt);
-#endif
+
 					//printf("got an uncompressed eeg pkt\n");
 				break;
 		
@@ -211,11 +211,11 @@ int muse_process_pkt(void *param)
 
 					/*Extract delta values values*/
 					parse_compressed_packet(&(param_ptr->ptr[soft_packets_headers[i]]), eeg_data_buffer);
-#if 1					
+
 					/*Send them to the translator*/
 					param_translate_pkt.type = MUSE_COMPRESSED_PKT;
 					TRANS_PKT_FC(&param_translate_pkt);
-#endif
+
 					//printf("got a compressed eeg pkt\n");
 				break;
 			}

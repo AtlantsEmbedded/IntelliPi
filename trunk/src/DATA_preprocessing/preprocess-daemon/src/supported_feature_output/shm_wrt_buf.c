@@ -109,7 +109,8 @@ int shm_wrt_write_to_buf(void *param){
 		memcpy((void*)&(shm_buf[write_ptr]),(void*)data->ptr, data->nb_data*sizeof(double));
 		
 		/*-increment count (circular buffer)*/
-		feature_vect_count = (feature_vect_count+data->nb_data)%BUFFER_DEPTH;
+		//feature_vect_count = (feature_vect_count+data->nb_data)%BUFFER_DEPTH;
+		feature_vect_count = 0;
 		
 		/*-post the semaphore*/
 		sops->sem_num = PREPROC_OUT_READY;
