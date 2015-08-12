@@ -2,10 +2,10 @@
 <appConfig>
   <appAttributes>
     <debug>TRUE</debug>
-    <feature_source>FAKE_FEATURE</feature_source>
+    <feature_source>SHM</feature_source>
     <nb_features>4</nb_features>
     <training_set_size>20</training_set_size>
-    <eeg_harware_present>FALSE</eeg_harware_present>
+    <eeg_harware_present>TRUE</eeg_harware_present>
     <threshold>10</threshold>
     <noise_std_dev>1</noise_std_dev>
     <test_duration>15</test_duration>

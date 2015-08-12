@@ -204,7 +204,7 @@ int muse_process_pkt(void *param)
 						param_translate_pkt.type = MUSE_UNCOMPRESS_PKT;
 						TRANS_PKT_FC(&param_translate_pkt);
 #endif
-					printf("got an uncompressed eeg pkt\n");
+					//printf("got an uncompressed eeg pkt\n");
 				break;
 		
 				case MUSE_COMPRESSED_PKT:	
@@ -216,7 +216,7 @@ int muse_process_pkt(void *param)
 					param_translate_pkt.type = MUSE_COMPRESSED_PKT;
 					TRANS_PKT_FC(&param_translate_pkt);
 #endif
-					printf("got a compressed eeg pkt\n");
+					//printf("got a compressed eeg pkt\n");
 				break;
 			}
 			
