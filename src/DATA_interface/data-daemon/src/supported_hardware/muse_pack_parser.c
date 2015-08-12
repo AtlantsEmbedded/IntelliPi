@@ -222,7 +222,7 @@ void compressed_parse_medians(unsigned char* medians_header, int* quantizations,
 	medians[3] = (int)((medians_header[3]&0xc0)>>6 | (medians_header[4]&0x0f)<<2);
 	quantizations[3] = (int)(medians_header[4]&0xf0)>>4;
 	
-	printf("%i, %i, %i, %i\n",medians[0],medians[1],medians[2],medians[3]);
+	//printf("%i, %i, %i, %i\n",medians[0],medians[1],medians[2],medians[3]);
 	
 	/*Convert the bit values of the quantizations to integers*/
 	quantizations[0] = compute_quantization(quantizations[0]);

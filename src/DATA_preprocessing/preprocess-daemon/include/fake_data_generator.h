@@ -11,7 +11,8 @@
 #include "data_input.h"
 
 #define NB_CHANNELS 4 
-#define NB_SAMPLES 110 /*nb of samples per page*/
+#define NB_SAMPLES 110
+#define SAMPLING_FREQ 2200
 
 int fake_data_gen_init();
 

@@ -40,6 +40,8 @@ struct sembuf *sops; /* pointer to operations to perform */
  */
 int shm_rd_init(void *param __attribute__ ((unused))){
 	
+	int i;
+	
 	printf("\n**************\nInit SHM Input\n**************\n\n");
 	
     /*
@@ -78,6 +80,10 @@ int shm_rd_init(void *param __attribute__ ((unused))){
 	/*allocate the memory for the pointer to semaphore operations*/
 	sops = (struct sembuf *) malloc(sizeof(struct sembuf));
 
+	for(i=0;i<4;i++){
+		semctl(semid, i, SETVAL, 0);
+	}
+
 	printf("\n**************\nSuccess\n**************\n\n");
 	return EXIT_SUCCESS;
 }
@@ -91,6 +97,9 @@ int shm_rd_init(void *param __attribute__ ((unused))){
  * @return EXIT_FAILURE for unknown type, EXIT_SUCCESS for known/success
  */
 int shm_rd_read_from_buf(void *param){
+	
+	int read_ptr;
+	double* data_buf = (double*)((feature_t *)param)->ptr;
 	
 	/*open the buffer string*/
 	/*preprocessing opened*/
@@ -113,6 +122,12 @@ int shm_rd_read_from_buf(void *param){
 		return EXIT_FAILURE;
 	}
 	
+	
+	/*compute the read location*/
+	read_ptr = 0;
+	
+	memcpy(data_buf,(void*)&(shm_buf[read_ptr]), 4*sizeof(double));
+		
 	/*copy them in the buffer*/
 	printf("sample received\n");
 	

@@ -6,7 +6,7 @@
     <nb_features>4</nb_features>
     <training_set_size>20</training_set_size>
     <eeg_harware_present>TRUE</eeg_harware_present>
-    <threshold>10</threshold>
+    <threshold>4</threshold>
     <noise_std_dev>1</noise_std_dev>
     <test_duration>15</test_duration>
     <time_period>0.5</time_period>

@@ -124,10 +124,10 @@ int main(int argc, char **argv){
 			get_normalized_sample(&feature_vect);
 			
 			
-			printf("Drift rate:%f\n",feature_array[0]);
+			printf("Drift rate:%f\n",feature_array[1]);
 			
 			/*push it to to noisy integrator*/
-			decision_var_value = iterate_rwalk_process(feature_array[0]);
+			decision_var_value = iterate_rwalk_process(feature_array[1]);
 			
 			printf("DV:%f\n",decision_var_value);
 			

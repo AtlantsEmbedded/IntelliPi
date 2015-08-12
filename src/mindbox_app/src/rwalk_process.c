@@ -37,7 +37,12 @@ double iterate_rwalk_process(double drift_rate){
 	
 	printf("v_decision_value:%f\n",v_decision_value);
 	
-	sleep(1);
+	//sleep(1);
+	
+	if(v_decision_value<0.0){
+		v_decision_value = 0;
+	}
+	
 	return v_decision_value;		
 	
 }

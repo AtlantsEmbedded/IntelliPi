@@ -25,8 +25,10 @@ int fake_data_gen_get_sample(void *param){
 	for(i=0;i<NB_SAMPLES;i++){
 		for(j=0;j<NB_CHANNELS;j++){
 			/*read and convert*/;
-			data_buf[i*NB_CHANNELS+j] = (0.5*(double)rand()/((double)RAND_MAX)+0.5)*sin(2*M_PI*10*i/NB_SAMPLES)+
-										(0.5*(double)rand()/((double)RAND_MAX)+0.5)*sin(2*M_PI*22*i/NB_SAMPLES);
+			data_buf[i*NB_CHANNELS+j] = (0.5*(double)rand()/((double)RAND_MAX)+0.5)*sin(2*M_PI*100*i/SAMPLING_FREQ);
+			
+			//+
+			//							(0.5*(double)rand()/((double)RAND_MAX)+0.5)*sin(2*M_PI*0*i/SAMPLING_FREQ);
 		}
 	}
 	
