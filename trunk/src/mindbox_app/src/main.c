@@ -18,6 +18,23 @@ appconfig_t* app_config;
 #define CONFIG_NAME "config/application_config.xml"
 
 /**
+ * which_config(int argc, char **argv)
+ * @brief return which config to use
+ * @param argc
+ * @param argv
+ * @return string of config
+ */
+inline char *which_config(int argc, char **argv)
+{
+
+	if (argc == 2) {
+		return argv[1];
+	} else {
+		return CONFIG_NAME;
+	}
+}
+
+/**
  * main(int argc, char **argv)
  * @brief test the mindbx_lib
  */
@@ -34,7 +51,7 @@ int main(int argc, char **argv){
 	double* feature_array;
 	
 	/*read the xml*/
-	app_config = xml_initialize(CONFIG_NAME);
+	app_config = xml_initialize(which_config(argc, argv));
 	
 	threshold = app_config->threshold;
 	
@@ -48,7 +65,7 @@ int main(int argc, char **argv){
 	setup_mindbx();
 	
 	/*set LED strip to pairing mode*/
-	set_led_strip_flash_state(WHITE, OFF, 1);
+	set_led_strip_flash_state(WHITE, OFF, 1000);
 	
 	/*if required, wait for eeg hardware to be present*/
 	if(app_config->eeg_hardware_required){
@@ -75,13 +92,13 @@ int main(int argc, char **argv){
 		printf("check\n");
 	
 		/*set LED strip to wait mode*/
-		set_led_strip_flash_state(PINK, OFF, 1);
+		set_led_strip_flash_state(PINK, OFF, 1000);
 	
 		/*wait for a coin*/
 		wait_for_coin_insertion();
 		
 		/*set LED strip to train mode*/
-		set_led_strip_flash_state(GREEN, OFF, 1);
+		set_led_strip_flash_state(GREEN, OFF, 1000);
 		
 		/*wait 3 seconds*/
 		sleep(3);
@@ -95,7 +112,7 @@ int main(int argc, char **argv){
 		test_running = 0x01;
 		
 		/*set LED strip to test mode*/
-		set_led_strip_flash_state(BLUE, RED, 1);
+		set_led_strip_flash_state(BLUE, RED, 1000);
 
 		/*wait 3 seconds*/
 		sleep(3);

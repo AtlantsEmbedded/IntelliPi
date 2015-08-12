@@ -24,6 +24,24 @@ static data_t feature_output;
 void init_app_buffers(appconfig_t *config);
 void cleanup_app_buffers(appconfig_t *config);
 
+
+/**
+ * which_config(int argc, char **argv)
+ * @brief return which config to use
+ * @param argc
+ * @param argv
+ * @return string of config
+ */
+inline char *which_config(int argc, char **argv)
+{
+
+	if (argc == 2) {
+		return argv[1];
+	} else {
+		return CONFIG_NAME;
+	}
+}
+
 /**
  * main()
  * @brief Application main running loop
@@ -36,7 +54,7 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	(void)signal(SIGINT, ctrl_c_handler);
 
 	/*read the config from the xml*/
-	appconfig_t *config = (appconfig_t *) xml_initialize(CONFIG_NAME);
+	appconfig_t *config = (appconfig_t *) xml_initialize(which_config(argc, argv));
 	if (config == NULL) {
 		printf("Error initializing XML configuration\n");
 		return (-1);
