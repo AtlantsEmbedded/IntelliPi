@@ -18,7 +18,7 @@ define Package/mindbx_app
 	CATEGORY:=Atom
 	TITLE:=mindbx_app
 	SUBMENU:=Interfaces
-	DEPENDS:=wiringPi +libpthread +libezxml
+	DEPENDS:=wiringPi +libpthread +libezxml +glib2
 endef
 
 define Package/mindbx_app/description
