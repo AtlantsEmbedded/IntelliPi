@@ -10,9 +10,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <wiringPi.h>
+#include <pthread.h>
 
 #include "mindbx_lib.h"
-#include "pthread.h"
 
 #define	LED_STRIP_RED	0
 #define	LED_STRIP_GREEN	1

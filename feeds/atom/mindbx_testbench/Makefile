@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mindbx_testbench
-PKG_VERSION:=2015-1-08
+PKG_VERSION:=2015-08-16
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
 PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/mindbx_testbench
