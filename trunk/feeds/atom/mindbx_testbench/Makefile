@@ -18,7 +18,7 @@ define Package/mindbx_testbench
 	CATEGORY:=Atom
 	TITLE:=mindbx_testbench
 	SUBMENU:=Interfaces
-	DEPENDS:=wiringPi +libpthread +lrt
+	DEPENDS:=wiringPi +libpthread +librt
 endef
 
 define Package/mindbx_testbench/description
