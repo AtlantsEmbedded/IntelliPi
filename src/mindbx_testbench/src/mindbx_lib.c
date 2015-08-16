@@ -63,14 +63,14 @@ void setup_mindbx(void)
 	  pinMode(COIN_ACCEPTOR, INPUT);
 	  
 	  /*set default output values*/
-	  digitalWrite (SOLENOID, 0);
+	  digitalWrite (SOLENOID, LOW);
 	  set_led_strip_color(OFF);
 
 	  /*set other pins as output*/
 	  for (i=FIRST_UNUSED_GPIO ; i<TOT_NB_GPIO ; i++)
 	  {
 			pinMode (i, OUTPUT);
-			digitalWrite (i, 0);
+			digitalWrite (i, LOW);
 	  }
 
 	  /*inform user*/
@@ -118,9 +118,9 @@ void wait_for_test_button(void)
  */
 void set_led_strip_color(char rgb)
 {
-  digitalWrite(LED_STRIP_RED, rgb & RED ? 1 : 0);
-  digitalWrite(LED_STRIP_GREEN, rgb & GREEN ? 1 : 0);
-  digitalWrite(LED_STRIP_BLUE, rgb & BLUE ? 1 : 0);
+  digitalWrite(LED_STRIP_RED, rgb & RED ? HIGH : LOW);
+  digitalWrite(LED_STRIP_GREEN, rgb & GREEN ? HIGH : LOW);
+  digitalWrite(LED_STRIP_BLUE, rgb & BLUE ? HIGH : LOW);
 }
 
 /**
@@ -131,10 +131,10 @@ void open_door(void)
 {
 
   /*open the door*/
-  digitalWrite(SOLENOID, 1);
+  digitalWrite(SOLENOID, HIGH);
   printf ("Door opened!\n");
   delay(5000);
-  digitalWrite(SOLENOID, 0);
+  digitalWrite(SOLENOID, LOW);
   printf ("Can close door now\n");
 
 }
