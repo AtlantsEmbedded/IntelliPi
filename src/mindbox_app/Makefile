@@ -12,8 +12,6 @@ CFLAGS        = -pipe -O2 -Wall -W   $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 CXXFLAGS      =  -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 LINK          = $(CC)
 LFLAGS        = 
-GLIB2_CC	  = `pkg-config --cflags glib-2.0`
-GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
 ifeq ($(ARCH), arm)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
@@ -21,7 +19,6 @@ ifeq ($(ARCH), arm)
 	INCPATH       = -I. \
                 -Iinclude \
                 -I$(STAGING_DIR)/include \
-                -I$(STAGING_DIR)/usr/include/glib-2.0/
 	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
@@ -35,7 +32,7 @@ else
                		-Iinclude
 endif
 
-LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
+LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread -lezxml $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf

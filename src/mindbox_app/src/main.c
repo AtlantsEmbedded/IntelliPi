@@ -14,8 +14,9 @@
 
 appconfig_t* app_config;
 
-
 #define CONFIG_NAME "config/application_config.xml"
+
+void run_testbench();
 
 /**
  * which_config(int argc, char **argv)
@@ -40,8 +41,6 @@ inline char *which_config(int argc, char **argv)
  */
 int main(int argc, char **argv){
 	
-	int i;
-	char winner = 0x00;
 	double decision_var_value = 0.0;
 	double threshold = 0.0;
 	char test_running = 0x00;
@@ -53,16 +52,17 @@ int main(int argc, char **argv){
 	/*read the xml*/
 	app_config = xml_initialize(which_config(argc, argv));
 	
-	threshold = app_config->threshold;
+	/*configure the mind box*/
+	setup_mindbx();
+	
+	/*run test over gpios*/
+	run_testbench();
 	
 	/*configure the feature input*/
 	init_feature_input(app_config->feature_source);
 	
 	/*configure the inter-process communication channel*/
 	ipc_comm_init();
-	
-	/*configure the mind box*/
-	setup_mindbx();
 	
 	/*set LED strip to pairing mode*/
 	set_led_strip_flash_state(WHITE, OFF, 1000);
@@ -80,6 +80,7 @@ int main(int argc, char **argv){
 	rwalk_opts.dt = app_config->time_period;
 	init_rwalk_process(rwalk_opts);
 	
+	threshold = app_config->threshold;
 	feature_vect.nb_features = app_config->nb_features;
 	feature_vect.ptr = (unsigned char*)malloc(sizeof(double)*feature_vect.nb_features);
 	
@@ -157,4 +158,38 @@ int main(int argc, char **argv){
 	free(feature_vect.ptr);
 	
 	exit(0);
+}
+
+
+
+
+void run_testbench(){
+
+	int i;
+	
+	/*flash the LEDs RED and BLUE*/
+	set_led_strip_flash_state(RED,BLUE,500);
+	
+	/*wait for test button*/
+	wait_for_test_button();
+	
+	/*flash the LEDs GREEN and YELLOW faster*/
+	set_led_strip_flash_state(GREEN,YELLOW,150);
+	
+	/*wait for coin acceptor*/
+	wait_for_coin_insertion();
+	
+	/*turn off led flashing*/
+	reset_led_strip_flash_state();
+	
+	/*turn off the LED strip*/
+	set_led_strip_color(OFF);
+
+	/*and open the door 5 times*/
+	for(i=0;i<5;i++){
+		open_door();
+		delay(2000);
+	}	
+	
+	printf("GPIO test over");
 }

@@ -10,9 +10,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <wiringPi.h>
+#include <pthread.h>
 
 #include "mindbx_lib.h"
-#include "pthread.h"
 
 #define	LED_STRIP_RED	0
 #define	LED_STRIP_GREEN	1
@@ -168,7 +168,7 @@ void set_led_strip_flash_state(char rgb_on, char rgb_off, int half_period){
  * @brief 
  * @param 
  */
-void* led_strip_flash(void* param){
+void* led_strip_flash(void* param __attribute__ ((unused))){
 
 	printf ("Starts LED flashing\n");
   
