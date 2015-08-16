@@ -19,7 +19,7 @@ int fake_feat_gen_init(){
 
 int fake_feat_gen_get_sample(void *param){
 	
-	int i,j;
+	int i;
 	/*fill in the buffer with a fake signal*/
 	double* feat_buf = (double*)((feature_t *)param)->ptr;
 	
