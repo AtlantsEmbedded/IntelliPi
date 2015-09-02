@@ -1,5 +1,5 @@
 #############################################################################
-# Makefile for building: wiringpi_testbench
+# Makefile for building: MindBX_testbench 
 #############################################################################
 
 MAKEFILE      = Makefile
@@ -8,39 +8,31 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = $(CXX)
-CFLAGS        = -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CFLAGS        = -pipe -O2 -Wall -W   $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 CXXFLAGS      =  -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 LINK          = $(CC)
 LFLAGS        = 
-GLIB2_CC	  = `pkg-config --cflags glib-2.0`
-GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
 ifeq ($(ARCH), arm)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
 	RASPI_DEFINES  =-DRASPI=1
 	INCPATH       = -I. \
                 -Iinclude \
-                -I$(STAGING_DIR)/include \
-                -I$(STAGING_DIR)/usr/include/glib-2.0/
+                -I$(STAGING_DIR)/include
+	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
-	X86_DEFINES   =-DX86=1
+	X86_DEFINES   =-DX86=1 -g
 	INCPATH       = -I. \
-               		 -Iinclude \
-               		 -I/usr/include/glib-2.0 \
-               		 -I/usr/lib/glib-2.0/include
-	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(GLIB2_CC)
+               		-Iinclude
 else 
 	ARCH_LIBS 	  =
 	X86_DEFINES   =-DX86=1 -g
 	INCPATH       = -I. \
-               		-Iinclude \
-               		-I/usr/include/glib-2.0 \
-               		-I/usr/lib/glib-2.0/include
-	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(GLIB2_CC)
+               		-Iinclude
 endif
 
-LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
+LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -66,11 +58,15 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = src/main.c
-OBJECTS       = src/main.o
-DIST          = src/main.c
+SOURCES       = src/main.c \
+				src/mindbx_lib.c 
+
+OBJECTS       = src/main.o \
+				src/mindbx_lib.o 
+
+DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = wiringpi_testbench
+TARGET        = mindbx_testbench
 
 
 first: all
@@ -105,10 +101,9 @@ compile: Makefile $(TARGET)
 
 $(TARGET):  $(OBJECTS)
 	@echo "\nLinking----------------------------------------------\n"
-	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(GLIB2_LINK)
+	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
-dist: 
-
+dist:
 
 
 ####### Compile
@@ -116,10 +111,17 @@ dist:
 main.o: src/main.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o src/main.c
 
+mindbx_lib.o: src/mindbx_lib.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c
+	
 ####### Install
 
 install:   FORCE
 
 uninstall:   FORCE
+
+clean:
+	find . -name "*.o" -type f -delete
+	rm $(TARGET)
 
 FORCE:
