@@ -66,7 +66,7 @@ OBJECTS       = src/main.o \
 
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = mindbx_testbench
+TARGET        = wiringpi_testbench
 
 
 first: all
