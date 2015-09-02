@@ -16,7 +16,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/wiringpi_testbench
 	SECTION:=Interfaces
 	CATEGORY:=Atom
-	TITLE:=GPIO_interface
+	TITLE:=wiringpi_testbench
 	SUBMENU:=Interfaces
 	DEPENDS:=wiringPi +libpthread +libezxml +glib2
 endef

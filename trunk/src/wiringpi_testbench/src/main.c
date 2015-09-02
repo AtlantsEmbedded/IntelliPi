@@ -12,10 +12,10 @@
 #include <ctype.h>
 
 #ifdef RASPI
-#include <wiringPi.h>
-#include <mcp23017.h>
-#include <softTone.h>
-#include <lcd.h>
+	#include <wiringPi.h>
+	#include <mcp23017.h>
+	#include <softTone.h>
+	#include <lcd.h>
 #endif
 
 /**
@@ -27,7 +27,6 @@
  */
 int main(int argc, char **argv)
 {
-
 
 	wiringPiSetup();
 
