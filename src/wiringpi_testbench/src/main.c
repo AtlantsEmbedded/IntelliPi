@@ -5,7 +5,18 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
+#include <stdint.h>
+#include <ctype.h>
+
+#ifdef RASPI
 #include <wiringPi.h>
+#include <mcp23017.h>
+#include <softTone.h>
+#include <lcd.h>
+#endif
 
 /**
  * main(int argc, char **argv)
