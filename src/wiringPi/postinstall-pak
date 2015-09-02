@@ -1,0 +1,7 @@
+#!/bin/bash
+echo
+echo "WiringPi for C1 is now installed"
+echo "Please check the wiki: http://odroid.com/dokuwiki/doku.php?id=en:odroid-c1"
+echo "For extra references:"
+echo "Github: https://github.com/hardkernel/wiringPi"
+echo "Examples folder is copied to /usr/share/wiringPi/examples"

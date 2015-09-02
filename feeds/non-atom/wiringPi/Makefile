@@ -1,15 +1,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiringPi
-PKG_VERSION:=2014-26-14
+PKG_VERSION:=2015-09-01
 PKG_RELEASE:=1
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=git://github.com/hardkernel/wiringPi
+PKG_SOURCE_PROTO:=svn
+PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/wiringPi
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -25,10 +25,6 @@ define Package/wiringPi/description
 	C GPIO libraries for the RPI
 endef
 
-define Build/Prepare
-	git clone $(PKG_SOURCE_URL) $(PKG_BUILD_DIR)
-	$(call Build/Prepare/Default,)
-endef
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR)/wiringPi \
