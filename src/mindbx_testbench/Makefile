@@ -1,38 +1,38 @@
 #############################################################################
-# Makefile for building: MindBX_testbench 
+# Makefile for building: gpio_menu
 #############################################################################
 
 MAKEFILE      = Makefile
 
 ####### Compiler, tools and options
 
-CC            = gcc
+CC            = $(CC)
 CXX           = $(CXX)
-CFLAGS        = -pipe -O2 -Wall -W   $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
-CXXFLAGS      =  -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+CXXFLAGS      =  -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 LINK          = $(CC)
 LFLAGS        = 
+GLIB2_CC	  = `pkg-config --cflags glib-2.0`
+GLIB2_LINK	  = `pkg-config --libs glib-2.0`
 
 ifeq ($(ARCH), arm)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
 	RASPI_DEFINES  =-DRASPI=1
 	INCPATH       = -I. \
                 -Iinclude \
-                -I$(STAGING_DIR)/include
-	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
+                -I$(STAGING_DIR)/include \
+                -I$(STAGING_DIR)/usr/include/glib-2.0/
+	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT -fPIE  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
-	X86_DEFINES   =-DX86=1 -g
+	X86_DEFINES   =-DX86=1
 	INCPATH       = -I. \
-               		-Iinclude
+               		 -Iinclude \
 else 
 	ARCH_LIBS 	  =
-	X86_DEFINES   =-DX86=1 -g
-	INCPATH       = -I. \
-               		-Iinclude
 endif
 
-LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread $(ARCH_LIBS)
+LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -59,14 +59,31 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = src/main.c \
-				src/mindbx_lib.c 
-
+				src/xml.c \
+				src/user_input.c \
+				src/menu_structure.c \
+				src/menu_item.c \
+				src/event.c \
+				src/socket.c \
+				src/hardware.c
 OBJECTS       = src/main.o \
-				src/mindbx_lib.o 
-
-DIST          = 
+				src/xml.o \
+				src/user_input.o \
+				src/menu_structure.o \
+				src/menu_item.o  \
+				src/event.o \
+				src/socket.o \
+				src/hardware.o
+DIST          = src/main.c \
+				src/xml.c \
+				src/user_input.c \
+				src/menu_structure.c \
+				src/menu_item.c \
+				src/event.c \
+				src/socket.c \
+				src/hardware.c
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = mindbx_testbench
+TARGET        = gpio_interface
 
 
 first: all
@@ -101,9 +118,10 @@ compile: Makefile $(TARGET)
 
 $(TARGET):  $(OBJECTS)
 	@echo "\nLinking----------------------------------------------\n"
-	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
+	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(GLIB2_LINK)
 
-dist:
+dist: 
+
 
 
 ####### Compile
@@ -111,17 +129,31 @@ dist:
 main.o: src/main.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o src/main.c
 
-mindbx_lib.o: src/mindbx_lib.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o mindbx_lib.o src/mindbx_lib.c
+xml.o: src/xml.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o xml.o src/xml.c 
+
+user_input.o: src/user_input.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o user_input.o src/user_input.c 
 	
+menu_structure.o: src/menu_structure.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o menu_structure.o src/menu_structure.c 
+	
+menu_item.o: src/menu_item.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o menu_item.o src/menu_item.c 
+	
+socket.o: src/socket.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o socket.o src/socket.c 
+	
+event.o: src/event.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o event.o src/event.c 
+	
+hardware.o: src/hardware.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o hardware.o src/hardware.c 
+
 ####### Install
 
 install:   FORCE
 
 uninstall:   FORCE
-
-clean:
-	find . -name "*.o" -type f -delete
-	rm $(TARGET)
 
 FORCE:

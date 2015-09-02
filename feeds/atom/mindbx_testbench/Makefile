@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mindbx_testbench
-PKG_VERSION:=2015-08-16a
+PKG_VERSION:=2015-09-01
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
 PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/mindbx_testbench
@@ -18,7 +18,7 @@ define Package/mindbx_testbench
 	CATEGORY:=Atom
 	TITLE:=mindbx_testbench
 	SUBMENU:=Interfaces
-	DEPENDS:=wiringPi +libpthread +librt
+	DEPENDS:=wiringPi +libpthread
 endef
 
 define Package/mindbx_testbench/description
