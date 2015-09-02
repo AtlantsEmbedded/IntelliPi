@@ -28,7 +28,7 @@ endef
 define Package/wiringpi_testbench/install
 	$(INSTALL_DIR) $(1)/atom
 	$(INSTALL_DIR) $(1)/atom/gpio
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/gpio-daemon/wiringpi_testbench $(1)/atom/gpio
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wiringpi_testbench $(1)/atom/gpio
 endef
 
 $(eval $(call BuildPackage,wiringpi_testbench))
