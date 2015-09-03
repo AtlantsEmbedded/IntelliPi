@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <wiringPi.h>
 
 #include "mindbx_lib.h"
 
@@ -18,28 +17,22 @@ int main(int argc, char **argv){
 	/*configure the mind box*/
 	setup_mindbx();
 	
-	/*flash the LEDs RED and BLUE*/
-	set_led_strip_flash_state(RED,BLUE,500);
+	/*open the door 5 times*/
+	for(i=0;i<5;i++){
+		open_door();
+		delay(2000);
+	}
 	
 	/*wait for test button*/
 	wait_for_test_button();
 	
-	/*flash the LEDs GREEN and YELLOW faster*/
-	set_led_strip_flash_state(GREEN,YELLOW,150);
-	
 	/*wait for coin acceptor*/
 	wait_for_coin_insertion();
 	
-	/*turn off led flashing*/
-	reset_led_strip_flash_state();
-	
-	/*turn off the LED strip*/
-	set_led_strip_color(OFF);
-
-	/*and open the door 5 times*/
-	for(i=0;i<5;i++){
-		open_door();
-		delay(2000);
+	/*play with led strip*/
+	for(i=0;i<1024;i++){
+		set_led_strip_intensity(i);
+		delay(125);
 	}
 	
 	exit(0);

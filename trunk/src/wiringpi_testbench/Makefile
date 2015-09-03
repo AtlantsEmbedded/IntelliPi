@@ -6,7 +6,7 @@ MAKEFILE      = Makefile
 
 ####### Compiler, tools and options
 
-CC            = $(CC)
+CC            = gcc
 CXX           = $(CXX)
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 CXXFLAGS      =  -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
@@ -22,14 +22,22 @@ ifeq ($(ARCH), arm)
                 -Iinclude \
                 -I$(STAGING_DIR)/include \
                 -I$(STAGING_DIR)/usr/include/glib-2.0/
-	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
 	X86_DEFINES   =-DX86=1
 	INCPATH       = -I. \
                		 -Iinclude \
+               		 -I/usr/include/glib-2.0 \
+               		 -I/usr/lib/glib-2.0/include
+	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT -fPIE  $(DEFINES) $(X86_DEFINES) $(GLIB2_CC)
 else 
 	ARCH_LIBS 	  =
+	X86_DEFINES   =-DX86=1 -g
+	INCPATH       = -I. \
+               		-Iinclude \
+               		-I/usr/include/glib-2.0 \
+               		-I/usr/lib/glib-2.0/include
+	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W -D_REENTRANT -fPIE  $(DEFINES) $(X86_DEFINES) $(GLIB2_CC)
 endif
 
 LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
@@ -59,11 +67,8 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = src/main.c
-
 OBJECTS       = src/main.o
-
 DIST          = src/main.c
-
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = wiringpi_testbench
 

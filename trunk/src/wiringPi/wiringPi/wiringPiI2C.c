@@ -223,10 +223,8 @@ int wiringPiI2CSetup (const int devId)
 
   piBoardId (&model, &rev, &mem, &maker, &overVolted) ;
 
-  if      ( model == PI_MODEL_ODROIDC )
+  if ( model == PI_MODEL_ODROIDC )
     device = "/dev/i2c-1" ;
-  else if ( model == PI_MODEL_ODROIDXU_34 )
-    device = "/dev/i2c-3" ;
   else  {
     rev = piBoardRev () ;
 
