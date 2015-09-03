@@ -77,7 +77,6 @@
 #define	PI_MODEL_CM       4
 #define	PI_MODEL_AP       5
 #define	PI_MODEL_ODROIDC  6
-#define PI_MODEL_ODROIDXU_34    7
 
 #define	PI_VERSION_UNKNOWN	0
 #define	PI_VERSION_1        1
@@ -91,7 +90,7 @@
 #define	PI_MAKER_QISDA      3
 #define	PI_MAKER_HARDKERNEL 4
 
-extern const char *piModelNames    [8] ;
+extern const char *piModelNames    [7] ;
 extern const char *piRevisionNames [5] ;
 extern const char *piMakerNames    [5] ;
 
