@@ -1,5 +1,5 @@
 #############################################################################
-# Makefile for building: mindbox_app
+# Makefile for building: MindBX_app #
 #############################################################################
 
 MAKEFILE      = Makefile
@@ -11,17 +11,15 @@ CXX           = $(CXX)
 CFLAGS        = -pipe -O2 -Wall -W   $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 CXXFLAGS      =  -pipe -O2 -Wall -W $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 LINK          = $(CC)
-LFLAGS        = 
-GLIB2_CC	  = `pkg-config --cflags glib-2.0`
-GLIB2_LINK	  = `pkg-config --libs glib-2.0`
+LFLAGS        =
+CFLAGS        =
 
 ifeq ($(ARCH), arm)
 	ARCH_LIBS = -lwiringPi -lwiringPiDev
 	RASPI_DEFINES  =-DRASPI=1
 	INCPATH       = -I. \
                 -Iinclude \
-                -I$(STAGING_DIR)/include \
-                -I$(STAGING_DIR)/usr/include/glib-2.0/
+                -I$(STAGING_DIR)/include 
 	CFLAGS=$(TARGET_CFLAGS) -pipe -O2 -Wall -W  $(DEFINES) $(X86_DEFINES) $(RASPI_DEFINES)
 else ifeq ($(ARCH), x86)
 	ARCH_LIBS 	  =
@@ -35,7 +33,7 @@ else
                		-Iinclude
 endif
 
-LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread -lezxml -lglib-2.0 $(ARCH_LIBS)
+LIBS          =-L$(STAGING_DIR)/lib -L$(STAGING_DIR)/usr/lib -lm -lpthread -lezxml $(ARCH_LIBS)
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -83,7 +81,7 @@ OBJECTS       = src/main.o \
 				src/supported_feature_input/shm_rd_buf.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = mindbox_app
+TARGET        = mindbx_app
 
 
 first: all
@@ -118,7 +116,7 @@ compile: Makefile $(TARGET)
 
 $(TARGET):  $(OBJECTS)
 	@echo "\nLinking----------------------------------------------\n"
-	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(GLIB2_LINK)
+	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 dist:
 
@@ -155,7 +153,7 @@ fake_feature_generator.o: src/supported_feature_input/fake_feature_generator.c
 	
 shm_rd_buf.o: src/supported_feature_input/shm_rd_buf.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o shm_rd_buf.o src/supported_feature_input/shm_rd_buf.c 
-	
+
 ####### Install
 
 install:   FORCE
@@ -167,3 +165,4 @@ clean:
 	rm $(TARGET)
 
 FORCE:
+
