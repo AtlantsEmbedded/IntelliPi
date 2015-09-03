@@ -1,5 +1,5 @@
 #############################################################################
-# Makefile for building: MindBX_testbench 
+# Makefile for building: MindBX_testbench #
 #############################################################################
 
 MAKEFILE      = Makefile
