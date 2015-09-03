@@ -29,7 +29,7 @@ define Package/mindbx_app/install
 	$(INSTALL_DIR) $(1)/atom
 	$(INSTALL_DIR) $(1)/atom/app
 	$(INSTALL_DIR) $(1)/atom/app/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/mindbox_app $(1)/atom/app
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/mindbx_app $(1)/atom/app
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/launch_mindbx.sh $(1)/atom/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/config/application_config.xml $(1)/atom/app/config
 	$(INSTALL_DIR) $(1)/etc
