@@ -57,7 +57,7 @@ int main(int argc, char **argv){
 	setup_mindbx();
 	
 	/*run test over gpios*/
-	run_testbench();
+	//run_testbench();
 	
 	/*configure the feature input*/
 	init_feature_input(app_config->feature_source);
