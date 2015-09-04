@@ -48,6 +48,7 @@ int main(int argc, char **argv){
 	rwalk_options_t rwalk_opts;
 	feature_t feature_vect;
 	double* feature_array;
+	double fail_safe = 0.5;
 	
 	/*read the xml*/
 	app_config = xml_initialize(which_config(argc, argv));
@@ -93,13 +94,13 @@ int main(int argc, char **argv){
 		printf("check\n");
 	
 		/*set LED strip to wait mode*/
-		set_led_strip_flash_state(PINK, OFF, 1000);
+		set_led_strip_flash_state(PINK, OFF, 500);
 	
 		/*wait for a coin*/
 		wait_for_coin_insertion();
 		
 		/*set LED strip to train mode*/
-		set_led_strip_flash_state(GREEN, OFF, 1000);
+		set_led_strip_flash_state(GREEN, OFF, 500);
 		
 		/*wait 3 seconds*/
 		sleep(3);
@@ -113,7 +114,7 @@ int main(int argc, char **argv){
 		test_running = 0x01;
 		
 		/*set LED strip to test mode*/
-		set_led_strip_flash_state(BLUE, RED, 1000);
+		set_led_strip_flash_state(BLUE, RED, 1100);
 
 		/*wait 3 seconds*/
 		sleep(3);
@@ -130,21 +131,27 @@ int main(int argc, char **argv){
 			/*push it to to noisy integrator*/
 			decision_var_value = iterate_rwalk_process(feature_array[1]);
 			
+			
 			printf("DV:%f\n",decision_var_value);
 			
 			/*update flash frequency*/
-			set_led_strip_flash_state(BLUE, RED, ((threshold-decision_var_value)/threshold)*1000);
+			set_led_strip_flash_state(BLUE, RED, ((threshold-decision_var_value)/threshold)*1000+100);
 		
 			/*check if one of the stop conditions is met*/
 			if(decision_var_value>threshold){
 				test_running = 0x00;
 			}
+			
+			fail_safe = (double)rand()/(double)RAND_MAX;
+			decision_var_value += fail_safe;
 		}
 		
 		if(decision_var_value>threshold){
 			/*if we have a winner*/
 			/*open the door*/
 			open_door();
+			set_led_strip_flash_state(BLUE, WHITE, 500);
+			sleep(3);
 		}
 		
 	}

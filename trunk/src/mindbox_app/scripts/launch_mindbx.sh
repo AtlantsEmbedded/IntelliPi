@@ -1,34 +1,33 @@
-#!/bin/ash
-
-hciconfig hci0 sspmode 1
-/atom/data/data_interface /atom/data/config/data_config.xml &
-/atom/data/data_preprocessing /atom/data/config/preprocess_config.xml &
-/atom/app/mindbox_app /atom/app/config/application_config.xml &
-
-
-# #!/bin/sh /etc/rc.common
-
-#START=1
-#STOP=2
+#!/bin/sh /etc/rc.common
+# MindBx startup script
  
-#start() {        
-#        hciconfig hci0 sspmode 1
-#        /atom/data/data_interface /atom/data/config/data_config.xml &
-#        /atom/data/data_preprocessing /atom/data/config/preprocess_config.xml &
-#        /atom/app/mindbox_app /atom/app/config/application_config.xml &
-#}                 
+START=1
+STOP=2
  
-#stop() {          
-#        killall data_interface
-#        killall data_preprocessing
-#        killall data_mindbox
-#}
+start() {        
 
-#boot() {
-#        hciconfig hci0 sspmode 1
-#        /atom/data/data_interface /atom/data/config/data_config.xml &
-#        /atom/data/data_preprocessing /atom/data/config/preprocess_config.xml &
-#        /atom/app/mindbox_app /atom/app/config/application_config.xml &
-#}
+	hciconfig hci0 sspmode 1
 
+	/atom/data/data_interface /atom/data/config/data_config.xml &
+	sleep 2
+	/atom/data/data_preprocessing /atom/data/config/preprocess_config.xml &
+	sleep 2
+	/atom/app/mindbx_app /atom/app/config/application_config.xml &
+}                 
+ 
+stop() {          
+        killall data_interface
+        killall data_preprocessing
+        killall mindbx_app
+}
 
+boot() {
+	hciconfig hci0 sspmode 1
+
+	/atom/data/data_interface /atom/data/config/data_config.xml &
+	sleep 2
+	/atom/data/data_preprocessing /atom/data/config/preprocess_config.xml &
+	sleep 2
+	/atom/app/mindbx_app /atom/app/config/application_config.xml &
+	
+}
