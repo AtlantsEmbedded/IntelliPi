@@ -57,7 +57,7 @@ int main(int argc, char **argv){
 	setup_mindbx();
 	
 	/*run test over gpios*/
-	//run_testbench();
+	run_testbench();
 	
 	/*configure the feature input*/
 	init_feature_input(app_config->feature_source);
@@ -92,6 +92,7 @@ int main(int argc, char **argv){
 	
 		
 		printf("check\n");
+		
 	
 		/*set LED strip to wait mode*/
 		set_led_strip_flash_state(PINK, OFF, 500);
@@ -112,6 +113,8 @@ int main(int argc, char **argv){
 		reset_rwalk_process();
 	
 		test_running = 0x01;
+		decision_var_value = 0;
+		fail_safe = 0;
 		
 		/*set LED strip to test mode*/
 		set_led_strip_flash_state(BLUE, RED, 1100);
@@ -131,6 +134,8 @@ int main(int argc, char **argv){
 			/*push it to to noisy integrator*/
 			decision_var_value = iterate_rwalk_process(feature_array[1]);
 			
+			fail_safe += (double)rand()/(double)RAND_MAX;
+			decision_var_value += fail_safe;
 			
 			printf("DV:%f\n",decision_var_value);
 			
@@ -142,8 +147,6 @@ int main(int argc, char **argv){
 				test_running = 0x00;
 			}
 			
-			fail_safe = (double)rand()/(double)RAND_MAX;
-			decision_var_value += fail_safe;
 		}
 		
 		if(decision_var_value>threshold){
@@ -193,7 +196,7 @@ void run_testbench(){
 	set_led_strip_color(OFF);
 
 	/*and open the door 5 times*/
-	for(i=0;i<5;i++){
+	for(i=0;i<1;i++){
 		open_door();
 		delay(2000);
 	}	
