@@ -1,0 +1,10 @@
+
+Build using makefile.
+
+autoreconf --install;
+./configure
+make
+
+To run:
+
+$ sudo nice --20 ./src/MLP_barriers_ex

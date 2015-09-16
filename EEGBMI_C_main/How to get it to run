@@ -1,0 +1,51 @@
+
+
+#---------------------------------
+# FFT shared object /EEGBMI_C_fft
+#---------------------------------
+
+# generate object file
+g++ -fPIC -c fft.cpp
+
+# to generate library from the object file
+g++ -shared -o libfft.so fft.o
+
+#---------------------------------
+# FDA shared object /EEGBMI_C_fda
+#---------------------------------
+
+# generate object file
+g++ -Ieigen-lib -fPIC -c fda.cpp -lm -lrt
+
+# to generate library from the object file
+g++ -shared -o libfda.so fda.o
+
+
+#---------------------------------
+# FDA_NG shared object /EEGBMI_C_fda
+#---------------------------------
+
+# generate object file
+g++ -fPIC -c fda.cpp -lm -lrt
+
+# to generate library from the object file
+g++ -shared -o libfda.so fda.o
+
+#---------------------------------
+# SVM shared object /EEGBMI_C_svm
+#---------------------------------
+
+g++ -fPIC -c svm.cpp base_example.cpp classifier.cpp example.cpp model.cpp param.cpp q_matrix.cpp qp_solver.cpp svm_solver.cpp  svr_solver.cpp oneclass_solver.cpp -lm -lrt
+
+g++ -shared -o libsvm.so svm.o base_example.o classifier.o example.o model.o param.o q_matrix.o qp_solver.o svm_solver.o svr_solver.o oneclass_solver.o
+
+#---------------------------------
+# Build the software
+#---------------------------------
+
+#add them to the path
+$ LD_LIBRARY_PATH=./EEGBMI_C_fft:./EEGBMI_C_fda_ng:./EEGBMI_C_svm
+$ export LD_LIBRARY_PATH
+
+$ make
+$ ./EEGBMI.exe
