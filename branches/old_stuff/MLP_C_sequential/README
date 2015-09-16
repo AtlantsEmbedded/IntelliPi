@@ -1,0 +1,10 @@
+
+Build using makefile.
+
+autoreconf --install; or autogen.sh
+./configure 
+make
+
+To run:
+
+$ sudo nice --20 ./src/MLP_sequential_ex
