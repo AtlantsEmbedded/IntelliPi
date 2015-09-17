@@ -23,22 +23,20 @@ PKG_BUILD_DEPENDS:=PACKAGE_python-smbus:python
 include $(INCLUDE_DIR)/package.mk
 $(call include_mk, python-package.mk)
 
-define Package/i2c-clone/Default
-  SECTION:=utils
-  CATEGORY:=Atom-GPL
+define Package/i2c/Default
   URL:=http://lm-sensors.org/wiki/I2CTools
   TITLE:=I2C
 endef
 
 define Package/libi2c
-  $(call Package/i2c-clone/Default)
+  $(call Package/i2c/Default)
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE+=library
 endef
 
 define Package/i2c-tools-clone
-  $(call Package/i2c-clone/Default)
+  $(call Package/i2c/Default)
   SECTION:=utils
   CATEGORY:=Atom-GPL
   SUBMENU:=Utilities
@@ -96,7 +94,7 @@ define Package/libi2c/install
 	$(CP) $(PKG_BUILD_DIR)/lib/libi2c.so* $(1)/usr/lib/
 endef
 
-define Package/i2c-tools/install
+define Package/i2c-tools-clone/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tools/i2cdetect $(1)/usr/sbin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tools/i2cdump $(1)/usr/sbin/
