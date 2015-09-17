@@ -24,6 +24,8 @@ include $(INCLUDE_DIR)/package.mk
 $(call include_mk, python-package.mk)
 
 define Package/i2c-clone/Default
+  SECTION:=utils
+  CATEGORY:=Atom-GPL
   URL:=http://lm-sensors.org/wiki/I2CTools
   TITLE:=I2C
 endef
