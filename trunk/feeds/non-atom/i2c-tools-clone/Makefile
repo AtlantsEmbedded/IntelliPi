@@ -23,20 +23,20 @@ PKG_BUILD_DEPENDS:=PACKAGE_python-smbus:python
 include $(INCLUDE_DIR)/package.mk
 $(call include_mk, python-package.mk)
 
-define Package/i2c/Default
+define Package/i2c-clone/Default
   URL:=http://lm-sensors.org/wiki/I2CTools
-  TITLE:=I2C
+  TITLE:=I2C-clone
 endef
 
 define Package/libi2c
-  $(call Package/i2c/Default)
+  $(call Package/i2c-clone/Default)
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE+=library
 endef
 
 define Package/i2c-tools-clone
-  $(call Package/i2c/Default)
+  $(call Package/i2c-clone/Default)
   SECTION:=utils
   CATEGORY:=Atom-GPL
   SUBMENU:=Utilities
