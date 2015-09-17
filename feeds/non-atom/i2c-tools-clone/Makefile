@@ -38,7 +38,8 @@ endef
 define Package/i2c-tools-clone
   $(call Package/i2c-clone/Default)
   SECTION:=utils
-  CATEGORY:=Utilities
+  CATEGORY:=Atom-GPL
+  SUBMENU:=Utilities
   TITLE+=tools for Linux
   DEPENDS:=+libi2c
 endef
