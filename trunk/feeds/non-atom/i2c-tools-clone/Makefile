@@ -53,7 +53,7 @@ define Package/python-smbus
   DEPENDS:=+PACKAGE_python-smbus:python-mini +i2c-tools-clone
 endef
 
-define Package/i2c-tools/description
+define Package/i2c-tools-clone/description
  This package contains an heterogeneous set of I2C tools for Linux. These tools
  were originally part of the lm-sensors package.  It is a clone of the lm-sensor's I2C package
  as the website and GIT dissappeared.
