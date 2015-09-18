@@ -54,7 +54,7 @@ int preparse_packet(unsigned char* raw_packet_header, int packet_length, int *so
 	int bitlength = 0;
 	
 	/*until we reach the end of the raw packet*/
-	while(position<packet_length & nb_packets<MAX_NB_SOFT_PACKETS){
+	while((position<packet_length) & (nb_packets<MAX_NB_SOFT_PACKETS)){
 		
 		soft_packet_headers[nb_packets] = position;
 		
@@ -124,7 +124,7 @@ int preparse_packet(unsigned char* raw_packet_header, int packet_length, int *so
 			case MUSE_INVALID:
 			default:
 				printf("Pre-Parsing error!\n");
-				return;
+				return 0;
 		}
 	
 		nb_packets = nb_packets+1;
@@ -182,8 +182,13 @@ int parse_compressed_packet(unsigned char* packet_header, int* deltas)
 	/*parse out the deltas*/
 	parsed_bits_length = compressed_parse_deltas(&(packet_header[DELTAS_OFFSET]), medians, quantizations, deltas);
 	
-	if(expected_bits_length!=parsed_bits_length)
+	if(expected_bits_length!=parsed_bits_length){
+	
 		printf("error, parsing compressed packet\n");
+		printf("expected_bits_length: %i\n",expected_bits_length);
+		printf("parsed_bits_length: %i\n",parsed_bits_length);
+		
+	}
 	
 	return EXIT_SUCCESS;
 }
@@ -314,17 +319,17 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 	
 	/*Variables for the remainder*/
 	/*nb of bits in the remainder (watchout might be actualized during processing)*/
-	int maxreminderbits = 0;
+	//int maxreminderbits = 0;
 	/*number above which another bit needs to be added to the remainder*/
-	int max1less = 0;
+	//int max1less = 0;
 	
 	/*Variables for the Elias code*/
 	/*counter of 0s in the elias code*/
-	int nb_zeros = 0;
+	//int nb_zeros = 0;
 	/*condition for the loop parsing the zeros*/
-	char zeros_parsed = 0;
+	//char zeros_parsed = 0;
 	/*binary code extracted from elias code*/
-	int elias_code = 0;
+	//int elias_code = 0;
 	
 	/*get the first byte of the stream*/
 	cur_byte = bits_header[byteshift];
@@ -403,6 +408,10 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 					//printf("cur_byte:");
 					//printbits(cur_byte);
 					//printf("\n");
+					
+					if(quotient_value>=15){
+						printf("quotient value: %i\n",quotient_value);
+					}
 					
 					/***********************************/
 					/* Remainder                       */
@@ -492,11 +501,11 @@ int compressed_parse_deltas(unsigned char* bits_header, int* median, int* quanti
 					
 					/*if bit is 1, positive*/
 					if(cur_byte&0x80){
-						sign_value = 1;
+						sign_value = -1;
 					}
 					/*if bit is 0, negative*/
 					else{
-						sign_value = -1;
+						sign_value = 1;
 					}
 								
 					/*shift bit and...*/						
@@ -738,15 +747,15 @@ void parse_uncompressed_packet(unsigned char* values_header, int* values)
 	/*XXXX YYYY*/
 	/*YYXX XXXX*/
 	/*YYYY YYYY*/
-	int i;
+	//int i;
 	
 	memset((void*)values,0,sizeof(int)*4);
 		
 	/*For each, mask the necessary bits, shift them in place and OR them into an integer*/
-	values[0] = (int)(((values_header[1]&0x03)<<8)|values_header[0]);
-	values[1] = (int)(((values_header[2]&0x0F)<<6)|((values_header[1]&0xFC)>>2));
-	values[2] = (int)(((values_header[3]&0x3F)<<4)|(values_header[2]&0xF0)>>4);
-	values[3] = (int)((values_header[4]<<2)|((values_header[3]&0xC0)>>6));
+	values[0] = (unsigned int)(((values_header[1]&0x03)<<8)|(values_header[0]&0xFF));
+	values[1] = (unsigned int)(((values_header[2]&0x0F)<<6)|((values_header[1]&0xFC)>>2));
+	values[2] = (unsigned int)(((values_header[3]&0x3F)<<4)|(values_header[2]&0xF0)>>4);
+	values[3] = (unsigned int)(((values_header[4]&0xFF)<<2)|((values_header[3]&0xC0)>>6));
 
 #if 0
 	/*check for sign bit (two's complement coding)*/
