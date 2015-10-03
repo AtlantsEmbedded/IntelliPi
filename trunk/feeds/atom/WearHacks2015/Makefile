@@ -18,7 +18,7 @@ define Package/WearHacks2015
 	CATEGORY:=Atom
 	TITLE:=WearHacks2015
 	SUBMENU:=Events
-	DEPENDS:=
+	DEPENDS:=wiringPi +libpthread +libezxml +glib2
 endef
 
 define Package/WearHacks2015/description
