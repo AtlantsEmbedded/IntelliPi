@@ -86,8 +86,6 @@ int muse_translate_pkt(void *param)
 			for(i=0;i<MUSE_NB_CHANNELS;i++){
 				cur_eeg_values[i] = muse_trslt_pkt_ptr->eeg_data[i];
 			}
-			
-			cur_eeg_values[3] = 1; 
 					
 			/*Push the new sample in the output*/
 			COPY_DATA_IN(&data_struct);
@@ -106,31 +104,10 @@ int muse_translate_pkt(void *param)
 					cur_eeg_values[j] = cur_eeg_values[j]+muse_trslt_pkt_ptr->eeg_data[j*MUSE_NB_DELTAS+i];		
 				}
 				
-				/*tag for debugging*/
-				cur_eeg_values[3] = 0; 
-				
 				/*Push the new sample in the output*/
 				COPY_DATA_IN(&data_struct);
 			}
 		
-#if 0		
-			/*It's a compressed packet, we just received the variation measured from previous sample*/
-			/*go over all deltas*/
-			for(i=0;i<MUSE_NB_DELTAS;i++){
-				delta_offset = i*MUSE_NB_CHANNELS;	
-				
-				/*compute the new value from the previous value*/	
-				for(j=0;j<MUSE_NB_CHANNELS;j++){
-					cur_eeg_values[j] = cur_eeg_values[j]+muse_trslt_pkt_ptr->eeg_data[delta_offset+j];
-				}
-				
-				cur_eeg_values[3] = i; 
-				
-				/*Push the new sample in the output*/
-				COPY_DATA_IN(&data_struct);
-				
-			}
-#endif
 			break;
 		
 	}
@@ -200,9 +177,6 @@ int muse_process_pkt(void *param)
 	param_t *param_ptr = (param_t *) param;
 	
 	int nb_bits = 0;
-
-	//fprintf(stdout, "Bytes read = %d\n", param_ptr->len);
-	//hexdump((unsigned char *)param_ptr->ptr, param_ptr->len);
 	
 	if (param_ptr->len >= 6) {
 		
@@ -223,11 +197,6 @@ int muse_process_pkt(void *param)
 						param_translate_pkt.type = MUSE_UNCOMPRESS_PKT;
 						TRANS_PKT_FC(&param_translate_pkt);
 
-						if(eeg_data_buffer[0]<450){
-							printf("%i\n",eeg_data_buffer[0]);
-							hexdump((unsigned char *)param_ptr->ptr, param_ptr->len);
-						}
-					//printf("got an uncompressed eeg pkt\n");
 				break;
 		
 				case MUSE_COMPRESSED_PKT:	

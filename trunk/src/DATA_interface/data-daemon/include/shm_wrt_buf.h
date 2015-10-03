@@ -17,13 +17,13 @@
 
 #define SHM_KEY 5678
 
-#define NB_FEATURES 4
-#define FEATURE_SIZE 4 // to be fixed, only supporting int right now
-#define SAMPLE_SIZE NB_FEATURES*FEATURE_SIZE /*4 channels, each containing an int*/ 
-#define NB_SAMPLES_PER_PAGE 110 /*nb of samples per page*/
-#define NB_PAGE 2 /*2 pages, one sent and the other being filled*/
-#define SHM_PAGE_SIZE NB_SAMPLES_PER_PAGE*SAMPLE_SIZE /*size of one page, containing a max of 250 samples*/
-#define SHM_BUF_SIZE SHM_PAGE_SIZE*NB_PAGE /*size of the memory array*/ 
+//#define NB_FEATURES 4
+//#define FEATURE_SIZE 4 // to be fixed, only supporting int right now
+//#define SAMPLE_SIZE NB_FEATURES*FEATURE_SIZE /*4 channels, each containing an int*/ 
+//#define NB_SAMPLES_PER_PAGE 110 /*nb of samples per page*/
+//#define NB_PAGE 2 /*2 pages, one sent and the other being filled*/
+//#define SHM_PAGE_SIZE NB_SAMPLES_PER_PAGE*SAMPLE_SIZE /*size of one page, containing a max of 250 samples*/
+//#define SHM_BUF_SIZE SHM_PAGE_SIZE*NB_PAGE /*size of the memory array*/ 
  
 /*this list must be shared between the following processes:
  * - DATA_interface
