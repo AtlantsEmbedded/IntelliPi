@@ -14,14 +14,12 @@ int main(int argc, char **argv){
 	int i;
 	
 	/*configure the mind box*/
+	wiringPiSetup();
+	wiringPiSPISetup(0,500000);
 	
-	
-	wiringPiSPISetup(0,1000000);
-	
-	
-	wiringPiSPIDataRW(0,0xF1,1);
-	
-	
+	while(1){
+		wiringPiSPIDataRW(0,0xF1,1);
+	}
 	
 	exit(0);
 }
