@@ -10,6 +10,13 @@
 
 int nb_channels;
 int nb_samples;
+int feature_vect_length;
+
+char timeseries_enabled = 0x00;
+char fft_enabled = 0x00;
+char alpha_pwr_enabled = 0x00;
+char beta_pwr_enabled = 0x00;
+char gamma_pwr_enabled = 0x00;
 
 double* signals_avg_vector;
 double* signals_wo_avg;
@@ -22,18 +29,46 @@ void abs_powerdft_interval(const double *signal, double *abs_power_interval, int
 void stat_mean(double *a, double *mean, int dim_i, int dim_j);
 void mtx_transpose(double *A, double *A_prime, int dim_i, int dim_j);
 double stat_vect_mean(double *a, int n);
+void abs_dft_interval(const double *signal, double *abs_power_interval, int n, int interval_start, int interval_stop);
 
 int init_preprocess_core(appconfig_t *config){
 	
 	/*copy infos about input data*/
 	nb_channels = config->nb_channels;
-	nb_samples = config->buffer_depth;
+	nb_samples = config->window_width;
+	feature_vect_length = 0;
+	
+	/*adjust the size of the feature buffer according to selected options*/ 
+	if(config->timeseries){
+		feature_vect_length += config->window_width*config->nb_channels;
+		timeseries_enabled = 0x01;
+	}
+	
+	if(config->fft){
+		feature_vect_length += config->window_width/2*config->nb_channels;
+		fft_enabled = 0x01;
+	}
+	
+	if(config->power_alpha){
+		feature_vect_length += config->nb_channels;
+		alpha_pwr_enabled = 0x01;
+	}
+	
+	if(config->power_beta){
+		feature_vect_length += config->nb_channels;
+		beta_pwr_enabled = 0x01;
+	}
+	
+	if(config->power_gamma){
+		feature_vect_length += config->nb_channels;
+		gamma_pwr_enabled = 0x01;
+	}
 	
 	/*allocate memory for buffer required during processing*/
 	signals_avg_vector = (double*)malloc(config->nb_channels*sizeof(double));
-	signals_wo_avg = (double*)malloc(config->nb_channels*config->buffer_depth*sizeof(double));
-	signals_transposed = (double*)malloc(config->nb_channels*config->buffer_depth*sizeof(double));
-	dft_vector = (double*)malloc(3*sizeof(double));
+	signals_wo_avg = (double*)malloc(config->nb_channels*config->window_width*sizeof(double));
+	signals_transposed = (double*)malloc(config->nb_channels*config->window_width*sizeof(double));
+	dft_vector = (double*)malloc(feature_vect_length*sizeof(double));
 	
 	return EXIT_SUCCESS;
 }
@@ -53,7 +88,7 @@ int cleanup_preprocess_core(){
 
 int preprocess_data(data_t* data_input, data_t* feature_output){
 	
-	int i,k;
+	int i,j;
 	double* signals_array = (double*)data_input->ptr;
 	double* features_array = (double*)feature_output->ptr;
 	
@@ -68,28 +103,29 @@ int preprocess_data(data_t* data_input, data_t* feature_output){
 	/*transpose the signal array*/
 	mtx_transpose(signals_wo_avg, signals_transposed, nb_samples, nb_channels);
 	
-	/*compute abs power-dft for each each channel*/
-	for(i=0;i<nb_channels;i++){
-		/*squared dft values*/
-		abs_powerdft_interval(&(signals_transposed[i*nb_samples]), dft_vector, 110, 4, 6);
-		
-		/*average squared dft values and*/
-		/*store in feature vector*/
-		features_array[i] = stat_vect_mean(dft_vector, 3);
+	if(fft_enabled){
+		/*compute abs power-dft for each each channel*/
+		for(i=0;i<nb_channels;i++){
+			/*squared dft values*/
+			abs_dft_interval(&(signals_transposed[i*nb_samples]), dft_vector, nb_samples, 0, nb_samples/2);
+			
+			for(j=0;j<nb_samples/2;j++){
+				features_array[i*nb_samples/2+j] = dft_vector[j];
+			}
+		}
 	}
 	
-	for(i=0;i<nb_channels;i++){
-		printf("features_array[i]: %f\n",features_array[i]);
+	for(i=0;i<nb_samples/2;i++){
+		printf("fft[i]: \t%f \t%f \t%f \t%f\n",features_array[i], features_array[i+nb_samples/2], features_array[i+2*nb_samples/2], features_array[i+3*nb_samples/2]);
 	}
 	
 	return EXIT_SUCCESS;
 }
 
 
-void abs_powerdft_interval(const double *signal, double *abs_power_interval, int n, int interval_start, int interval_stop){
+void abs_dft_interval(const double *signal, double *abs_power_interval, int n, int interval_start, int interval_stop){
 	int k;
 	int coef_idx = 0;
-	double n_sqr = n*n;
 	for (k = interval_start; k < interval_stop; k++) {
 		
 		double sumreal = 0;
@@ -102,10 +138,12 @@ void abs_powerdft_interval(const double *signal, double *abs_power_interval, int
 			sumimag += signal[t]*sin(angle);
 		}
 		
-		abs_power_interval[coef_idx] = (sumreal*sumreal+sumimag*sumimag)/n_sqr;
+		abs_power_interval[coef_idx] = 2*sqrt(sumreal*sumreal+sumimag*sumimag)/n;
 		coef_idx++;
 	}
-}
+}  
+
+
 
 void remove_mean_col(double *a, double *mean, double *b, int dim_i, int dim_j){
 	 

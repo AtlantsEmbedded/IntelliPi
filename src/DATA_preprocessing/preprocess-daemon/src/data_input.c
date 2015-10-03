@@ -16,7 +16,7 @@
  * @param input_type, string identifying the type of input to init
  * @return EXIT_FAILURE for unknown type, EXIT_SUCCESS for known/success
  */
-int init_data_input(char input_type){
+int init_data_input(char input_type, data_input_options_t options){
 
 	_INIT_DATA_INPUT_FC = NULL;
 	_READ_DATA_FC = NULL;
@@ -40,5 +40,5 @@ int init_data_input(char input_type){
 		return EXIT_FAILURE;
 	}
 
-	return INIT_DATA_INPUT_FC();
+	return INIT_DATA_INPUT_FC(&options);
 }

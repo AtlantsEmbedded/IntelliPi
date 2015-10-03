@@ -19,7 +19,11 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info);
 static int sanity_check_app_attributes(ezxml_t app_attribute);
 
 const char *XML_app_elements[] =
-    { "debug", "data_source", "nb_channels", "buffer_depth", "feature_dest", "timeseries", "fft", "power_alpha", "power_beta", "power_gamma"};
+    { "debug", "data_source", "nb_channels", 
+	  "window_width", "feature_dest",
+	  "rd_shm_key","wr_shm_key","sem_key", 
+	  "timeseries", "fft", "power_alpha", 
+	  "power_beta", "power_gamma"};
 
 static appconfig_t *config = NULL;
 
@@ -94,12 +98,36 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 	app_info->nb_channels = atoi(tmp->txt);
 
 	/*Get appAttributes/buffer_depth*/
-	tmp = ezxml_child(app_attribute, "buffer_depth");
+	tmp = ezxml_child(app_attribute, "window_width");
 	if (tmp == NULL) {
-		printf("appAttributes->buffer_depth is missing\n");
+		printf("appAttributes->window_width is missing\n");
 		return (-1);
 	}
-	app_info->buffer_depth = atoi(tmp->txt);
+	app_info->window_width = atoi(tmp->txt);
+
+	/*Get appAttributes/shm_key*/
+	tmp = ezxml_child(app_attribute, "rd_shm_key");
+	if (tmp == NULL) {
+		printf("appAttributes->rd_shm_key is missing\n");
+		return (-1);
+	}
+	app_info->rd_shm_key = atoi(tmp->txt);
+
+	/*Get appAttributes/shm_key*/
+	tmp = ezxml_child(app_attribute, "wr_shm_key");
+	if (tmp == NULL) {
+		printf("appAttributes->wr_shm_key is missing\n");
+		return (-1);
+	}
+	app_info->wr_shm_key = atoi(tmp->txt);
+
+	/*Get appAttributes/sem_key*/
+	tmp = ezxml_child(app_attribute, "sem_key");
+	if (tmp == NULL) {
+		printf("appAttributes->sem_key is missing\n");
+		return (-1);
+	}
+	app_info->sem_key = atoi(tmp->txt);
 
 	/*Get appAttributes/feature_dest*/
 	tmp = ezxml_child(app_attribute, "feature_dest");

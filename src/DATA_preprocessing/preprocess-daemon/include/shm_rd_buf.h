@@ -18,8 +18,8 @@
 #define SHM_KEY 5678
 
 #define NB_FEATURES 4
-#define FEATURE_SIZE 4 // to be fixed, only supporting int right now
-#define SAMPLE_SIZE NB_FEATURES*FEATURE_SIZE /*4 channels, each containing an int*/ 
+#define DATA_SIZE 4 // to be fixed, only supporting int right now
+#define SAMPLE_SIZE NB_FEATURES*DATA_SIZE /*4 channels, each containing an int*/ 
 #define NB_SAMPLES_PER_PAGE 110 /*nb of samples per page*/
 #define NB_PAGE 2 /*2 pages, one sent and the other being filled*/
 #define SHM_PAGE_SIZE NB_SAMPLES_PER_PAGE*SAMPLE_SIZE /*size of one page, containing a max of 250 samples*/
@@ -40,6 +40,9 @@
 #define CONNECT_INTERFACE_REQ 4 //sem posted when application request interface connection
 #define INTERFACE_CONNECTED 5 //sem posted when interface connection established
 /**/
+
+
+
 
 int shm_rd_init(void *param);
 int shm_rd_read_from_buf(void *param);
