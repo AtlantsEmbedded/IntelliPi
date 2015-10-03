@@ -25,7 +25,7 @@ int main(int argc, char **argv){
 	
 	/*configure the mind box*/
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
-	size_t write(spi_driver, buffer, 6);
+	write(spi_driver, buffer, 6);
 	
 	close(spi_driver);
 	
