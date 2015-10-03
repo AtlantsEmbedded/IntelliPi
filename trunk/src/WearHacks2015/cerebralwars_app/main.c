@@ -29,7 +29,7 @@ int main(int argc, char **argv){
 	int spi_driver;
 	
 	/*define buffer*/
-	pixel_t* buffer[150];
+	pixel_t buffer[150];
 	
 	/*set the whole array to 0*/
 	memset(buffer,0,150*sizeof(pixel_t));
