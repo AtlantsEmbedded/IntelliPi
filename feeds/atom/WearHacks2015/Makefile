@@ -30,7 +30,7 @@ define Package/WearHacks2015/install
 	$(INSTALL_DIR) $(1)/atom/data
 	$(INSTALL_DIR) $(1)/atom/data/config
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/configs/* $(1)/atom/data/config/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/cerebralwars_app/src/cerebralwars_app $(1)/atom/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/cerebralwars_app/cerebralwars_app $(1)/atom/
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 endef
