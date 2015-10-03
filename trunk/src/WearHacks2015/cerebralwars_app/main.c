@@ -1,8 +1,15 @@
+
+
+#include <stdint.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <wiringPi.h>
-#include <wiringPiSPI.h>
+#include <string.h>
+#include <getopt.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <linux/spi/spidev.h>
 
 
 /**
@@ -12,14 +19,15 @@
 int main(int argc, char **argv){
 	
 	int i;
+	int spi_driver;
+	
+	unsigned char* buffer = {0xff,0xaa,0xff,0xaa,0xff,0xaa};
 	
 	/*configure the mind box*/
-	wiringPiSetup();
-	wiringPiSPISetup(0,500000);
+	spi_driver = open("/dev/spidev0.0",O_RDWR);
+	size_t write(spi_driver, buffer, 6);
 	
-	while(1){
-		wiringPiSPIDataRW(0,0xF1,1);
-	}
+	close(spi_driver);
 	
 	exit(0);
 }
