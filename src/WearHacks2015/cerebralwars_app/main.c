@@ -21,7 +21,7 @@ int main(int argc, char **argv){
 	int i;
 	int spi_driver;
 	
-	unsigned char* buffer = {0xff,0xaa,0xff,0xaa,0xff,0xaa};
+	unsigned char* buffer[6] = {0xff,0xaa,0xff,0xaa,0xff,0xaa};
 	
 	/*configure the mind box*/
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
