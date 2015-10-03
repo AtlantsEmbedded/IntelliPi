@@ -83,7 +83,7 @@ OBJECTS       = src/main.o \
 				src/supported_feature_output/csv_file.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = data_preprocessing
+TARGET        = cerebralwars_app
 
 
 first: all
