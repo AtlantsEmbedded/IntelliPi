@@ -20,7 +20,7 @@
  * @param output_type, identifies the type of output to init
  * @return EXIT_FAILURE for unknown type, EXIT_SUCCESS for known/success
  */
-int init_data_output(char output_type){
+int init_data_output(char output_type, data_out_options_t options){
 
 	_INIT_DATA_OUTPUT_FC = NULL;
 	_COPY_DATA_IN = NULL;
@@ -48,5 +48,5 @@ int init_data_output(char output_type){
 		return EXIT_FAILURE;
 	}
 
-	return INIT_DATA_OUTPUT_FC();
+	return INIT_DATA_OUTPUT_FC((void*)&options);
 }

@@ -57,6 +57,8 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	pthread_t readT, writeT;
 	int iret1 __attribute__ ((unused)), iret2 __attribute__ ((unused)), ret = 0, attempts = 0;
 
+	data_out_options_t data_output_options;
+
 	// Set up ctrl c signal handler
 	(void)signal(SIGINT, ctrl_c_handler);
 
@@ -82,8 +84,18 @@ int main(int argc __attribute__ ((unused)), char **argv __attribute__ ((unused))
 	printf("Attempts: %d\n", get_appconfig()->conn_attempts);
 	printf("Keep alive: %d seconds: %d\n", get_appconfig()->keep_alive, get_appconfig()->keep_time);
 	
+	/*Copy info from xml to dataoutput options*/
+	data_output_options.shm_key = config->shm_key;
+	data_output_options.sem_key = config->sem_key;
+	data_output_options.nb_data_channels = config->nb_data_channels*sizeof(float); /*adjusted for data type (patch)*/
+	data_output_options.window_size = config->window_size;
+	data_output_options.nb_pages = config->nb_pages;
+	data_output_options.page_size = data_output_options.window_size*data_output_options.nb_data_channels;
+	data_output_options.buffer_size = data_output_options.page_size*data_output_options.nb_pages;
+	
+	
 	/*init the data output*/
-	if (init_data_output((char)config->output_format)==EXIT_FAILURE){
+	if (init_data_output((char)config->output_format,data_output_options)==EXIT_FAILURE){
 		printf("Error initializing data output");
 		return (-1);
 	}

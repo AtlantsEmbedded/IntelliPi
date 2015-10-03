@@ -7,8 +7,8 @@
  *        to user options.
  */
 
-#define INIT_DATA_OUTPUT_FC() \
-		_INIT_DATA_OUTPUT_FC(NULL)
+#define INIT_DATA_OUTPUT_FC(param) \
+		_INIT_DATA_OUTPUT_FC(param)
 		
 #define COPY_DATA_IN(param) \
 		_COPY_DATA_IN(param)
@@ -33,8 +33,25 @@ typedef struct data_s {
 	int nb_data;
 } data_t;
 
+
+/*Structure containing the configuration of the hardware*/
+typedef struct data_out_options_s {
+
+	/*definitions defining key to shared memory and IPC semaphore*/
+	int shm_key;
+	int sem_key;
+
+	/*definitions affecting output buffer memory requirement and usage*/
+	int nb_data_channels;
+	int window_size;
+	int nb_pages;
+	int page_size;
+	int buffer_size;
+	
+} data_out_options_t;
+
 /*init function to setup funciton pointers*/
-int init_data_output(char output_type);
+int init_data_output(char output_type, data_out_options_t options);
 
 
 #endif

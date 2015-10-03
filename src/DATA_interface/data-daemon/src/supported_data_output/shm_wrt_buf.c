@@ -30,6 +30,10 @@ static int current_page; /*keeps track of the page to be written into*/
 static char page_opened; /*flags indicate if the page is being written into*/
 static char* shm_buf; /*pointer to the beginning of the shared buffer*/
 
+/*static copy of the buffer options*/
+data_out_options_t shm_options;
+
+
 static int semid; /*id of semaphore set*/
 struct sembuf *sops; /* pointer to operations to perform */
 
@@ -48,13 +52,25 @@ union semun {
  * @param param, unused
  * @return EXIT_FAILURE for unknown type, EXIT_SUCCESS for known/success
  */
-int shm_wrt_init(void *param __attribute__ ((unused))){
+int shm_wrt_init(void *param){
 	
 	union semun semopts;    
+	
+	/*make local copy of shm options*/
+	memcpy(&shm_options, param, sizeof(data_out_options_t));
+	
+	
+	printf("shm_key:%i\n",shm_options.shm_key);
+	printf("sem_key:%i\n",shm_options.sem_key);
+	printf("nb_data_channels:%i\n",shm_options.nb_data_channels);
+	printf("window_size:%i\n",shm_options.window_size);
+	printf("nb_pages:%i\n",shm_options.nb_pages);
+	printf("page_size:%i\n",shm_options.page_size);
+	printf("buffer_size:%i\n",shm_options.buffer_size);
 		        
     /*initialise the shared memory array*/
 	printf("\nshmget: setup shared memory space\n");
-    if ((shmid = shmget(SHM_KEY, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
+    if ((shmid = shmget(shm_options.shm_key, shm_options.buffer_size, IPC_CREAT | 0666)) < 0) {
         perror("shmget");
         return EXIT_FAILURE;
     }
@@ -72,13 +88,14 @@ int shm_wrt_init(void *param __attribute__ ((unused))){
     
     /*Access the semaphore array*/
     printf("\nsemget: setting up the semaphore array\n");
-	if ((semid = semget(SEM_KEY, NB_SEM, IPC_CREAT | 0666)) == -1) {
+	if ((semid = semget(shm_options.sem_key, NB_SEM, IPC_CREAT | 0666)) == -1) {
 		perror("semget failed\n");
 		return EXIT_FAILURE;
     } 
     else 
 		printf("semget succeeded\n");
 
+	/*set semaphores initial value to 0*/
     semopts.val = 0;
     semctl( semid, 0, SETVAL, semopts);
     semctl( semid, 1, SETVAL, semopts);
@@ -109,9 +126,6 @@ int shm_wrt_write_in_buf(void *param){
 	data_t *data = (data_t *) param;
 	int write_ptr;
 	
-	
-	printf("check write to shm, before page opened\n");
-	
 	/*check if the page is not opened*/
 	if(!page_opened){
 		/*if not opened*/
@@ -128,17 +142,17 @@ int shm_wrt_write_in_buf(void *param){
 	/*if the page is opened*/
 	if(page_opened){
 		
-		printf("check page opened\n");
+		printf("writing to data buffer: %i\n",rand());
 		
 		/*compute the write location*/
-		write_ptr = SHM_PAGE_SIZE*current_page+SAMPLE_SIZE*samples_count;
+		write_ptr = shm_options.page_size*current_page+shm_options.nb_data_channels*samples_count;
 		
 		/*check which type of data is coming in*/
 		switch(data->type){
 			/*32 bits unsigned integer*/
 			case INT32:
 				/*write data*/
-				memcpy((void*)&(shm_buf[write_ptr]),(void*)data->ptr, data->nb_data*sizeof(int));
+				memcpy((void*)&(shm_buf[write_ptr]),(void*)data->ptr, data->nb_data*sizeof(float));
 			break;
 			
 			default:
@@ -148,14 +162,12 @@ int shm_wrt_write_in_buf(void *param){
 		samples_count++;
 		
 		/*check if the page is full*/
-		if(samples_count>NB_SAMPLES_PER_PAGE){
-			
-			printf("sem set\n");
+		if(samples_count>=shm_options.window_size){
 		
 			/*close the page*/
 			page_opened = 0x00;
 			/*change the page*/
-			current_page = (current_page+1)%NB_PAGE;
+			current_page = (current_page+1)%shm_options.nb_pages;
 			/*reset nb of samples read*/
 			samples_count = 0; 
 			
@@ -165,6 +177,7 @@ int shm_wrt_write_in_buf(void *param){
 			sops->sem_flg = SEM_UNDO | IPC_NOWAIT; /*undo if fails and non-blocking call*/
 			semop(semid, sops, 1);
 		}
+		
 	}
 	else{
 		/*else drop the sample (do nothing)*/

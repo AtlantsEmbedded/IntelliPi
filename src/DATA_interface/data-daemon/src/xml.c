@@ -21,8 +21,8 @@ static int sanity_check_app_attributes(ezxml_t app_attribute);
 
 const char *XML_app_elements[] =
     { "debug", "interface", "device", "keep_alive", "keep_time", "compression", "remote_addr", "process_data", "buffer",
-	"samples", "conn_attempts",
-	"number_runs", "output_format"
+	"shm_key","sem_key","nb_data_channels","window_size","nb_pages","samples", "number_runs", "conn_attempts",
+	"output_format"
 };
 
 static appconfig_t *config = NULL;
@@ -142,7 +142,52 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 	} else {
 		app_info->buffer = 0;
 	}
-
+	
+	/*Get appAttributes/shm_key*/
+	tmp = ezxml_child(app_attribute, "shm_key");
+	if (tmp == NULL) {
+		printf("appAttributes->shm_key is missing\n");
+		return (-1);
+	}
+	app_info->shm_key = (uint16_t) atoi(tmp->txt);
+	
+	
+	/*Get appAttributes/sem_key*/
+	tmp = ezxml_child(app_attribute, "sem_key");
+	if (tmp == NULL) {
+		printf("appAttributes->sem_key is missing\n");
+		return (-1);
+	}
+	app_info->sem_key = (uint16_t) atoi(tmp->txt);
+	
+	
+	/*Get appAttributes/nb_data_channels*/
+	tmp = ezxml_child(app_attribute, "nb_data_channels");
+	if (tmp == NULL) {
+		printf("appAttributes->nb_data_channels is missing\n");
+		return (-1);
+	}
+	app_info->nb_data_channels = (uint16_t) atoi(tmp->txt);
+	
+	
+	/*Get appAttributes/window_size*/
+	tmp = ezxml_child(app_attribute, "window_size");
+	if (tmp == NULL) {
+		printf("appAttributes->window_size is missing\n");
+		return (-1);
+	}
+	app_info->window_size = (uint16_t) atoi(tmp->txt);
+	
+	
+	
+	/*Get appAttributes/nb_pages*/
+	tmp = ezxml_child(app_attribute, "nb_pages");
+	if (tmp == NULL) {
+		printf("appAttributes->nb_pages is missing\n");
+		return (-1);
+	}
+	app_info->nb_pages = (uint16_t) atoi(tmp->txt);
+	
 	/*Get appAttributes/samples*/
 	tmp = ezxml_child(app_attribute, "samples");
 	if (tmp == NULL) {

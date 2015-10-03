@@ -22,6 +22,11 @@ typedef struct appconfig_s {
 	unsigned char interface[MAX_CHAR_FIELD_LENGTH];
 	unsigned char device[MAX_CHAR_FIELD_LENGTH];
 	unsigned char remote_addr[MAX_CHAR_FIELD_LENGTH];
+	int shm_key;
+	int sem_key;
+	int nb_data_channels;
+	int window_size;
+	int nb_pages;
 	uint32_t compression:1;
 	uint32_t keep_alive:1;
 	uint32_t process_data:1;
