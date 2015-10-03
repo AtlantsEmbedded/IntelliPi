@@ -61,8 +61,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = src/main.c
-OBJECTS       = src/main.o
+SOURCES       = main.c
+OBJECTS       = main.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = cerebralwars_app
@@ -107,8 +107,8 @@ dist:
 
 ####### Compile
 
-main.o: src/main.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o src/main.c
+main.o: main.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o main.c
 
 ####### Install
 
