@@ -16,7 +16,7 @@
  * @param output_type, integer identifying the output mode to be configured 
  * @return EXIT_FAILURE for unknown type, EXIT_SUCCESS for known/success
  */
-int init_feature_output(char input_type){
+int init_feature_output(char input_type, feature_output_options_t options){
 
 	_INIT_FEATURE_OUTPUT_FC = NULL;
 	_WRITE_DATA_FC = NULL;
@@ -45,5 +45,5 @@ int init_feature_output(char input_type){
 		return EXIT_FAILURE;
 	}
 
-	return INIT_FEATURE_OUTPUT_FC();
+	return INIT_FEATURE_OUTPUT_FC(&options);
 }

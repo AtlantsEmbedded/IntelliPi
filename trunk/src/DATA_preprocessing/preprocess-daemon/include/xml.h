@@ -24,7 +24,11 @@ typedef struct appconfig_s {
 	/*data source config*/
 	char data_source;
     int nb_channels;
-    int buffer_depth;
+    int window_width;
+    
+    int rd_shm_key;
+    int wr_shm_key;
+	int sem_key;
 	
 	/*feature vector config*/
 	char feature_dest;

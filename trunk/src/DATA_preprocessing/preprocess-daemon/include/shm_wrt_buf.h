@@ -11,9 +11,9 @@
  *        (...)
  */
 
-#define SHM_KEY 7803
+//#define SHM_KEY 7804
 
-#define NB_FEATURES 4
+#define NB_FEATURES 220
 #define FEATURE_SIZE 8 
 #define SAMPLE_SIZE NB_FEATURES*FEATURE_SIZE 
 #define BUFFER_DEPTH 2 /*nb of samples in the buffer*/

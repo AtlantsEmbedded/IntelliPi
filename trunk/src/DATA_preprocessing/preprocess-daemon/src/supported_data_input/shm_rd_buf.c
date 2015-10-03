@@ -32,6 +32,8 @@ static char* shm_buf; /*pointer to the beginning of the shared buffer*/
 static int semid; /*id of semaphore set*/
 struct sembuf *sops; /* pointer to operations to perform */
 
+data_input_options_t data_input_opts;
+
 /**
  * int shm_rd_init(void *param)
  * @brief Setups the shared memory input (memory and semaphores linkage)
@@ -39,7 +41,11 @@ struct sembuf *sops; /* pointer to operations to perform */
  * @param param, unused
  * @return EXIT_FAILURE for unknown type, EXIT_SUCCESS for known/success
  */
-int shm_rd_init(void *param __attribute__ ((unused))){
+int shm_rd_init(void *param){
+	
+	
+	memcpy(&data_input_opts,param,sizeof(data_input_opts));
+	
 	
 	printf("\n**************\nInit SHM Input\n**************\n\n");
 	
@@ -47,7 +53,7 @@ int shm_rd_init(void *param __attribute__ ((unused))){
      * initialise the shared memory array
      */
 	printf("shmget: setup shared memory space\n");
-    if ((shmid = shmget(SHM_KEY, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
+    if ((shmid = shmget(data_input_opts.shm_key, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
         perror("shmget");
         return EXIT_FAILURE;
     }
@@ -69,7 +75,7 @@ int shm_rd_init(void *param __attribute__ ((unused))){
      * Access the semaphore array.
      */
     printf("semget: setting up the semaphore array\n");
-	if ((semid = semget(SEM_KEY, NB_SEM, IPC_CREAT | 0666)) == -1) {
+	if ((semid = semget(data_input_opts.sem_key, NB_SEM, IPC_CREAT | 0666)) == -1) {
 		perror("semget failed\n");
 		return EXIT_FAILURE;
     } 
@@ -114,10 +120,10 @@ int shm_rd_read_from_buf(void *param){
 	
 	/*read all data in the page*/
 	for(i=0;i<NB_SAMPLES_PER_PAGE;i++){
-		for(j=0;j<NB_FEATURES;j++){
+		for(j=0;j<data_input_opts.nb_channels;j++){
 			
 			/*read and convert*/
-			data_buf[i*NB_FEATURES+j] = (double)shm_buf[read_ptr+FEATURE_SIZE*j+i*SAMPLE_SIZE];
+			data_buf[i*data_input_opts.nb_channels+j] = (double)shm_buf[read_ptr+DATA_SIZE*j+i*SAMPLE_SIZE];
 			
 		}
 	}

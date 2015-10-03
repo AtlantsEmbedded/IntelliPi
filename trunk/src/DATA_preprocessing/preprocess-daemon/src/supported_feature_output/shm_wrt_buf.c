@@ -23,6 +23,8 @@ static char* shm_buf; /*pointer to the beginning of the shared buffer*/
 static int semid; /*id of semaphore set*/
 struct sembuf *sops; /* pointer to operations to perform */
 
+feature_output_options_t feature_output_opt;
+
 /* arg for semctl system calls. */
 union semun {
 		int val;                /* value for SETVAL */
@@ -38,13 +40,15 @@ union semun {
  * @param param, unused
  * @return EXIT_FAILURE for unknown type, EXIT_SUCCESS for known/success
  */
-int shm_wrt_init(void *param __attribute__ ((unused))){
+int shm_wrt_init(void *param){
 	
 	union semun semopts;    
+	
+	memcpy(&feature_output_opt,param, sizeof(feature_output_options_t));
 		        
     /*initialise the shared memory array*/
 	printf("\nshmget: setup shared memory space\n");
-    if ((shmid = shmget(SHM_KEY, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
+    if ((shmid = shmget(feature_output_opt.shm_key, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
         perror("shmget");
         return EXIT_FAILURE;
     }
@@ -62,16 +66,12 @@ int shm_wrt_init(void *param __attribute__ ((unused))){
     
     /*Access the semaphore array*/
     printf("\nsemget: setting up the semaphore array\n");
-	if ((semid = semget(SEM_KEY, NB_SEM, IPC_CREAT | 0666)) == -1) {
+	if ((semid = semget(feature_output_opt.sem_key, NB_SEM, IPC_CREAT | 0666)) == -1) {
 		perror("semget failed\n");
 		return EXIT_FAILURE;
     } 
     else 
 		printf("semget succeeded\n");
-
-    //semopts.val = 0;
-    //semctl( semid, 0, SETVAL, semopts);
-    //semctl( semid, 1, SETVAL, semopts);
 	
 	/*allocate the memory for the pointer to semaphore operations*/
 	sops = (struct sembuf *) malloc(sizeof(struct sembuf));
@@ -108,8 +108,7 @@ int shm_wrt_write_to_buf(void *param){
 		/*-write data*/
 		memcpy((void*)&(shm_buf[write_ptr]),(void*)data->ptr, data->nb_data*sizeof(double));
 		
-		/*-increment count (circular buffer)*/
-		//feature_vect_count = (feature_vect_count+data->nb_data)%BUFFER_DEPTH;
+		/*the plan was to have 2 pages, but only one page is used, currently*/
 		feature_vect_count = 0;
 		
 		/*-post the semaphore*/
