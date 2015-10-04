@@ -26,7 +26,7 @@ typedef struct pixel_s{
 }pixel_t;
 
 
-const unsigned char particle_kernel[PARTICLE_LENGTH] = {0, 100, 150, 200};
+const unsigned char particle_kernel[PARTICLE_LENGTH] = {0, 50, 100, 200};
 
 /**
  * main(int argc, char **argv)
@@ -89,7 +89,7 @@ int main(int argc, char **argv){
 			
 			/*else roll a dice to determine if a new particule needs to be spawned*/
 			if(((float)rand()/(float)RAND_MAX)>0.66){
-				particle_counter = PARTICLE_LENGTH;
+				particle_counter = (PARTICLE_LENGTH-1);
 				particle_color = rand()%3;
 				
 				//printf("New particle up!\n");
@@ -98,7 +98,7 @@ int main(int argc, char **argv){
 		
 		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
 		
-		usleep(750000);	
+		usleep(75000);	
 	}
 	
 	
