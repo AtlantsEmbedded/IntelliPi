@@ -37,7 +37,7 @@ int main(int argc, char **argv){
 
 	/*define buffer*/
 	pixel_t buffer[NB_LEDS];
-	
+	int i;
 	int spi_driver;
 	unsigned char particle_counter = 0x00;
 	unsigned char particle_color = 0x00;
@@ -82,6 +82,7 @@ int main(int argc, char **argv){
 			}
 		}	
 		
+		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
 		usleep(250);	
 	}
 	
