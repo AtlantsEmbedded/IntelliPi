@@ -62,11 +62,7 @@ int main(int argc, char **argv){
 	
 	for(;;)
 	{	
-		/*define buffer*/
-		pixel_t buffer[loop_count];
-	
-		/*set the whole array to 0*/
-		memset(buffer,0,loop_count*sizeof(pixel_t));
+		
 		if((cnt%2) == 0)
 		{
 			for(i=start_count;i<loop_count;i++){
