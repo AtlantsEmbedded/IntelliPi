@@ -5,11 +5,11 @@ START=1
 STOP=2
  
 start() {        
-        /atom/data/data_interface config/zwhacks_datainterface_muse_1.xml
-        /atom/data/data_interface config/zwhacks_datainterface_muse_2.xml
-        /atom/data/data_processing config/zwhacks_preprocessing_muse_1.xml
-        /atom/data/data_processing config/zwhacks_preprocessing_muse_2.xml
-        /atom/cerebralwars_app
+      #  /atom/data/data_interface config/zwhacks_datainterface_muse_1.xml &
+      #  /atom/data/data_interface config/zwhacks_datainterface_muse_2.xml & 
+      #  /atom/data/data_processing config/zwhacks_preprocessing_muse_1.xml &
+      #  /atom/data/data_processing config/zwhacks_preprocessing_muse_2.xml &
+      #  /atom/cerebralwars_app
 }                 
  
 stop() {          
