@@ -11,6 +11,84 @@
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
 
+
+#define NB_LEDS 149   
+#define PARTICLE_LENGTH 4
+#define RED 0
+#define GREEN 1
+#define BLUE 2
+
+typedef struct pixel_s{
+	
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+}pixel_t;
+
+
+const unsigned char particle_kernel[PARTICLE_LENGTH] = {255, 200, 100, 0};
+
+/**
+ * main(int argc, char **argv)
+ * @brief test the mindbx_lib
+ */
+int main(int argc, char **argv){
+	
+
+	/*define buffer*/
+	pixel_t buffer[NB_LEDS];
+	
+	int spi_driver;
+	unsigned char particle_counter = 0x00;
+	unsigned char particle_color = 0x00;
+	
+	spi_driver = open("/dev/spidev0.0",O_RDWR);
+	
+	memset(buffer,0,sizeof(pixel_t)*NB_LEDS);
+	
+	while(1){
+		
+		/*from the end of red*/
+		/*roll back by bringing encountered values forward*/
+		for(i=NB_LEDS-1;i>=0;i++){
+			buffer[i+1].red = buffer[i].red;
+			buffer[i+1].green = buffer[i].green;
+			buffer[i+1].blue = buffer[i].blue;
+		}
+		
+		/*check if a particle is being placed*/
+		if(particle_counter>0){
+			
+			switch(particle_color){
+				
+				case RED:
+					buffer[0].red = particle_kernel[particle_counter];
+					break;
+				case GREEN:
+					buffer[0].green = particle_kernel[particle_counter];
+					break;
+				case BLUE:
+					buffer[0].blue = particle_kernel[particle_counter];
+					break;
+			
+			}
+			particle_counter--;
+		}else{
+			
+			/*else roll a dice to determine if a new particule needs to be spawned*/
+			if(((float)rand()/(float)RAND_MAX)>0.66){
+				particle_counter = PARTICLE_LENGTH;
+				particle_color = rand()%3;
+			}
+		}		
+	}
+	
+	
+	exit(0);
+}
+
+
+#if 0
 typedef struct pixel_s{
 	
 	uint8_t red;
@@ -62,4 +140,4 @@ int main(int argc, char **argv){
 }
 	exit(0);
 }
-
+#endif
