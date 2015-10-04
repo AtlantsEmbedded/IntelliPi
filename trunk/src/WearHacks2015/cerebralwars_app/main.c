@@ -110,7 +110,7 @@ int main(int argc, char **argv){
 		/*check if a particle is being placed at the end*/
 		if(particle_counter[END]>0){
 			
-			switch(particle_color){
+			switch(particle_color[END]){
 				
 				case RED:
 					buffer[NB_LEDS].red = particle_kernel[particle_counter[END]];
