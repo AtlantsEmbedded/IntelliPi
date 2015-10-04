@@ -13,9 +13,9 @@
 
 typedef struct pixel_s{
 	
-	uint16_t red:8;
-	uint16_t green:8;
-	uint16_t blue:8;
+	uint16_t red:7;
+	uint16_t green:7;
+	uint16_t blue:7;
 	//uint32_t first_bit:1;
 } __attribute__((packed)) pixel_t;
 
@@ -26,11 +26,13 @@ typedef struct pixel_s{
  */
 int main(int argc, char **argv){
 	
-	int i, loop_count;
+	int i, loop_count,start_count;
 	int red, blue, green;
 	int spi_driver;
 	while(1){
-	printf("Input the value counts: ");
+	printf("Input the value of start count: ");
+	scanf("%d", &start_count);
+	printf("Input the value of end count: ");
 	scanf("%d", &loop_count);
 	printf("Input the Red intensity: ");
 	scanf("%d", &red);
@@ -45,7 +47,7 @@ int main(int argc, char **argv){
 	/*set the whole array to 0*/
 	memset(buffer,0,loop_count*sizeof(pixel_t));
 	
-	for(i=0;i<loop_count;i++){
+	for(i=start_count;i<loop_count;i++){
 		buffer[i].red = red;
 		buffer[i].blue = blue;
 		buffer[i].green = green;
