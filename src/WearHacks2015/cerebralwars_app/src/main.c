@@ -1,5 +1,5 @@
 
-#define LED_STRIP_ENABLED 1
+#define LED_STRIP_ENABLED 0
 
 #include <stdio.h>
 #include <stdlib.h>
