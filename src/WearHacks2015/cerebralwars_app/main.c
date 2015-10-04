@@ -16,7 +16,7 @@ typedef struct pixel_s{
 	uint8_t red;
 	uint8_t green;
 	uint8_t blue;
-	uint8_t first_bit;
+	//uint8_t first_bit;
 } /*__attribute__((packed)) */pixel_t;
 
 
