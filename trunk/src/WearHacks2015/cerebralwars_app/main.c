@@ -54,14 +54,6 @@ int main(int argc, char **argv){
 	
 	while(1){
 		
-		/*from the end to explosion*/
-		/*roll back by bringing encountered values forward*/
-		for(i=explosion_location;i<NB_LEDS;i++){
-			buffer[i-1].red = buffer[i].red;
-			buffer[i-1].green = buffer[i].green;
-			buffer[i-1].blue = buffer[i].blue;
-		}
-		
 		/*from the start to explosion*/
 		for(i=explosion_location;i>=0;i--){
 			buffer[i+1].red = buffer[i].red;
@@ -101,10 +93,19 @@ int main(int argc, char **argv){
 			/*else roll a dice to determine if a new particule needs to be spawned*/
 			if(((float)rand()/(float)RAND_MAX)>0.66){
 				particle_counter[BEGIN] = (PARTICLE_LENGTH-1);
-				particle_color[BEGIN] = rand()%3;
+				particle_color[BEGIN] = BLUE;
 				
 			}
 		}	
+		
+		
+		/*from the end to explosion*/
+		/*roll back by bringing encountered values forward*/
+		for(i=explosion_location;i<NB_LEDS;i++){
+			buffer[i-1].red = buffer[i].red;
+			buffer[i-1].green = buffer[i].green;
+			buffer[i-1].blue = buffer[i].blue;
+		}
 		
 		
 		/*check if a particle is being placed at the end*/
@@ -113,33 +114,33 @@ int main(int argc, char **argv){
 			switch(particle_color[END]){
 				
 				case RED:
-					buffer[NB_LEDS].red = particle_kernel[particle_counter[END]];
-					buffer[NB_LEDS].green = 0;
-					buffer[NB_LEDS].blue = 0;
+					buffer[NB_LEDS-1].red = particle_kernel[particle_counter[END]];
+					buffer[NB_LEDS-1].green = 0;
+					buffer[NB_LEDS-1].blue = 0;
 					break;
 				case GREEN:
-					buffer[NB_LEDS].red = 0;
-					buffer[NB_LEDS].green = particle_kernel[particle_counter[END]];
-					buffer[NB_LEDS].blue = 0;
+					buffer[NB_LEDS-1].red = 0;
+					buffer[NB_LEDS-1].green = particle_kernel[particle_counter[END]];
+					buffer[NB_LEDS-1].blue = 0;
 					break;
 				case BLUE:
-					buffer[NB_LEDS].red = 0;
-					buffer[NB_LEDS].green = 0;
-					buffer[NB_LEDS].blue = particle_kernel[particle_counter[END]];
+					buffer[NB_LEDS-1].red = 0;
+					buffer[NB_LEDS-1].green = 0;
+					buffer[NB_LEDS-1].blue = particle_kernel[particle_counter[END]];
 					break;
 			
 			}
 			particle_counter[END]--;
 		}else{
 	
-			buffer[NB_LEDS].red = 0;
-			buffer[NB_LEDS].green = 0;
-			buffer[NB_LEDS].blue = 0;
+			buffer[NB_LEDS-1].red = 0;
+			buffer[NB_LEDS-1].green = 0;
+			buffer[NB_LEDS-1].blue = 0;
 			
 			/*else roll a dice to determine if a new particule needs to be spawned*/
 			if(((float)rand()/(float)RAND_MAX)>0.66){
 				particle_counter[END] = (PARTICLE_LENGTH-1);
-				particle_color[END] = rand()%3;
+				particle_color[END] = RED;
 				
 				//printf("New particle up!\n");
 			}
