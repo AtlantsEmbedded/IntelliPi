@@ -21,10 +21,10 @@
 #define	FALSE	(1==2)
 #endif
 
+#define SCALE_MAX 20
 
-
-int scale[23] =
-    { 0, 0, 0, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 170, 180, 200, 300, 400,
+int scale[20] =
+    { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 170, 180, 200, 300, 400,
 500 };
 
 typedef struct {
@@ -69,7 +69,7 @@ static void scale_up_button(button_s * state)
 {
 	if ((digitalRead(UP_TMP_PIN) == LOW)) {
 		printf("Up button pressed\n");
-		if (scale_val < 23) {
+		if (scale_val < SCALE_MAX) {
 			scale_val++;
 		}
 		state->waitForRelease = TRUE;
@@ -156,6 +156,7 @@ int main(int argc, char *argv[])
 			}
 		} else {
 			softToneWrite(BEEPER_PIN, scale[scale_val]);
+			printf("scale: %d %d\n",scale_val,scale[scale_val])
 			b_state.waitForRelease = FALSE;
 		}
 
