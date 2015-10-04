@@ -1,0 +1,216 @@
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <wiringPi.h>
+
+#include "rwalk_process.h"
+#include "feature_processing.h"
+#include "ipc_status_comm.h"
+#include "feature_input.h"
+#include "xml.h"
+#include "main.h"
+
+appconfig_t* app_config;
+
+#define CONFIG_NAME "config/application_config.xml"
+
+#define PLAYER_1_ENABLED 1
+#define PLAYER_2_ENABLED 1
+
+unsigned char app_running = 0x01;
+
+void* train_player(void* param);
+void* get_sample(void* param);
+
+/**
+ * which_config(int argc, char **argv)
+ * @brief return which config to use
+ * @param argc
+ * @param argv
+ * @return string of config
+ */
+inline char *which_config(int argc, char **argv)
+{
+
+	if (argc == 2) {
+		return argv[1];
+	} else {
+		return CONFIG_NAME;
+	}
+}
+
+/**
+ * main(int argc, char **argv)
+ * @brief test the mindbx_lib
+ */
+int main(int argc, char **argv){
+	
+	int i;
+	feature_input_t feature_input_1;
+	feature_input_t feature_input_2;
+	ipc_comm_t ipc_comm_1;
+	ipc_comm_t ipc_comm_2;
+	feat_proc_t feature_proc_1;
+	feat_proc_t feature_proc_2;
+	
+	pthread_t thread[2];
+	pthread_attr_t attr;
+
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		
+	/*read the xml*/
+	app_config = xml_initialize(which_config(argc, argv));
+	
+	
+	/*configure the feature input - muse 1*/
+#if PLAYER_1_ENABLED
+	feature_input_1.shm_key=7804;
+	feature_input_1.sem_key=1234;
+	init_feature_input(app_config->feature_source, &feature_input_1);
+#endif
+
+#if PLAYER_2_ENABLED
+	/*configure the feature input - muse 2*/
+	feature_input_2.shm_key=4786;
+	feature_input_2.sem_key=1728;
+	init_feature_input(app_config->feature_source, &feature_input_2);
+#endif
+	
+	/*configure the inter-process communication channel - muse 1 & muse 2*/
+#if PLAYER_1_ENABLED
+	ipc_comm_1.sem_key=1234;
+	ipc_comm_init(&ipc_comm_1);
+#endif
+
+#if PLAYER_2_ENABLED
+	ipc_comm_2.sem_key=1728;
+	ipc_comm_init(&ipc_comm_2);
+#endif	
+	/*if required, wait for eeg hardware to be present - muse 1 & muse 2*/
+	if(app_config->eeg_hardware_required){
+#if PLAYER_1_ENABLED
+		ipc_wait_for_harware(&ipc_comm_1);
+#endif		
+
+#if PLAYER_2_ENABLED
+		ipc_wait_for_harware(&ipc_comm_2);
+#endif
+	}
+	
+	/*init feature processing - muse 1 & muse 2*/
+#if PLAYER_1_ENABLED
+	feature_proc_1.nb_train_samples = 20;
+	feature_proc_1.feature_input = &feature_input_1;
+	init_feat_processing(&feature_proc_1);
+#endif
+
+#if PLAYER_2_ENABLED
+	feature_proc_2.nb_train_samples = 20;
+	feature_proc_2.feature_input = &feature_input_2;
+	init_feat_processing(&feature_proc_2);
+#endif
+
+	printf("check\n");
+
+	/*wait for the go*/
+	
+	/*wait 3 seconds*/
+	sleep(3);
+	
+	/*build training set - muse 1 & muse 2 (start a thread)*/
+#if PLAYER_1_ENABLED
+	pthread_create(&thread[0], &attr, train_player, (void*) &feature_proc_1); 
+#endif
+
+#if PLAYER_2_ENABLED
+	pthread_create(&thread[1], &attr, train_player, (void*) &feature_proc_2); 
+#endif
+
+	/*wait for training over - muse 1 & muse 2 (join with the thread)*/
+#if PLAYER_1_ENABLED
+	pthread_join(thread[0],NULL); 
+#endif
+#if PLAYER_2_ENABLED
+	pthread_join(thread[1],NULL); 
+#endif
+
+	printf("Training completed!\n");
+	fflush(stdout); 
+	
+	/*wait 3 seconds*/
+	sleep(3);
+	
+	/*run the test*/
+	for(i=0;i<100;i++){
+	
+		/*get a normalized sample - muse 1 & muse 2*/
+#if PLAYER_1_ENABLED
+		pthread_create(&thread[0], &attr, get_sample, (void*) &feature_proc_1); 
+#endif
+#if PLAYER_2_ENABLED
+		pthread_create(&thread[1], &attr, get_sample, (void*) &feature_proc_2); 
+#endif
+#if PLAYER_1_ENABLED
+		pthread_join(thread[0],NULL);
+#endif
+#if PLAYER_2_ENABLED
+		pthread_join(thread[1],NULL);
+#endif
+		
+		/*show sample - muse 1 & muse 2*/
+		printf("sample[%i]: ",i);
+#if PLAYER_1_ENABLED
+		printf("\tP1:%.3f ",feature_proc_1.sample);
+#endif
+#if PLAYER_2_ENABLED
+		printf("\tP2:%.3f",feature_proc_2.sample);
+#endif
+		printf("\n");
+		fflush(stdout); 
+		
+		/*compute drift variable - muse 2*/
+		
+		//if(drift_variable>4){
+		//	i--;
+		//	printf("eye blink detected\n");
+		//}
+		//else
+		//{
+		//	fprintf(fp,"%.3f : %i\n",drift_variable,trial_type);	
+		//}
+		
+		/*compare accumulation*/
+	}
+	
+#if PLAYER_1_ENABLED
+	ipc_comm_cleanup(&ipc_comm_1);
+	clean_up_feat_processing(&feature_proc_1);
+#endif
+#if PLAYER_2_ENABLED
+	ipc_comm_cleanup(&ipc_comm_2);
+	clean_up_feat_processing(&feature_proc_2);
+#endif
+	pthread_attr_destroy(&attr);
+	
+	exit(0);
+}
+
+void* train_player(void* param){
+	train_feat_processing((feat_proc_t*)param);	
+}
+
+void* get_sample(void* param){
+	get_normalized_sample((feat_proc_t*)param);
+}
+
+
+void stop_application(void){
+	app_running = 0x00;
+}
+
+
+
