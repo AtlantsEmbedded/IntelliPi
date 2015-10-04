@@ -59,26 +59,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = src/main.c \
-				src/xml.c \
-				src/app_signal.c \
-				src/wiringPi.c \
-				src/rwalk_process.c \
-				src/feature_processing.c \
-				src/feature_input.c \
-				src/ipc_status_comm.c \
-				src/supported_feature_input/fake_feature_generator.c \
-				src/supported_feature_input/shm_rd_buf.c
-OBJECTS       = src/main.o \
-				src/xml.o \
-				src/app_signal.o \
-				src/wiringPi.o \
-				src/rwalk_process.o \
-				src/feature_processing.o \
-				src/feature_input.o \
-				src/ipc_status_comm.o \
-				src/supported_feature_input/fake_feature_generator.o \
-				src/supported_feature_input/shm_rd_buf.o
+SOURCES       = src/main.c
+OBJECTS       = src/main.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = cerebralwars_app
@@ -127,33 +109,6 @@ dist:
 main.o: src/main.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o src/main.c
 	
-xml.o: src/xml.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o xml.o src/xml.c
-	
-wiringPi.o: src/wiringPi.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o wiringPi.o src/wiringPi.c
-
-app_signal.o: src/app_signal.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o app_signal.o src/app_signal.c
-	
-rwalk_process.o: src/rwalk_process.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o rwalk_process.o src/rwalk_process.c
-	
-feature_processing.o: src/train_set_acq.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o train_set_acq.o src/feature_processing.c 
-
-feature_input.o: src/feature_input.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o feature_input.o src/feature_input.c 
-
-ipc_status_comm.o: src/ipc_status_comm.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o ipc_status_comm.o src/ipc_status_comm.c 
-	
-fake_feature_generator.o: src/supported_feature_input/fake_feature_generator.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o fake_feature_generator.o src/supported_feature_input/fake_feature_generator.c 
-	
-shm_rd_buf.o: src/supported_feature_input/shm_rd_buf.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -o shm_rd_buf.o src/supported_feature_input/shm_rd_buf.c 
-
 ####### Install
 
 install:   FORCE
