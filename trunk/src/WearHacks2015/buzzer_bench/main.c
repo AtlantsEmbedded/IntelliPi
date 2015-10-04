@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @date Jan 17, 2015
+ * @date Oct 4th/2015
 */
 
 #include <stdio.h>
@@ -13,10 +13,7 @@
 #include <ctype.h>
 
 #include <wiringPi.h>
-#include <mcp23017.h>
 #include <softTone.h>
-#include <lcd.h>
-#include "main.h"
 
 
 #ifndef	TRUE
