@@ -50,6 +50,9 @@ static unsigned char particle_color[2] = {0x00,0x00};
 unsigned char led_strip_alive = 0x00;
 pthread_t led_strip_thread;
 
+
+void* led_strip_task(void* param);
+
 /**
  * main(int argc, char **argv)
  * @brief test the mindbx_lib
@@ -252,11 +255,13 @@ void* led_strip_task(void* param){
 		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
 		usleep(5000);	
 	}
+	
+	return NULL;
 }
 
 
 void cleanup_led_strip(){
 	close(spi_driver);
 	led_strip_alive = 0x00;
-	pthread_join(thread,NULL); 
+	pthread_join(led_strip_thread,NULL); 
 }
