@@ -48,7 +48,7 @@ int main(int argc, char **argv){
 	unsigned char particle_color[2] = {0x00,0x00};
 	static uint32_t speed = 1000000;
 	int explosion_location = NB_LEDS/2;
-	
+	int address;
 	
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
 	ioctl(spi_driver, SPI_IOC_WR_MAX_SPEED_HZ, &speed);	
