@@ -1,4 +1,5 @@
 
+#define LED_STRIP_ENABLED 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +14,10 @@
 #include "xml.h"
 #include "main.h"
 
+#if LED_STRIP_ENABLED
+	#include "led_strip_lib.h"
+#endif
+
 appconfig_t* app_config;
 
 #define CONFIG_NAME "config/application_config.xml"
@@ -24,6 +29,9 @@ unsigned char app_running = 0x01;
 
 void* train_player(void* param);
 void* get_sample(void* param);
+
+double player_1_acc_value = 5;
+double player_2_acc_value = 5;
 
 /**
  * which_config(int argc, char **argv)
@@ -55,6 +63,11 @@ int main(int argc, char **argv){
 	ipc_comm_t ipc_comm_2;
 	feat_proc_t feature_proc_1;
 	feat_proc_t feature_proc_2;
+	
+	int player_1_intensity;
+	int player_2_intensity;
+	
+	unsigned char game_over = 0x00;
 	
 	pthread_t thread[2];
 	pthread_attr_t attr;
@@ -115,75 +128,122 @@ int main(int argc, char **argv){
 #endif
 
 	printf("check\n");
+	
+	while(1){
 
-	/*wait for the go*/
-	
-	/*wait 3 seconds*/
-	sleep(3);
-	
-	/*build training set - muse 1 & muse 2 (start a thread)*/
-#if PLAYER_1_ENABLED
-	pthread_create(&thread[0], &attr, train_player, (void*) &feature_proc_1); 
-#endif
-
-#if PLAYER_2_ENABLED
-	pthread_create(&thread[1], &attr, train_player, (void*) &feature_proc_2); 
-#endif
-
-	/*wait for training over - muse 1 & muse 2 (join with the thread)*/
-#if PLAYER_1_ENABLED
-	pthread_join(thread[0],NULL); 
-#endif
-#if PLAYER_2_ENABLED
-	pthread_join(thread[1],NULL); 
-#endif
-
-	printf("Training completed!\n");
-	fflush(stdout); 
-	
-	/*wait 3 seconds*/
-	sleep(3);
-	
-	/*run the test*/
-	for(i=0;i<100;i++){
-	
-		/*get a normalized sample - muse 1 & muse 2*/
-#if PLAYER_1_ENABLED
-		pthread_create(&thread[0], &attr, get_sample, (void*) &feature_proc_1); 
-#endif
-#if PLAYER_2_ENABLED
-		pthread_create(&thread[1], &attr, get_sample, (void*) &feature_proc_2); 
-#endif
-#if PLAYER_1_ENABLED
-		pthread_join(thread[0],NULL);
-#endif
-#if PLAYER_2_ENABLED
-		pthread_join(thread[1],NULL);
-#endif
+		/*wait for the go*/
 		
-		/*show sample - muse 1 & muse 2*/
-		printf("sample[%i]: ",i);
-#if PLAYER_1_ENABLED
-		printf("\tP1:%.3f ",feature_proc_1.sample);
-#endif
-#if PLAYER_2_ENABLED
-		printf("\tP2:%.3f",feature_proc_2.sample);
-#endif
-		printf("\n");
+		/*wait 3 seconds*/
+		sleep(3);
+		
+		/*build training set - muse 1 & muse 2 (start a thread)*/
+	#if PLAYER_1_ENABLED
+		pthread_create(&thread[0], &attr, train_player, (void*) &feature_proc_1); 
+	#endif
+
+	#if PLAYER_2_ENABLED
+		pthread_create(&thread[1], &attr, train_player, (void*) &feature_proc_2); 
+	#endif
+
+		/*wait for training over - muse 1 & muse 2 (join with the thread)*/
+	#if PLAYER_1_ENABLED
+		pthread_join(thread[0],NULL); 
+	#endif
+	#if PLAYER_2_ENABLED
+		pthread_join(thread[1],NULL); 
+	#endif
+
+		printf("Training completed!\n");
 		fflush(stdout); 
 		
-		/*compute drift variable - muse 2*/
+#if LED_STRIP_ENABLED
+		/*start the led strip*/
+		init_led_strip();
+#endif
 		
-		//if(drift_variable>4){
-		//	i--;
-		//	printf("eye blink detected\n");
-		//}
-		//else
-		//{
-		//	fprintf(fp,"%.3f : %i\n",drift_variable,trial_type);	
-		//}
+		/*wait 3 seconds*/
+		sleep(3);
 		
-		/*compare accumulation*/
+		player_1_acc_value = 5;
+		player_2_acc_value = 5;
+		game_over = 0;
+
+		/*run the test*/
+		while(!game_over){
+		
+			/*get a normalized sample - muse 1 & muse 2*/
+	#if PLAYER_1_ENABLED
+			pthread_create(&thread[0], &attr, get_sample, (void*) &feature_proc_1); 
+	#endif
+	#if PLAYER_2_ENABLED
+			pthread_create(&thread[1], &attr, get_sample, (void*) &feature_proc_2); 
+	#endif
+	#if PLAYER_1_ENABLED
+			pthread_join(thread[0],NULL);
+	#endif
+	#if PLAYER_2_ENABLED
+			pthread_join(thread[1],NULL);
+	#endif
+			
+#if 0			
+			/*show sample - muse 1 & muse 2*/
+			printf("sample[%i]: ",i);
+	#if PLAYER_1_ENABLED
+			printf("\tP1:%.3f ",feature_proc_1.sample);
+	#endif
+	#if PLAYER_2_ENABLED
+			printf("\tP2:%.3f",feature_proc_2.sample);
+	#endif
+#endif
+			
+			if(feature_proc_1.sample>0){
+				player_1_acc_value += feature_proc_1.sample;
+			}
+			
+			if(feature_proc_2.sample>0){
+				player_2_acc_value += feature_proc_2.sample;
+			}
+			
+			player_1_intensity = (10-feature_proc_1.sample/3*10 + 1);
+			player_2_intensity = (10-feature_proc_2.sample/3*10 + 1);
+			
+			if(player_1_intensity>10){
+				player_1_intensity=10;
+			}else if(player_1_intensity<1){
+				player_1_intensity=1;
+			}
+			
+			if(player_2_intensity>10){
+				player_2_intensity=10;
+			}else if(player_2_intensity<1){
+				player_2_intensity=1;
+			}
+			
+#if LED_STRIP_ENABLED
+			set_led_strip_values(player_1_intensity, player_2_intensity, player_1_acc_value/(player_1_acc_value+player_2_acc_value)*NB_LEDS);
+#else
+			printf("iteration[%i]: ",i);
+			printf("\tP1:%i ",11-player_1_intensity);
+			printf("\tP2:%i ",11-player_2_intensity);
+			printf("\tloc:%.3f ",player_1_acc_value/(player_1_acc_value+player_2_acc_value));
+#endif
+			printf("\n");
+			fflush(stdout); 
+			
+			/*compare accumulation*/
+			if(abs(player_1_acc_value-player_2_acc_value)>10){
+				/*we have a winner*/
+				game_over = 0x01;
+				
+				if(player_1_acc_value>player_2_acc_value){
+					printf("Player 1 win!\n");
+				}else{
+					printf("Player 2 win!\n");
+				}
+			}
+			
+			
+		}
 	}
 	
 #if PLAYER_1_ENABLED
