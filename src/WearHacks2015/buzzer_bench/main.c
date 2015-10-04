@@ -61,35 +61,6 @@ static inline void print_banner()
 	printf("------------------------------------------\n");
 }
 
-/**
- * scale_up_button()
- * @brief Handles tmp up button functionality
- */
-static void scale_up_button(button_s * state)
-{
-	if ((digitalRead(UP_TMP_PIN) == LOW)) {
-		printf("Up button pressed\n");
-		if (scale_val < SCALE_MAX) {
-			scale_val++;
-		}
-		state->waitForRelease = TRUE;
-
-	}
-}
-
-/**
- * scale_down_button()
- * @brief Handles tmp down button functionality
- */
-static void scale_down_button(button_s * state)
-{
-	if ((digitalRead(DN_TMP_PIN) == LOW)) {
-		printf("Down button pressed\n");
-
-		state->waitForRelease = TRUE;
-	}
-
-}
 
 /**
  * turn_off_beeper()
@@ -153,9 +124,10 @@ int main(int argc, char *argv[])
 			if (scale_val < SCALE_MAX) {
 				scale_val++;
 			}
-			delay(50);
+			
 			printf("scale %d %d\n", scale_val, scale[scale_val]);
 			softToneWrite(BEEPER_PIN, scale[scale_val]);
+			delay(500);
 
 		}
 
@@ -164,9 +136,10 @@ int main(int argc, char *argv[])
 			if (scale_val > 0) {
 				scale_val--;
 			}
-			delay(50);
+			
 			printf("scale %d %d\n", scale_val, scale[scale_val]);
 			softToneWrite(BEEPER_PIN, scale[scale_val]);
+			delay(500);
 
 		}
 	}
