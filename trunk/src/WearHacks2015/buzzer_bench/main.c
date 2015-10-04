@@ -15,7 +15,6 @@
 #include <wiringPi.h>
 #include <softTone.h>
 
-
 #ifndef	TRUE
 #define	TRUE	(1==1)
 #define	FALSE	(1==2)
@@ -25,7 +24,8 @@
 
 int scale[20] =
     { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 170, 180, 200, 300, 400,
-500 };
+	500
+};
 
 typedef struct {
 	int waitForRelease;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 			}
 		} else {
 			softToneWrite(BEEPER_PIN, scale[scale_val]);
-			printf("scale: %d %d\n",scale_val,scale[scale_val])
+			printf("scale: %d %d\n", scale_val, scale[scale_val]);
 			b_state.waitForRelease = FALSE;
 		}
 
