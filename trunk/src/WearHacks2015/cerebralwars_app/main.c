@@ -80,7 +80,9 @@ int main(int argc, char **argv){
 				particle_counter = PARTICLE_LENGTH;
 				particle_color = rand()%3;
 			}
-		}		
+		}	
+		
+		usleep(250);	
 	}
 	
 	
