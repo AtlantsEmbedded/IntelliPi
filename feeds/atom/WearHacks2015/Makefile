@@ -31,6 +31,7 @@ define Package/WearHacks2015/install
 	$(INSTALL_DIR) $(1)/atom/data/config
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/configs/* $(1)/atom/data/config/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/cerebralwars_app/cerebralwars_app $(1)/atom/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/buzzer_bench/buzzer_bench $(1)/atom/
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/startup_wearhacks.sh $(1)/etc/init.d/wearhacks
