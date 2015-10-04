@@ -1,54 +1,41 @@
 
-#define LED_STRIP_ENABLED 1
 
+#include <stdint.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <wiringPi.h>
+#include <string.h>
+#include <getopt.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <linux/spi/spidev.h>
 
-#include "rwalk_process.h"
-#include "feature_processing.h"
-#include "ipc_status_comm.h"
-#include "feature_input.h"
-#include "xml.h"
-#include "main.h"
 
-#if LED_STRIP_ENABLED
-	#include "led_strip_lib.h"
-#endif
+#define NB_LEDS 149   
+#define PARTICLE_LENGTH 4
+#define RED 0
+#define GREEN 1
+#define BLUE 2
 
-appconfig_t* app_config;
+#define BEGIN 0
+#define END 1
 
-#define CONFIG_NAME "config/application_config.xml"
+#define RED_UPDATE_PERIOD 4
+#define BLUE_UPDATE_PERIOD 2
 
-#define PLAYER_1_ENABLED 1
-#define PLAYER_2_ENABLED 1
+typedef struct pixel_s{
+	
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+}pixel_t;
 
-unsigned char app_running = 0x01;
 
-void* train_player(void* param);
-void* get_sample(void* param);
+const unsigned char particle_kernel[PARTICLE_LENGTH] = {0, 25, 50, 150};
+const unsigned char explosion_kernel[8] = {0, 10, 25, 100, 100, 25, 10, 0};
+const float explosion_animation_kernel[8] = {0.1, 0.3, 0.5, 0.7, 0.7, 0.5, 0.3, 0.1};
 
-double player_1_acc_value = 5;
-double player_2_acc_value = 5;
-
-/**
- * which_config(int argc, char **argv)
- * @brief return which config to use
- * @param argc
- * @param argv
- * @return string of config
- */
-inline char *which_config(int argc, char **argv)
-{
-
-	if (argc == 2) {
-		return argv[1];
-	} else {
-		return CONFIG_NAME;
-	}
-}
 
 /**
  * main(int argc, char **argv)
@@ -56,224 +43,210 @@ inline char *which_config(int argc, char **argv)
  */
 int main(int argc, char **argv){
 	
+
+	/*define buffer*/
+	pixel_t buffer[NB_LEDS];
 	int i;
-	feature_input_t feature_input_1;
-	feature_input_t feature_input_2;
-	ipc_comm_t ipc_comm_1;
-	ipc_comm_t ipc_comm_2;
-	feat_proc_t feature_proc_1;
-	feat_proc_t feature_proc_2;
+	int spi_driver;
+	unsigned char particle_counter[2] = {0x00,0x00};
+	unsigned char particle_color[2] = {0x00,0x00};
+	static uint32_t speed = 1000000;
+	int explosion_location = NB_LEDS/2;
+	int address;
+	int red_update_counter = RED_UPDATE_PERIOD;
+	int blue_update_counter = BLUE_UPDATE_PERIOD;
 	
-	int player_1_intensity;
-	int player_2_intensity;
+	spi_driver = open("/dev/spidev0.0",O_RDWR);
+	ioctl(spi_driver, SPI_IOC_WR_MAX_SPEED_HZ, &speed);	
 	
-	unsigned char game_over = 0x00;
-	
-	pthread_t thread[2];
-	pthread_attr_t attr;
-
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-		
-	/*read the xml*/
-	app_config = xml_initialize(which_config(argc, argv));
-	
-	
-	/*configure the feature input - muse 1*/
-#if PLAYER_1_ENABLED
-	feature_input_1.shm_key=7804;
-	feature_input_1.sem_key=1234;
-	init_feature_input(app_config->feature_source, &feature_input_1);
-#endif
-
-#if PLAYER_2_ENABLED
-	/*configure the feature input - muse 2*/
-	feature_input_2.shm_key=4786;
-	feature_input_2.sem_key=1728;
-	init_feature_input(app_config->feature_source, &feature_input_2);
-#endif
-	
-	/*configure the inter-process communication channel - muse 1 & muse 2*/
-#if PLAYER_1_ENABLED
-	ipc_comm_1.sem_key=1234;
-	ipc_comm_init(&ipc_comm_1);
-#endif
-
-#if PLAYER_2_ENABLED
-	ipc_comm_2.sem_key=1728;
-	ipc_comm_init(&ipc_comm_2);
-#endif	
-	/*if required, wait for eeg hardware to be present - muse 1 & muse 2*/
-	if(app_config->eeg_hardware_required){
-#if PLAYER_1_ENABLED
-		ipc_wait_for_harware(&ipc_comm_1);
-#endif		
-
-#if PLAYER_2_ENABLED
-		ipc_wait_for_harware(&ipc_comm_2);
-#endif
-	}
-	
-	/*init feature processing - muse 1 & muse 2*/
-#if PLAYER_1_ENABLED
-	feature_proc_1.nb_train_samples = 20;
-	feature_proc_1.feature_input = &feature_input_1;
-	init_feat_processing(&feature_proc_1);
-#endif
-
-#if PLAYER_2_ENABLED
-	feature_proc_2.nb_train_samples = 20;
-	feature_proc_2.feature_input = &feature_input_2;
-	init_feat_processing(&feature_proc_2);
-#endif
-
-	printf("check\n");
+	memset(buffer,0,sizeof(pixel_t)*NB_LEDS);
 	
 	while(1){
-
-		/*wait for the go*/
 		
-		/*wait 3 seconds*/
-		sleep(3);
-		
-		/*build training set - muse 1 & muse 2 (start a thread)*/
-	#if PLAYER_1_ENABLED
-		pthread_create(&thread[0], &attr, train_player, (void*) &feature_proc_1); 
-	#endif
-
-	#if PLAYER_2_ENABLED
-		pthread_create(&thread[1], &attr, train_player, (void*) &feature_proc_2); 
-	#endif
-
-		/*wait for training over - muse 1 & muse 2 (join with the thread)*/
-	#if PLAYER_1_ENABLED
-		//pthread_join(thread[0],NULL); 
-	#endif
-	#if PLAYER_2_ENABLED
-		//pthread_join(thread[1],NULL); 
-	#endif
-
-		printf("Training completed!\n");
-		fflush(stdout); 
-		
-#if LED_STRIP_ENABLED
-		/*start the led strip*/
-		init_led_strip();
-#endif
-		
-		/*wait 3 seconds*/
-		sleep(3);
-		
-		player_1_acc_value = 5;
-		player_2_acc_value = 5;
-		game_over = 0;
-
-		/*run the test*/
-		while(!game_over){
-		
-			/*get a normalized sample - muse 1 & muse 2*/
-	#if PLAYER_1_ENABLED
-			//pthread_create(&thread[0], &attr, get_sample, (void*) &feature_proc_1); 
-	#endif
-	#if PLAYER_2_ENABLED
-			//pthread_create(&thread[1], &attr, get_sample, (void*) &feature_proc_2); 
-	#endif
-	#if PLAYER_1_ENABLED
-			//pthread_join(thread[0],NULL);
-	#endif
-	#if PLAYER_2_ENABLED
-			//pthread_join(thread[1],NULL);
-	#endif
+		if(red_update_counter<=0){
+			red_update_counter = RED_UPDATE_PERIOD;
 			
-#if 0			
-			/*show sample - muse 1 & muse 2*/
-			printf("sample[%i]: ",i);
-	#if PLAYER_1_ENABLED
-			printf("\tP1:%.3f ",feature_proc_1.sample);
-	#endif
-	#if PLAYER_2_ENABLED
-			printf("\tP2:%.3f",feature_proc_2.sample);
-	#endif
-#endif
-			
-			if(feature_proc_1.sample>0){
-				player_1_acc_value += rand()%3;
+			/*from the start to explosion*/
+			for(i=explosion_location;i>=0;i--){
+				buffer[i+1].red = buffer[i].red;
+				buffer[i+1].green = buffer[i].green;
+				buffer[i+1].blue = buffer[i].blue;
 			}
 			
-			if(feature_proc_2.sample>0){
-				player_2_acc_value += rand()%3;
-			}
-			
-			player_1_intensity = (10-feature_proc_1.sample/3*10 + 1);
-			player_2_intensity = (10-feature_proc_2.sample/3*10 + 1);
-			
-			if(player_1_intensity>10){
-				player_1_intensity=10;
-			}else if(player_1_intensity<1){
-				player_1_intensity=1;
-			}
-			
-			if(player_2_intensity>10){
-				player_2_intensity=10;
-			}else if(player_2_intensity<1){
-				player_2_intensity=1;
-			}
-			
-#if LED_STRIP_ENABLED
-			set_led_strip_values(player_1_intensity, player_2_intensity, player_1_acc_value/(player_1_acc_value+player_2_acc_value)*NB_LEDS);
-#else
-			printf("iteration[%i]: ",i);
-			printf("\tP1:%i ",11-player_1_intensity);
-			printf("\tP2:%i ",11-player_2_intensity);
-			printf("\tloc:%.3f ",player_1_acc_value/(player_1_acc_value+player_2_acc_value));
-#endif
-			printf("\n");
-			fflush(stdout); 
-			
-			/*compare accumulation*/
-			if(player_1_acc_value/(player_1_acc_value+player_2_acc_value) < 0.1 || player_1_acc_value/(player_1_acc_value+player_2_acc_value) > 0.9){
-				/*we have a winner*/
-				game_over = 0x01;
+			/*check if a particle is being placed at the beginning*/
+			if(particle_counter[BEGIN]>0){
 				
-				if(player_1_acc_value>player_2_acc_value){
-					printf("Player 1 win!\n");
-				}else{
-					printf("Player 2 win!\n");
+				switch(particle_color[BEGIN]){
+					
+					case RED:
+						buffer[0].red = particle_kernel[particle_counter[BEGIN]];
+						buffer[0].green = 0;
+						buffer[0].blue = 0;
+						break;
+					case GREEN:
+						buffer[0].red = 0;
+						buffer[0].green = particle_kernel[particle_counter[BEGIN]];
+						buffer[0].blue = 0;
+						break;
+					case BLUE:
+						buffer[0].red = 0;
+						buffer[0].green = 0;
+						buffer[0].blue = particle_kernel[particle_counter[BEGIN]];
+						break;
+				
 				}
+				particle_counter[BEGIN]--;
+			}else{
+		
+				buffer[0].red = 0;
+				buffer[0].green = 0;
+				buffer[0].blue = 0;
+				
+				/*else roll a dice to determine if a new particule needs to be spawned*/
+				if(((float)rand()/(float)RAND_MAX)>0.66){
+					particle_counter[BEGIN] = (PARTICLE_LENGTH-1);
+					particle_color[BEGIN] = BLUE;
+					
+				}
+			}	
+		}else{
+			red_update_counter--;
+		}
+		
+		
+		if(blue_update_counter<=0){
+			blue_update_counter = BLUE_UPDATE_PERIOD;
+			
+			/*from the end to explosion*/
+			/*roll back by bringing encountered values forward*/
+			for(i=explosion_location;i<NB_LEDS;i++){
+				buffer[i-1].red = buffer[i].red;
+				buffer[i-1].green = buffer[i].green;
+				buffer[i-1].blue = buffer[i].blue;
 			}
 			
-			if(player_1_acc_value>20){
-				player_1_acc_value /=2;
-				player_2_acc_value /=2;
-			}
+			
+			/*check if a particle is being placed at the end*/
+			if(particle_counter[END]>0){
+				
+				switch(particle_color[END]){
+					
+					case RED:
+						buffer[NB_LEDS-1].red = particle_kernel[particle_counter[END]];
+						buffer[NB_LEDS-1].green = 0;
+						buffer[NB_LEDS-1].blue = 0;
+						break;
+					case GREEN:
+						buffer[NB_LEDS-1].red = 0;
+						buffer[NB_LEDS-1].green = particle_kernel[particle_counter[END]];
+						buffer[NB_LEDS-1].blue = 0;
+						break;
+					case BLUE:
+						buffer[NB_LEDS-1].red = 0;
+						buffer[NB_LEDS-1].green = 0;
+						buffer[NB_LEDS-1].blue = particle_kernel[particle_counter[END]];
+						break;
+				
+				}
+				particle_counter[END]--;
+			}else{
+		
+				buffer[NB_LEDS-1].red = 0;
+				buffer[NB_LEDS-1].green = 0;
+				buffer[NB_LEDS-1].blue = 0;
+				
+				/*else roll a dice to determine if a new particule needs to be spawned*/
+				if(((float)rand()/(float)RAND_MAX)>0.66){
+					particle_counter[END] = (PARTICLE_LENGTH-1);
+					particle_color[END] = RED;
+					
+					//printf("New particle up!\n");
+				}
+			}	
+		}else{
+			blue_update_counter--;
 		}
+		
+		
+		/*paint explosion on top*/
+		for(i=0;i<8;i++){
+			
+			address = explosion_location-4 + i;
+			
+			if(((float)rand()/(float)RAND_MAX)>explosion_animation_kernel[i]){
+				
+				buffer[address].red = explosion_kernel[i];
+				buffer[address].green = explosion_kernel[i];
+				buffer[address].blue = explosion_kernel[i];
+			}else{
+				buffer[address].red = 0x00;
+				buffer[address].green = 0x00;
+				buffer[address].blue = 0x00;
+			}
+			
+		}
+		
+		
+		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
+		
+		usleep(15000);	
 	}
 	
-#if PLAYER_1_ENABLED
-	ipc_comm_cleanup(&ipc_comm_1);
-	clean_up_feat_processing(&feature_proc_1);
-#endif
-#if PLAYER_2_ENABLED
-	ipc_comm_cleanup(&ipc_comm_2);
-	clean_up_feat_processing(&feature_proc_2);
-#endif
-	pthread_attr_destroy(&attr);
 	
 	exit(0);
 }
 
-void* train_player(void* param){
-	train_feat_processing((feat_proc_t*)param);	
+
+#if 0
+typedef struct pixel_s{
+	
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+} /*__attribute__((packed)) */pixel_t;
+
+
+/**
+ * main(int argc, char **argv)
+ * @brief test the mindbx_lib
+ */
+int main(int argc, char **argv){
+	
+	int i, loop_count,start_count;
+	int red, blue, green;
+	int spi_driver;
+	while(1){
+	printf("Input the value of start count: ");
+	scanf("%d", &start_count);
+	printf("Input the value of end count: ");
+	scanf("%d", &loop_count);
+	printf("Input the Red intensity: ");
+	scanf("%d", &red);
+	printf("Input the Blue intensity: ");
+	scanf("%d", &blue);
+	printf("Input the Green intensity: ");
+	scanf("%d", &green);
+	
+	/*define buffer*/
+	pixel_t buffer[loop_count];
+	
+	/*set the whole array to 0*/
+	memset(buffer,0,loop_count*sizeof(pixel_t));
+	
+	for(i=start_count;i<loop_count;i++){
+		buffer[i].red = red;
+		buffer[i].blue = blue;
+		buffer[i].green = green;
+	}
+	
+	
+	/*configure the mind box*/
+	spi_driver = open("/dev/spidev0.0",O_RDWR);
+	write(spi_driver, buffer, loop_count*sizeof(pixel_t));
+	
+	close(spi_driver);	
+	
 }
-
-void* get_sample(void* param){
-	get_normalized_sample((feat_proc_t*)param);
+	exit(0);
 }
-
-
-void stop_application(void){
-	app_running = 0x00;
-}
-
-
-
+#endif
