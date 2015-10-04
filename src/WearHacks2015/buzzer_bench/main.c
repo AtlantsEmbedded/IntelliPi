@@ -147,14 +147,6 @@ int main(int argc, char *argv[])
 	turn_off_beeper();
 	for (;;) {
 
-		while (digitalRead(UP_TMP_PIN) == HIGH) {
-
-			if (scale_val < SCALE_MAX) {
-				scale_val++;
-			}
-			delay(50);
-
-		}
 
 		while (digitalRead(UP_TMP_PIN) == HIGH) {
 
