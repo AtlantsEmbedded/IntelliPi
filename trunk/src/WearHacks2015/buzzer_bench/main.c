@@ -85,11 +85,10 @@ static void scale_down_button(button_s * state)
 {
 	if ((digitalRead(DN_TMP_PIN) == LOW)) {
 		printf("Down button pressed\n");
-		if (scale_val > 0) {
-			scale_val--;
-		}
+
 		state->waitForRelease = TRUE;
 	}
+
 }
 
 /**
@@ -148,22 +147,36 @@ int main(int argc, char *argv[])
 	turn_off_beeper();
 	for (;;) {
 
-		if (b_state.waitForRelease) {
-			scale_up_button(&b_state);
-			scale_down_button(&b_state);
-			if (b_state.waitForRelease) {
-				continue;
+		while (digitalRead(UP_TMP_PIN) == HIGH) {
+
+			if (scale_val < SCALE_MAX) {
+				scale_val++;
 			}
-		} else {
-			softToneWrite(BEEPER_PIN, scale[scale_val]);
-			printf("scale: %d %d\n", scale_val, scale[scale_val]);
-			b_state.waitForRelease = FALSE;
+			delay(50);
+
 		}
 
-		// Check GPIO/buttons for input
-		scale_up_button(&b_state);
-		scale_down_button(&b_state);
+		while (digitalRead(UP_TMP_PIN) == HIGH) {
 
+			if (scale_val < SCALE_MAX) {
+				scale_val++;
+			}
+			delay(50);
+			printf("scale %d %d\n", scale_val, scale[scale_val]);
+			softToneWrite(BEEPER_PIN, scale[scale_val]);
+
+		}
+
+		while (digitalRead(DOWN_TMP_PIN) == HIGH) {
+
+			if (scale_val > 0) {
+				scale_val--;
+			}
+			delay(50);
+			printf("scale %d %d\n", scale_val, scale[scale_val]);
+			softToneWrite(BEEPER_PIN, scale[scale_val]);
+
+		}
 	}
 
 	return 0;
