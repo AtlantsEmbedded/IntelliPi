@@ -33,6 +33,7 @@ define Package/WearHacks2015/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/cerebralwars_app/cerebralwars_app $(1)/atom/
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/startup_wearhacks.sh $(1)/etc/init.d/wearhacks
 endef
 
 $(eval $(call BuildPackage,WearHacks2015))
