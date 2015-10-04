@@ -10,7 +10,7 @@
 #include "pthread.h"
 
 #define	LED_RED_P1  0
-#define	LED_GREEN,P1  1
+#define	LED_GREEN_P1  1
 #define	LED_RED_P2	2
 #define	LED_GREEN_P2  		3
 #define	TEST_BUTTON		4
