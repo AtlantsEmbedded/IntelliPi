@@ -12,11 +12,14 @@
 #include <linux/spi/spidev.h>
 
 
-#define NB_LEDS 300   
+#define NB_LEDS 149   
 #define PARTICLE_LENGTH 4
 #define RED 0
 #define GREEN 1
 #define BLUE 2
+
+#define BEGIN 0
+#define END 1
 
 typedef struct pixel_s{
 	
@@ -26,7 +29,7 @@ typedef struct pixel_s{
 }pixel_t;
 
 
-const unsigned char particle_kernel[PARTICLE_LENGTH] = {0, 50, 100, 200};
+const unsigned char particle_kernel[PARTICLE_LENGTH] = {0, 25, 50, 150};
 
 /**
  * main(int argc, char **argv)
@@ -39,9 +42,10 @@ int main(int argc, char **argv){
 	pixel_t buffer[NB_LEDS];
 	int i;
 	int spi_driver;
-	unsigned char particle_counter = 0x00;
-	unsigned char particle_color = 0x00;
+	unsigned char particle_counter[2] = {0x00,0x00};
+	unsigned char particle_color[2] = {0x00,0x00};
 	static uint32_t speed = 1000000;
+	int explosion_location = NB_LEDS/2;
 	
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
 	ioctl(spi_driver, SPI_IOC_WR_MAX_SPEED_HZ, &speed);	
@@ -50,37 +54,44 @@ int main(int argc, char **argv){
 	
 	while(1){
 		
-		/*from the end of red*/
+		/*from the end to explosion*/
 		/*roll back by bringing encountered values forward*/
-		for(i=NB_LEDS-1;i>=0;i--){
+		for(i=explosion_location;i<NB_LEDS;i++){
+			buffer[i-1].red = buffer[i].red;
+			buffer[i-1].green = buffer[i].green;
+			buffer[i-1].blue = buffer[i].blue;
+		}
+		
+		/*from the start to explosion*/
+		for(i=explosion_location;i>=0;i--){
 			buffer[i+1].red = buffer[i].red;
 			buffer[i+1].green = buffer[i].green;
 			buffer[i+1].blue = buffer[i].blue;
 		}
 		
-		/*check if a particle is being placed*/
-		if(particle_counter>0){
+		/*check if a particle is being placed at the beginning*/
+		if(particle_counter[BEGIN]>0){
 			
-			switch(particle_color){
+			switch(particle_color[BEGIN]){
 				
 				case RED:
-					buffer[0].red = particle_kernel[particle_counter];
+					buffer[0].red = particle_kernel[particle_counter[BEGIN]];
 					buffer[0].green = 0;
 					buffer[0].blue = 0;
 					break;
 				case GREEN:
 					buffer[0].red = 0;
-					buffer[0].green = particle_kernel[particle_counter];
+					buffer[0].green = particle_kernel[particle_counter[BEGIN]];
 					buffer[0].blue = 0;
 					break;
 				case BLUE:
 					buffer[0].red = 0;
 					buffer[0].green = 0;
-					buffer[0].blue = particle_kernel[particle_counter];
+					buffer[0].blue = particle_kernel[particle_counter[BEGIN]];
 					break;
 			
 			}
-			particle_counter--;
+			particle_counter[BEGIN]--;
 		}else{
 	
 			buffer[0].red = 0;
@@ -89,12 +100,51 @@ int main(int argc, char **argv){
 			
 			/*else roll a dice to determine if a new particule needs to be spawned*/
 			if(((float)rand()/(float)RAND_MAX)>0.66){
-				particle_counter = (PARTICLE_LENGTH-1);
-				particle_color = rand()%3;
+				particle_counter[BEGIN] = (PARTICLE_LENGTH-1);
+				particle_color[BEGIN] = rand()%3;
+				
+			}
+		}	
+		
+		
+		/*check if a particle is being placed at the end*/
+		if(particle_counter[END]>0){
+			
+			switch(particle_color){
+				
+				case RED:
+					buffer[NB_LEDS].red = particle_kernel[particle_counter[END]];
+					buffer[NB_LEDS].green = 0;
+					buffer[NB_LEDS].blue = 0;
+					break;
+				case GREEN:
+					buffer[NB_LEDS].red = 0;
+					buffer[NB_LEDS].green = particle_kernel[particle_counter[END]];
+					buffer[NB_LEDS].blue = 0;
+					break;
+				case BLUE:
+					buffer[NB_LEDS].red = 0;
+					buffer[NB_LEDS].green = 0;
+					buffer[NB_LEDS].blue = particle_kernel[particle_counter[END]];
+					break;
+			
+			}
+			particle_counter[END]--;
+		}else{
+	
+			buffer[NB_LEDS].red = 0;
+			buffer[NB_LEDS].green = 0;
+			buffer[NB_LEDS].blue = 0;
+			
+			/*else roll a dice to determine if a new particule needs to be spawned*/
+			if(((float)rand()/(float)RAND_MAX)>0.66){
+				particle_counter[END] = (PARTICLE_LENGTH-1);
+				particle_color[END] = rand()%3;
 				
 				//printf("New particle up!\n");
 			}
 		}	
+		
 		
 		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
 		
