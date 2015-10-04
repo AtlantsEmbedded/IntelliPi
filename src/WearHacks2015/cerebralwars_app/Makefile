@@ -61,8 +61,10 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = main.c
-OBJECTS       = main.o
+SOURCES       = main.c \
+				led_strip_lib.c
+OBJECTS       = main.o \
+				led_strip_lib.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = cerebralwars_app
@@ -109,6 +111,9 @@ dist:
 
 main.o: main.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o main.o main.c
+
+led_strip_lib.o: led_strip_lib.c 
+	$(CC) -c $(CFLAGS) $(INCPATH) -o led_strip_lib.o led_strip_lib.c
 
 ####### Install
 
