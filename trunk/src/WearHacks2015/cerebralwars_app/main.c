@@ -50,7 +50,7 @@ int main(int argc, char **argv){
 		
 		/*from the end of red*/
 		/*roll back by bringing encountered values forward*/
-		for(i=NB_LEDS-1;i>=0;i++){
+		for(i=NB_LEDS-1;i>=0;i--){
 			buffer[i+1].red = buffer[i].red;
 			buffer[i+1].green = buffer[i].green;
 			buffer[i+1].blue = buffer[i].blue;
@@ -63,11 +63,17 @@ int main(int argc, char **argv){
 				
 				case RED:
 					buffer[0].red = particle_kernel[particle_counter];
+					buffer[0].green = 0;
+					buffer[0].blue = 0;
 					break;
 				case GREEN:
+					buffer[0].red = 0;
 					buffer[0].green = particle_kernel[particle_counter];
+					buffer[0].blue = 0;
 					break;
 				case BLUE:
+					buffer[0].red = 0;
+					buffer[0].green = 0;
 					buffer[0].blue = particle_kernel[particle_counter];
 					break;
 			
@@ -79,10 +85,13 @@ int main(int argc, char **argv){
 			if(((float)rand()/(float)RAND_MAX)>0.66){
 				particle_counter = PARTICLE_LENGTH;
 				particle_color = rand()%3;
+				
+				printf("New particle up!\n");
 			}
 		}	
 		
 		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
+		
 		usleep(250);	
 	}
 	
