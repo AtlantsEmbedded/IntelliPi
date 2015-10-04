@@ -12,7 +12,7 @@
 #include <linux/spi/spidev.h>
 
 
-#define NB_LEDS 200   
+#define NB_LEDS 300   
 #define PARTICLE_LENGTH 4
 #define RED 0
 #define GREEN 1
@@ -41,8 +41,20 @@ int main(int argc, char **argv){
 	int spi_driver;
 	unsigned char particle_counter = 0x00;
 	unsigned char particle_color = 0x00;
+	static uint32_t speed = 1000000;
+	
+	struct spi_ioc_transfer tr = {
+		.tx_buf = (unsigned long)tx,
+		.rx_buf = (unsigned long)rx,
+		.len = ARRAY_SIZE(tx),
+		.delay_usecs = delay,
+		.speed_hz = 0,
+		.bits_per_word = 0,
+	};
+	
 	
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
+	ioctl(spi_driver, SPI_IOC_WR_MAX_SPEED_HZ, &speed);	
 	
 	memset(buffer,0,sizeof(pixel_t)*NB_LEDS);
 	
@@ -96,7 +108,7 @@ int main(int argc, char **argv){
 		
 		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
 		
-		usleep(1000);	
+		usleep(250000);	
 	}
 	
 	
