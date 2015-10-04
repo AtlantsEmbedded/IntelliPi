@@ -30,6 +30,8 @@ typedef struct pixel_s{
 
 
 const unsigned char particle_kernel[PARTICLE_LENGTH] = {0, 25, 50, 150};
+const unsigned char explosion_kernel[8] = {0, 10, 25, 100, 100, 25, 10, 0};
+const float explosion_animation_kernel[8] = {0.1, 0.3, 0.5, 0.7, 0.7, 0.5, 0.3, 0.1};
 
 /**
  * main(int argc, char **argv)
@@ -46,6 +48,7 @@ int main(int argc, char **argv){
 	unsigned char particle_color[2] = {0x00,0x00};
 	static uint32_t speed = 1000000;
 	int explosion_location = NB_LEDS/2;
+	
 	
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
 	ioctl(spi_driver, SPI_IOC_WR_MAX_SPEED_HZ, &speed);	
@@ -147,9 +150,22 @@ int main(int argc, char **argv){
 		}	
 		
 		
+		/*paint explosion on top*/
+		for(i=0;i<8;i++){
+			
+			address = explosion_location-4 + i;
+			if(((float)rand()/(float)RAND_MAX)>explosion_animation_kernel[i]){
+				
+				buffer[address].red = explosion_kernel[i];
+				buffer[address].green = explosion_kernel[i];
+				buffer[address].blue = explosion_kernel[i];
+			}
+		}
+		
+		
 		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
 		
-		usleep(75000);	
+		usleep(35000);	
 	}
 	
 	
