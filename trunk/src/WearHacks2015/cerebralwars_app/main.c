@@ -13,10 +13,10 @@
 
 typedef struct pixel_s{
 	
-	uint8_t red:5;
-	uint8_t green:5;
-	uint8_t blue:5;
-	uint8_t first_bit:1;
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+	//uint8_t first_bit:1;
 }pixel_t;
 
 
@@ -45,17 +45,16 @@ int main(int argc, char **argv){
 	/*set the whole array to 0*/
 	memset(buffer,0,loop_count*sizeof(pixel_t));
 	
-	for(i=0;i<loop_count;i+=2){
+	for(i=0;i<loop_count;i++){
 		buffer[i].red = red;
-	}
-	
-	for(i=1;i<loop_count;i+=2){
+		buffer[i].blue = blue;
 		buffer[i].green = green;
 	}
 	
+	
 	/*configure the mind box*/
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
-	write(spi_driver, buffer, 200*sizeof(pixel_t));
+	write(spi_driver, buffer, loop_count*sizeof(pixel_t));
 	
 	close(spi_driver);
 }
