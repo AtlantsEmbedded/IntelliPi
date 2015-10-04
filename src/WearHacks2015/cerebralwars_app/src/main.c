@@ -1,5 +1,5 @@
 
-#define LED_STRIP_ENABLED 0
+#define LED_STRIP_ENABLED 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -147,10 +147,10 @@ int main(int argc, char **argv){
 
 		/*wait for training over - muse 1 & muse 2 (join with the thread)*/
 	#if PLAYER_1_ENABLED
-		pthread_join(thread[0],NULL); 
+		//pthread_join(thread[0],NULL); 
 	#endif
 	#if PLAYER_2_ENABLED
-		pthread_join(thread[1],NULL); 
+		//pthread_join(thread[1],NULL); 
 	#endif
 
 		printf("Training completed!\n");
@@ -173,16 +173,16 @@ int main(int argc, char **argv){
 		
 			/*get a normalized sample - muse 1 & muse 2*/
 	#if PLAYER_1_ENABLED
-			pthread_create(&thread[0], &attr, get_sample, (void*) &feature_proc_1); 
+			//pthread_create(&thread[0], &attr, get_sample, (void*) &feature_proc_1); 
 	#endif
 	#if PLAYER_2_ENABLED
-			pthread_create(&thread[1], &attr, get_sample, (void*) &feature_proc_2); 
+			//pthread_create(&thread[1], &attr, get_sample, (void*) &feature_proc_2); 
 	#endif
 	#if PLAYER_1_ENABLED
-			pthread_join(thread[0],NULL);
+			//pthread_join(thread[0],NULL);
 	#endif
 	#if PLAYER_2_ENABLED
-			pthread_join(thread[1],NULL);
+			//pthread_join(thread[1],NULL);
 	#endif
 			
 #if 0			
@@ -197,11 +197,11 @@ int main(int argc, char **argv){
 #endif
 			
 			if(feature_proc_1.sample>0){
-				player_1_acc_value += feature_proc_1.sample;
+				player_1_acc_value += rand()%3;
 			}
 			
 			if(feature_proc_2.sample>0){
-				player_2_acc_value += feature_proc_2.sample;
+				player_2_acc_value += rand()%3;
 			}
 			
 			player_1_intensity = (10-feature_proc_1.sample/3*10 + 1);
