@@ -16,7 +16,6 @@ typedef struct pixel_s{
 	uint8_t red;
 	uint8_t green;
 	uint8_t blue;
-	//uint8_t first_bit;
 } /*__attribute__((packed)) */pixel_t;
 
 
@@ -26,7 +25,7 @@ typedef struct pixel_s{
  */
 int main(int argc, char **argv){
 	
-	int i, loop_count,start_count, cnt;
+	int i, loop_count,start_count;
 	int red, blue, green;
 	int spi_driver;
 	while(1){
@@ -58,44 +57,7 @@ int main(int argc, char **argv){
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
 	write(spi_driver, buffer, loop_count*sizeof(pixel_t));
 	
-	close(spi_driver);
-	
-	for(;;)
-	{	
-		
-		if((cnt%2) == 0)
-		{
-			for(i=start_count;i<loop_count;i++){
-				buffer[i].red = red;
-				buffer[i].blue = 0;
-				buffer[i].green = 0;
-			}
-		}
-		else if((cnt%3) == 0)
-		{
-			for(i=start_count;i<loop_count;i++){
-				buffer[i].red = 0;
-				buffer[i].blue = blue;
-				buffer[i].green = 0;
-			}
-		}
-		else 
-		{
-			for(i=start_count;i<loop_count;i++){
-				buffer[i].red = 0;
-				buffer[i].blue = 0;
-				buffer[i].green = green;
-			}
-		}
-		spi_driver = open("/dev/spidev0.0",O_RDWR);
-		write(spi_driver, buffer, loop_count*sizeof(pixel_t));
-	
-		close(spi_driver);
-		cnt++;
-		if(cnt>255)
-			cnt=0;
-	}
-	
+	close(spi_driver);	
 	
 }
 	exit(0);
