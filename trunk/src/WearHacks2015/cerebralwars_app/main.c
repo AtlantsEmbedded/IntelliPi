@@ -43,16 +43,6 @@ int main(int argc, char **argv){
 	unsigned char particle_color = 0x00;
 	static uint32_t speed = 1000000;
 	
-	struct spi_ioc_transfer tr = {
-		.tx_buf = (unsigned long)tx,
-		.rx_buf = (unsigned long)rx,
-		.len = ARRAY_SIZE(tx),
-		.delay_usecs = delay,
-		.speed_hz = 0,
-		.bits_per_word = 0,
-	};
-	
-	
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
 	ioctl(spi_driver, SPI_IOC_WR_MAX_SPEED_HZ, &speed);	
 	
