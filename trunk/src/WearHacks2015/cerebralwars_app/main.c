@@ -21,6 +21,9 @@
 #define BEGIN 0
 #define END 1
 
+#define RED_UPDATE_PERIOD 4
+#define BLUE_UPDATE_PERIOD 2
+
 typedef struct pixel_s{
 	
 	uint8_t red;
@@ -32,6 +35,7 @@ typedef struct pixel_s{
 const unsigned char particle_kernel[PARTICLE_LENGTH] = {0, 25, 50, 150};
 const unsigned char explosion_kernel[8] = {0, 10, 25, 100, 100, 25, 10, 0};
 const float explosion_animation_kernel[8] = {0.1, 0.3, 0.5, 0.7, 0.7, 0.5, 0.3, 0.1};
+
 
 /**
  * main(int argc, char **argv)
@@ -49,6 +53,8 @@ int main(int argc, char **argv){
 	static uint32_t speed = 1000000;
 	int explosion_location = NB_LEDS/2;
 	int address;
+	int red_update_counter = RED_UPDATE_PERIOD;
+	int blue_update_counter = BLUE_UPDATE_PERIOD;
 	
 	spi_driver = open("/dev/spidev0.0",O_RDWR);
 	ioctl(spi_driver, SPI_IOC_WR_MAX_SPEED_HZ, &speed);	
@@ -57,115 +63,133 @@ int main(int argc, char **argv){
 	
 	while(1){
 		
-		/*from the start to explosion*/
-		for(i=explosion_location;i>=0;i--){
-			buffer[i+1].red = buffer[i].red;
-			buffer[i+1].green = buffer[i].green;
-			buffer[i+1].blue = buffer[i].blue;
-		}
-		
-		/*check if a particle is being placed at the beginning*/
-		if(particle_counter[BEGIN]>0){
+		if(red_update_counter<=0){
+			red_update_counter = RED_UPDATE_PERIOD;
 			
-			switch(particle_color[BEGIN]){
-				
-				case RED:
-					buffer[0].red = particle_kernel[particle_counter[BEGIN]];
-					buffer[0].green = 0;
-					buffer[0].blue = 0;
-					break;
-				case GREEN:
-					buffer[0].red = 0;
-					buffer[0].green = particle_kernel[particle_counter[BEGIN]];
-					buffer[0].blue = 0;
-					break;
-				case BLUE:
-					buffer[0].red = 0;
-					buffer[0].green = 0;
-					buffer[0].blue = particle_kernel[particle_counter[BEGIN]];
-					break;
-			
+			/*from the start to explosion*/
+			for(i=explosion_location;i>=0;i--){
+				buffer[i+1].red = buffer[i].red;
+				buffer[i+1].green = buffer[i].green;
+				buffer[i+1].blue = buffer[i].blue;
 			}
-			particle_counter[BEGIN]--;
+			
+			/*check if a particle is being placed at the beginning*/
+			if(particle_counter[BEGIN]>0){
+				
+				switch(particle_color[BEGIN]){
+					
+					case RED:
+						buffer[0].red = particle_kernel[particle_counter[BEGIN]];
+						buffer[0].green = 0;
+						buffer[0].blue = 0;
+						break;
+					case GREEN:
+						buffer[0].red = 0;
+						buffer[0].green = particle_kernel[particle_counter[BEGIN]];
+						buffer[0].blue = 0;
+						break;
+					case BLUE:
+						buffer[0].red = 0;
+						buffer[0].green = 0;
+						buffer[0].blue = particle_kernel[particle_counter[BEGIN]];
+						break;
+				
+				}
+				particle_counter[BEGIN]--;
+			}else{
+		
+				buffer[0].red = 0;
+				buffer[0].green = 0;
+				buffer[0].blue = 0;
+				
+				/*else roll a dice to determine if a new particule needs to be spawned*/
+				if(((float)rand()/(float)RAND_MAX)>0.66){
+					particle_counter[BEGIN] = (PARTICLE_LENGTH-1);
+					particle_color[BEGIN] = BLUE;
+					
+				}
+			}	
 		}else{
-	
-			buffer[0].red = 0;
-			buffer[0].green = 0;
-			buffer[0].blue = 0;
-			
-			/*else roll a dice to determine if a new particule needs to be spawned*/
-			if(((float)rand()/(float)RAND_MAX)>0.66){
-				particle_counter[BEGIN] = (PARTICLE_LENGTH-1);
-				particle_color[BEGIN] = BLUE;
-				
-			}
-		}	
-		
-		
-		/*from the end to explosion*/
-		/*roll back by bringing encountered values forward*/
-		for(i=explosion_location;i<NB_LEDS;i++){
-			buffer[i-1].red = buffer[i].red;
-			buffer[i-1].green = buffer[i].green;
-			buffer[i-1].blue = buffer[i].blue;
+			red_update_counter--;
 		}
 		
 		
-		/*check if a particle is being placed at the end*/
-		if(particle_counter[END]>0){
+		if(blue_update_counter<=0){
+			blue_update_counter = BLUE_UPDATE_PERIOD;
 			
-			switch(particle_color[END]){
-				
-				case RED:
-					buffer[NB_LEDS-1].red = particle_kernel[particle_counter[END]];
-					buffer[NB_LEDS-1].green = 0;
-					buffer[NB_LEDS-1].blue = 0;
-					break;
-				case GREEN:
-					buffer[NB_LEDS-1].red = 0;
-					buffer[NB_LEDS-1].green = particle_kernel[particle_counter[END]];
-					buffer[NB_LEDS-1].blue = 0;
-					break;
-				case BLUE:
-					buffer[NB_LEDS-1].red = 0;
-					buffer[NB_LEDS-1].green = 0;
-					buffer[NB_LEDS-1].blue = particle_kernel[particle_counter[END]];
-					break;
-			
+			/*from the end to explosion*/
+			/*roll back by bringing encountered values forward*/
+			for(i=explosion_location;i<NB_LEDS;i++){
+				buffer[i-1].red = buffer[i].red;
+				buffer[i-1].green = buffer[i].green;
+				buffer[i-1].blue = buffer[i].blue;
 			}
-			particle_counter[END]--;
+			
+			
+			/*check if a particle is being placed at the end*/
+			if(particle_counter[END]>0){
+				
+				switch(particle_color[END]){
+					
+					case RED:
+						buffer[NB_LEDS-1].red = particle_kernel[particle_counter[END]];
+						buffer[NB_LEDS-1].green = 0;
+						buffer[NB_LEDS-1].blue = 0;
+						break;
+					case GREEN:
+						buffer[NB_LEDS-1].red = 0;
+						buffer[NB_LEDS-1].green = particle_kernel[particle_counter[END]];
+						buffer[NB_LEDS-1].blue = 0;
+						break;
+					case BLUE:
+						buffer[NB_LEDS-1].red = 0;
+						buffer[NB_LEDS-1].green = 0;
+						buffer[NB_LEDS-1].blue = particle_kernel[particle_counter[END]];
+						break;
+				
+				}
+				particle_counter[END]--;
+			}else{
+		
+				buffer[NB_LEDS-1].red = 0;
+				buffer[NB_LEDS-1].green = 0;
+				buffer[NB_LEDS-1].blue = 0;
+				
+				/*else roll a dice to determine if a new particule needs to be spawned*/
+				if(((float)rand()/(float)RAND_MAX)>0.66){
+					particle_counter[END] = (PARTICLE_LENGTH-1);
+					particle_color[END] = RED;
+					
+					//printf("New particle up!\n");
+				}
+			}	
 		}else{
-	
-			buffer[NB_LEDS-1].red = 0;
-			buffer[NB_LEDS-1].green = 0;
-			buffer[NB_LEDS-1].blue = 0;
-			
-			/*else roll a dice to determine if a new particule needs to be spawned*/
-			if(((float)rand()/(float)RAND_MAX)>0.66){
-				particle_counter[END] = (PARTICLE_LENGTH-1);
-				particle_color[END] = RED;
-				
-				//printf("New particle up!\n");
-			}
-		}	
+			blue_update_counter--;
+		}
 		
 		
 		/*paint explosion on top*/
 		for(i=0;i<8;i++){
 			
 			address = explosion_location-4 + i;
+			
 			if(((float)rand()/(float)RAND_MAX)>explosion_animation_kernel[i]){
 				
 				buffer[address].red = explosion_kernel[i];
 				buffer[address].green = explosion_kernel[i];
 				buffer[address].blue = explosion_kernel[i];
+			}else{
+				buffer[address].red = 0x00;
+				buffer[address].green = 0x00;
+				buffer[address].blue = 0x00;
 			}
+			
 		}
 		
 		
 		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
 		
-		usleep(35000);	
+		usleep(15000);	
 	}
 	
 	
