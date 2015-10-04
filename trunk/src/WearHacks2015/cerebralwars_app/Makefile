@@ -62,7 +62,6 @@ OBJECTS_DIR   = ./
 SOURCES       = src/main.c \
 				src/xml.c \
 				src/app_signal.c \
-				src/led_strip_lib.c \
 				src/wiringPi.c \
 				src/rwalk_process.c \
 				src/feature_processing.c \
@@ -73,7 +72,6 @@ SOURCES       = src/main.c \
 OBJECTS       = src/main.o \
 				src/xml.o \
 				src/app_signal.o \
-				src/led_strip_lib.o \
 				src/wiringPi.o \
 				src/rwalk_process.o \
 				src/feature_processing.o \
@@ -83,7 +81,7 @@ OBJECTS       = src/main.o \
 				src/supported_feature_input/shm_rd_buf.o
 DIST          = 
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = cerebral_wars
+TARGET        = cerebralwars_app
 
 
 first: all
@@ -137,9 +135,6 @@ wiringPi.o: src/wiringPi.c
 
 app_signal.o: src/app_signal.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o app_signal.o src/app_signal.c
-	
-led_strip_lib.o: src/led_strip_lib.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o led_strip_lib.o src/led_strip_lib.c
 	
 rwalk_process.o: src/rwalk_process.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o rwalk_process.o src/rwalk_process.c
