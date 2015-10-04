@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 
 		}
 
-		while (digitalRead(DOWN_TMP_PIN) == HIGH) {
+		while (digitalRead(DN_TMP_PIN) == HIGH) {
 
 			if (scale_val > 0) {
 				scale_val--;
