@@ -12,7 +12,7 @@
 #include <linux/spi/spidev.h>
 
 
-#define NB_LEDS 149   
+#define NB_LEDS 200   
 #define PARTICLE_LENGTH 4
 #define RED 0
 #define GREEN 1
@@ -26,7 +26,7 @@ typedef struct pixel_s{
 }pixel_t;
 
 
-const unsigned char particle_kernel[PARTICLE_LENGTH] = {255, 200, 100, 0};
+const unsigned char particle_kernel[PARTICLE_LENGTH] = {200, 150, 50, 0};
 
 /**
  * main(int argc, char **argv)
@@ -80,6 +80,10 @@ int main(int argc, char **argv){
 			}
 			particle_counter--;
 		}else{
+	
+			buffer[0].red = 0;
+			buffer[0].green = 0;
+			buffer[0].blue = 0;
 			
 			/*else roll a dice to determine if a new particule needs to be spawned*/
 			if(((float)rand()/(float)RAND_MAX)>0.66){
@@ -92,7 +96,7 @@ int main(int argc, char **argv){
 		
 		write(spi_driver, buffer, NB_LEDS*sizeof(pixel_t));
 		
-		usleep(250);	
+		usleep(1000);	
 	}
 	
 	
