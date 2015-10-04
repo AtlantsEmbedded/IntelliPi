@@ -231,7 +231,7 @@ int main(int argc, char **argv){
 			fflush(stdout); 
 			
 			/*compare accumulation*/
-			if(abs(player_1_acc_value-player_2_acc_value)>10){
+			if(player_1_acc_value/(player_1_acc_value+player_2_acc_value) < 0.1 || player_1_acc_value/(player_1_acc_value+player_2_acc_value) > 0.9){
 				/*we have a winner*/
 				game_over = 0x01;
 				
@@ -242,7 +242,10 @@ int main(int argc, char **argv){
 				}
 			}
 			
-			
+			if(player_1_acc_value>20){
+				player_1_acc_value /=2;
+				player_2_acc_value /=2;
+			}
 		}
 	}
 	
