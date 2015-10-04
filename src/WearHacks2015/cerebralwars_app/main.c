@@ -17,7 +17,7 @@ typedef struct pixel_s{
 	uint16_t green:7;
 	uint16_t blue:7;
 	//uint32_t first_bit:1;
-} __attribute__((packed)) pixel_t;
+} /*__attribute__((packed)) */pixel_t;
 
 
 /**
