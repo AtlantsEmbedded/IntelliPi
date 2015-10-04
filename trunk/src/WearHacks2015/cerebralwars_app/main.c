@@ -13,10 +13,10 @@
 
 typedef struct pixel_s{
 	
-	uint16_t red:5;
-	uint16_t green:5;
-	uint16_t blue:5;
-	uint16_t first_bit:1;
+	uint8_t red:5;
+	uint8_t green:5;
+	uint8_t blue:5;
+	uint8_t first_bit:1;
 }pixel_t;
 
 
@@ -26,21 +26,31 @@ typedef struct pixel_s{
  */
 int main(int argc, char **argv){
 	
-	int i;
+	int i, loop_count;
+	int red, blue, green;
 	int spi_driver;
+	while(1){
+	printf("Input the value counts: ");
+	scanf("%d", &loop_count);
+	printf("Input the Red intensity: ");
+	scanf("%d", &red);
+	printf("Input the Blue intensity: ");
+	scanf("%d", &blue);
+	printf("Input the Green intensity: ");
+	scanf("%d", &green);
 	
 	/*define buffer*/
-	pixel_t buffer[200];
+	pixel_t buffer[loop_count];
 	
 	/*set the whole array to 0*/
-	memset(buffer,0,200*sizeof(pixel_t));
+	memset(buffer,0,loop_count*sizeof(pixel_t));
 	
-	for(i=0;i<200;i+=2){
-		buffer[i].red = 0x1F;
+	for(i=0;i<loop_count;i+=2){
+		buffer[i].red = red;
 	}
 	
-	for(i=1;i<200;i+=2){
-		buffer[i].green = 0x1F;
+	for(i=1;i<loop_count;i+=2){
+		buffer[i].green = green;
 	}
 	
 	/*configure the mind box*/
@@ -48,7 +58,7 @@ int main(int argc, char **argv){
 	write(spi_driver, buffer, 200*sizeof(pixel_t));
 	
 	close(spi_driver);
-	
+}
 	exit(0);
 }
 
