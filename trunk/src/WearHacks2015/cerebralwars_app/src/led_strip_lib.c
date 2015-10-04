@@ -14,7 +14,6 @@
 
 #include "led_strip_lib.h"
 
-#define NB_LEDS 149   
 #define PARTICLE_LENGTH 4
 #define RED 0
 #define GREEN 1
