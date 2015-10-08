@@ -1,3 +1,4 @@
+# TODO-REBRANDING: Need to check if feeds are compatible with git and how to change them for that
 src-git packages https://github.com/openwrt/packages.git;for-14.07
 #src-git luci https://github.com/openwrt/luci.git;luci-0.12
 #src-git routing https://github.com/openwrt-routing/packages.git;for-14.07

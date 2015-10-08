@@ -1,11 +1,11 @@
 /**
  * @file socket.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @brief This source file contains all of the documentation for 
+ * @brief This source file contains all of the documentation for
  * an epoll IPC mechanism that will handle external input which
  * may come from an external application called gpio_ipc_client
  * @note For IPC codes look in include/event.h
- * @copy Menu system for Atom Prototype
+ * @copy Menu system for Atlants Prototype
  * @todo Synchronization between user_input.c and
  * event.c functions; there could be a battle between
  * who accesses the LCD
@@ -37,7 +37,7 @@ static void list_on_epoll_fd(int epoll_event_fd);
  * initialize_ipc_sock()
  * @brief initialize the IPC socket and thread
  * @return 0 for success (if thread fails it exits...)
- */ 
+ */
 int initialize_ipc_sock()
 {
 
@@ -62,22 +62,22 @@ int initialize_ipc_sock()
  * list_on_epoll_fd(int epoll_event_fd)
  * @brief Retrieve data on epoll event and execute IPC event
  * @param fd
- */ 
+ */
 static void list_on_epoll_fd(int epoll_event_fd)
 {
 	ipc_msg_t msg;
 	int recv_bytes = 0;
-	
+
     if ((recv_bytes = recv(epoll_event_fd,  &msg,  sizeof(ipc_msg_t),  0)) == -1) {
         perror("Error recv incoming message");
 	}
-	
+
 	if(recv_bytes == sizeof(ipc_msg_t)) {
 		execute_ipc_event(&msg);
 	} else {
 		perror("Size of msg does not meet min");
 	}
-	
+
     close(epoll_event_fd);
 }
 
@@ -86,7 +86,7 @@ static void list_on_epoll_fd(int epoll_event_fd)
  * @brief set socket to nonblocking
  * @param fd
  * @return results from fcntl or ioctl
- */ 
+ */
 static int set_fd_to_nonblocking(int fd)
 {
 	int flags;
@@ -108,11 +108,11 @@ static int set_fd_to_nonblocking(int fd)
  * epoll_sock_for_ipc(void *ptr)
  * @brief function that sets up epolling and any file descriptors
  * @param ptr (if needed)
- */ 
+ */
 static void *epoll_sock_for_ipc(void *ptr)
 {
 	int *data __attribute__ ((unused)) = (int *)ptr;
-	
+
 	struct epoll_event ev, events[MAX_EVENTS];
 	int listen_sock, conn_sock, epollfd;
 	struct sockaddr_un local;
@@ -129,7 +129,7 @@ static void *epoll_sock_for_ipc(void *ptr)
 	strcpy(local.sun_path, UX_SOCK_PATH);
 	unlink(local.sun_path);
 	len = strlen(local.sun_path) + sizeof(local.sun_family);
-	
+
 	/// Socket usuals, bind, listen
 	if (bind(listen_sock, (struct sockaddr *)&local, len) == -1) {
 		perror("bind");

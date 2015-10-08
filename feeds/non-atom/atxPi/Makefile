@@ -15,7 +15,7 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/atxPi
 	SECTION:=utils
-	CATEGORY:=Atom-GPL
+	CATEGORY:=Atlants-GPL
 	TITLE:=atxPi
 	SUBMENU:=Utilities
 	DEPENDS:=wiringPi

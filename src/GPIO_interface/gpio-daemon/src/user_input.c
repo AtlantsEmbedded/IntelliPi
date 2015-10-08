@@ -1,9 +1,9 @@
 /**
  * @file user_input.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @brief This source file will manage input which may come from who 
+ * @brief This source file will manage input which may come from who
  * knows what source: cmd or SPI at this time/case
- * @copy Menu system for Atom Prototype
+ * @copy Menu system for Atlants Prototype
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,7 +68,7 @@ int user_input_manager()
 /**
  * wait_for_input()
  * @brief Waits for user input
- * @return -1 for error (should never happen), 
+ * @return -1 for error (should never happen),
  */
 inline int wait_for_input()
 {

@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @copy Menu system for Atom Prototype
+ * @copy Menu system for Atlants Prototype
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,11 +32,11 @@ int main(int argc, char **argv)
 
 	for (;;)
 	{
-		digitalWrite(0, HIGH); 
+		digitalWrite(0, HIGH);
 		delay(500);
-		digitalWrite(0, LOW); 
+		digitalWrite(0, LOW);
 		delay (500) ;
 	}
-	
+
 	return 0;
 }

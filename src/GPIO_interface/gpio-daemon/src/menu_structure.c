@@ -1,7 +1,7 @@
 /**
  * @file menu_structure.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @copy Menu system for Atom Prototype
+ * @copy Menu system for Atlants Prototype
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +52,7 @@ inline void set_current_menu_item(GNode * new_node)
 }
 
 /**
- * get_current_node() 
+ * get_current_node()
  * @brief Return current node
  * @return current_node
  */

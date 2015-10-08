@@ -1,8 +1,8 @@
 /**
  * @file menu_item.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @copy Menu system for Atom Prototype
- */ 
+ * @copy Menu system for Atlants Prototype
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +28,7 @@ const char *XML_menu_item_elements[] = { "name", "text", "selectable", "actionab
 
 /**
  * sanity_check_menu_item(ezxml_t menu_item)
- * @brief Provide a quick sanity check to make sure that there are 
+ * @brief Provide a quick sanity check to make sure that there are
  * at least the minimum number of elements present in a menu item
  * @param menu_item
  * @return 0 for success, -1 for error
@@ -64,7 +64,7 @@ GNode *initialize_menu_item(ezxml_t menu_item)
 
 	uint8_t bool_value = 0;
 	menu_item_t *menu_item_obj = (menu_item_t *) malloc(sizeof(menu_item_t));
-	
+
 	if (!menu_item_obj) {
 		return NULL;
 	}
@@ -149,7 +149,7 @@ inline char *true_or_false(uint8_t value)
 }
 
 /**
- * null_or_not(char *input) 
+ * null_or_not(char *input)
  * @brief return static string if len < 1 (null because everything
  * should be zero'd)
  * @param input

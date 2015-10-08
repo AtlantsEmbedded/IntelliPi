@@ -1,8 +1,8 @@
 /**
  * @file menu_structure.h
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @copy Menu system for Atom Prototype
- */ 
+ * @copy Menu system for Atlants Prototype
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,7 +37,7 @@ typedef struct menu_item_s {
 int initialize_menu_structure();
 int cleanup_menu_structure();
 void dump_menu_structure(GNode * root_of_tree);
-	
+
 void print_item_text(GNode *node);
 void print_item_menu(GNode *node);
 

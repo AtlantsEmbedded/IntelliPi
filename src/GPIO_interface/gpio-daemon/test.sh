@@ -1,6 +1,7 @@
 #!/bin/sh
 # -----------------------------------------------------------
 # Ronnie Brash (ron.brash@gmail.com)
+# TODO-REBRANDING: Confirm website
 # Atomsproducts.com || pacificsimplicity.ca
 # -----------------------------------------------------------
 # Simple test script for use by the GPIO daemon functionality
@@ -45,4 +46,3 @@ if [ "$3" = "loop" ]; then
 	done
 
 fi
-

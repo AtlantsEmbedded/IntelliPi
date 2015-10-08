@@ -4,6 +4,7 @@ PKG_NAME:=WearHacks2015
 PKG_VERSION:=2015-08-12
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
+# TODO-REBRANDING: Cference, this might need to be refactored into it's own project, WearHacks2015
 PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/WearHacks2015
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
@@ -15,7 +16,7 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/WearHacks2015
 	SECTION:=Events
-	CATEGORY:=Atom
+	CATEGORY:=Atlants
 	TITLE:=WearHacks2015
 	SUBMENU:=Events
 	DEPENDS:=wiringPi +libpthread +libezxml +glib2
@@ -26,12 +27,12 @@ define Package/WearHacks2015/description
 endef
 
 define Package/WearHacks2015/install
-	$(INSTALL_DIR) $(1)/atom
-	$(INSTALL_DIR) $(1)/atom/data
-	$(INSTALL_DIR) $(1)/atom/data/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/configs/* $(1)/atom/data/config/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/cerebralwars_app/cerebralwars_app $(1)/atom/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/buzzer_bench/buzzer_bench $(1)/atom/
+	$(INSTALL_DIR) $(1)/Atlants
+	$(INSTALL_DIR) $(1)/Atlants/data
+	$(INSTALL_DIR) $(1)/Atlants/data/config
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/configs/* $(1)/Atlants/data/config/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/cerebralwars_app/cerebralwars_app $(1)/Atlants/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/buzzer_bench/buzzer_bench $(1)/Atlants/
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/startup_wearhacks.sh $(1)/etc/init.d/wearhacks

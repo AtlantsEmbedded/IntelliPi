@@ -4,6 +4,7 @@ PKG_NAME:=mindbx_app
 PKG_VERSION:=2015-08-12
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
+# TODO-REBRANDING: Cference, this might need to be refactored into it's own project, mindbox_app
 PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/mindbox_app
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
@@ -15,7 +16,7 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/mindbx_app
 	SECTION:=Applications
-	CATEGORY:=Atom
+	CATEGORY:=Atlants
 	TITLE:=mindbx_app
 	SUBMENU:=Interfaces
 	DEPENDS:=wiringPi +libpthread +libezxml +glib2
@@ -26,12 +27,12 @@ define Package/mindbx_app/description
 endef
 
 define Package/mindbx_app/install
-	$(INSTALL_DIR) $(1)/atom
-	$(INSTALL_DIR) $(1)/atom/app
-	$(INSTALL_DIR) $(1)/atom/app/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/mindbx_app $(1)/atom/app
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/launch_mindbx.sh $(1)/atom/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/config/application_config.xml $(1)/atom/app/config
+	$(INSTALL_DIR) $(1)/Atlants
+	$(INSTALL_DIR) $(1)/Atlants/app
+	$(INSTALL_DIR) $(1)/Atlants/app/config
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/mindbx_app $(1)/Atlants/app
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/launch_mindbx.sh $(1)/Atlants/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/config/application_config.xml $(1)/Atlants/app/config
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/launch_mindbx.sh $(1)/etc/init.d/

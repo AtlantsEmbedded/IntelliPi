@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <appConfig>
   <appAttributes>
-    <name>Atom BCI Proto</name>
+    <name>Atlants BCI Proto</name>
     <text>SEL to start</text>
   </appAttributes>
   <appMenu>

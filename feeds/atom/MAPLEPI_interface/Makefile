@@ -4,6 +4,7 @@ PKG_NAME:=MAPLEPI_interface
 PKG_VERSION:=2014-26-14
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
+# TODO-REBRANDING: Cference, this might need to be refactored into it's own git project, MAPLEPI_interface
 PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/MAPLEPI_interface
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
@@ -15,7 +16,7 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/MAPLEPI_interface
 	SECTION:=system
-	CATEGORY:=Atom
+	CATEGORY:=Atlants
 	SUBMENU:=Interfaces
 	TITLE:=MAPLEPI_interface
 	DEPENDS:=wiringPi
@@ -27,9 +28,9 @@ define Package/MAPLEPI_interface/description
 endef
 
 define Package/MAPLEPI_interface/install
-	$(INSTALL_DIR) $(1)/atom
-	$(INSTALL_DIR) $(1)/atom/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/gpio_interface $(1)/atom/bin
+	$(INSTALL_DIR) $(1)/Atlants
+	$(INSTALL_DIR) $(1)/Atlants/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/gpio_interface $(1)/Atlants/bin
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/gpio $(1)/etc/init.d/

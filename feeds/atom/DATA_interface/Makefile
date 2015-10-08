@@ -4,6 +4,7 @@ PKG_NAME:=DATA_interface
 PKG_VERSION:=2015-08-12
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=svn
+# TODO-REBRANDING: Cference, this might need to be refactored into an individual project DATA_interface
 PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/DATA_interface
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=HEAD
@@ -15,7 +16,7 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/DATA_interface
 	SECTION:=Interfaces
-	CATEGORY:=Atom
+	CATEGORY:=Atlants
 	TITLE:=DATA_interface
 	SUBMENU:=Interfaces
 	DEPENDS:=+wiringPi +libpthread +libezxml +glib2 +bluez-libs
@@ -27,11 +28,11 @@ define Package/DATA_interface/description
 endef
 
 define Package/DATA_interface/install
-	$(INSTALL_DIR) $(1)/atom
-	$(INSTALL_DIR) $(1)/atom/data
-	$(INSTALL_DIR) $(1)/atom/data/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/config/data_config.xml $(1)/atom/data/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/data_interface $(1)/atom/data
+	$(INSTALL_DIR) $(1)/Atlants
+	$(INSTALL_DIR) $(1)/Atlants/data
+	$(INSTALL_DIR) $(1)/Atlants/data/config
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/config/data_config.xml $(1)/Atlants/data/config
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/data-daemon/data_interface $(1)/Atlants/data
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d/
 endef

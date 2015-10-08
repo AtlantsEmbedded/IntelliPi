@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @copy Menu system for Atom Prototype
+ * @copy Menu system for Atlants Prototype
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,33 +85,33 @@ int main(int argc, char **argv)
 	if (initialize_ipc_sock() < 0) {
 		return (-1);
 	}
-	
+
 	/// Setup hardware function pointers
 	if(setup_hardware() < 0) {
 		debug_msg("Unable to configure hardware\n");
 		exit (-1);
 	}
-	
+
 	/// Initialize hardware abstraction layer & LCD
 	INIT_HARDWARE();
-	
+
 	/// Print Banner & Instructions
 	print_instructions(&app_info);
-	
+
 	/// Wait for select
 	wait_for_select();
-	
+
 	/// Wait for arrows
-	
+
 	/// Step 1 set menu item to child of root
 	set_current_menu_item(g_node_first_child(return_root_node()));
-	
+
 	/// Step 2 print node
 	print_item_text(get_current_node());
-	
+
 	/// Step 3 wait for left or right "arrow" button to be pressed
 	wait_for_arrows();
-	
+
 	/// Step 4 set node to first child of this parent
 	set_current_menu_item(g_node_first_child(get_current_node()));
 

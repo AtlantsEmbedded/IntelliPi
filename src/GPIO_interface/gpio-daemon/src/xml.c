@@ -1,8 +1,8 @@
 /**
  * @file xml.c
  * @author Ronnie Brash (ron.brash@gmail.com)
- * @copy Menu system for Atom Prototype
- */ 
+ * @copy Menu system for Atlants Prototype
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,14 +51,14 @@ int XML_exists(char *file)
 
 /**
  * sanity_check_app_attributes(ezxml_t menu_item)
- * @brief Provide a quick sanity check to make sure that there are 
- * at least the minimum number of elements present in the 
+ * @brief Provide a quick sanity check to make sure that there are
+ * at least the minimum number of elements present in the
  * app attributes element
  * @param menu_item
  * @return 0 for success, -1 for error
  */
 static int sanity_check_app_attributes(ezxml_t app_attribute) {
-	
+
 	int elements = (sizeof(XML_app_elements) / sizeof(XML_app_elements[0]));
 	int i = 0;
 	for (i = 0; i < elements; i++) {
@@ -70,7 +70,7 @@ static int sanity_check_app_attributes(ezxml_t app_attribute) {
 	}
 
 	return (0);
-	
+
 }
 
 /**
@@ -155,10 +155,10 @@ static int parse_menu_item(ezxml_t menu_item, GNode * cur_node)
 		debug_msg("Error creating menu_item { XML or malloc }\n");
 		return (-1);
 	}
-	
+
 	if(add_menu_node(cur_node,new_menu_node) == NULL) {
 		debug_msg("Unable to add new menu item to data-structure\n");
-		return (-1);		
+		return (-1);
 	}
 
 	if (hasChildren == NULL) {
