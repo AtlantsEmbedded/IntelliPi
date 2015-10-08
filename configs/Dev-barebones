@@ -220,8 +220,8 @@ CONFIG_FEED_packages=y
 CONFIG_FEED_management=y
 CONFIG_FEED_oldpackages=y
 # TODO-REBRANDING: Confirm if this is Atom branding
-CONFIG_FEED_nonatom=y
-CONFIG_FEED_atom=y
+CONFIG_FEED_nonatlants=y
+CONFIG_FEED_atlants=y
 # CONFIG_SMIMEOPT is not set
 CONFIG_OPKGSMIME_PASSPHRASE=y
 
