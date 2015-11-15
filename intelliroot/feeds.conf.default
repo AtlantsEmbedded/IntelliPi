@@ -13,5 +13,5 @@ src-git oldpackages http://git.openwrt.org/14.07/packages.git
 #src-svn xfce svn://svn.openwrt.org/openwrt/feeds/xfce
 #src-svn lxde svn://svn.openwrt.org/openwrt/feeds/lxde
 #src-link custom /usr/src/openwrt/custom-feed
-src-svn nonatom http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/non-atom
-src-svn atom http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/atom
+src-svn nonatlants http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/non-atom
+src-svn atlants http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/atom
