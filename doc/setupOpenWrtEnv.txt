@@ -24,9 +24,8 @@ src-git packages https://github.com/openwrt/packages.git
 #src-svn xfce svn://svn.openwrt.org/openwrt/feeds/xfce
 #src-svn lxde svn://svn.openwrt.org/openwrt/feeds/lxde
 #src-link custom /usr/src/openwrt/custom-feed
-# TODO-REBRANDING: Need to check if feeds are compatible with git and how to change them for that
-src-svn nonatlants http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/non-atom
-src-svn atlants http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/atom
+src-git nonatlants https://github.com/AtlantsEmbedded/feed-nonatlants.git
+src-git atlants https://github.com/AtlantsEmbedded/feed-atlants.git
 
 Now update feeds of openwrt:
 

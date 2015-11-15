@@ -1,4 +1,3 @@
-# TODO-REBRANDING: Need to check if feeds are compatible with git and how to change them for that
 src-git packages https://github.com/openwrt/packages.git;for-14.07
 #src-git luci https://github.com/openwrt/luci.git;luci-0.12
 #src-git routing https://github.com/openwrt-routing/packages.git;for-14.07
@@ -13,5 +12,5 @@ src-git oldpackages http://git.openwrt.org/14.07/packages.git
 #src-svn xfce svn://svn.openwrt.org/openwrt/feeds/xfce
 #src-svn lxde svn://svn.openwrt.org/openwrt/feeds/lxde
 #src-link custom /usr/src/openwrt/custom-feed
-src-svn nonatlants http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/non-atom
-src-svn atlants http://svn.code.sf.net/p/atomproducts/svn/trunk/feeds/atom
+src-svn nonatlants https://github.com/AtlantsEmbedded/feed-nonatlants.git
+src-svn atlants https://github.com/AtlantsEmbedded/feed-atlants.git
