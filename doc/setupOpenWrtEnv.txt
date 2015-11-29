@@ -2,7 +2,7 @@ Install the following pre-req software:
 
 sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext \
 git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 \
-subversion flex mercurial automake
+subversion flex mercurial automake libssl-dev
 
 Checkout Openwrt
 
@@ -32,16 +32,16 @@ Now update feeds of openwrt:
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
-Checkout the config folder which can be used by openwrt:
-
-svn co svn://svn.code.sf.net/p/atomproducts/svn/trunk/configs configs
+From the IntelliPi configs folder, copy the config you wish to apply.
 
 Now copy one of the configuration files as so:
 
-cp configs/<whateverOne> .config
-git archive --remote=https://github.com/AtlantsEmbedded/IntelliPi.git HEAD:configs/kernel_config-3.14 target/linux/brcm2708/config-3.14 | tar -x
+cp <pathToIntelliPiProject>/configs/<whateverOne> .config
 
-^ The above svn co is just for the kernel config - this will work and has things like 1wire support for w1-therm and w1-gpio
+Finally, copy the configuration file for 1wire support, and other things.
+
+cp <pathToIntelliPiProject>/configs/kernel_config-3.14 target/linux/brcm2708/config-3.14
+
 At this point, menuconfig can be ran OR the config file con be used
 
 make menuconfig
