@@ -5,7 +5,7 @@ START=1
 STOP=2
 
 start() {
-        /Atlants/gpio/gpio_interface /Atlants/gpio/config/gpio_config.xml &
+        /intelli/gpio/gpio_interface /intelli/gpio/config/gpio_config.xml &
 }
 
 stop() {
@@ -13,5 +13,5 @@ stop() {
 }
 
 boot() {
-        /Atlants/gpio/gpio_interface /Atlants/gpio/config/gpio_config.xml &
+        /intelli/gpio/gpio_interface /intelli/gpio/config/gpio_config.xml &
 }

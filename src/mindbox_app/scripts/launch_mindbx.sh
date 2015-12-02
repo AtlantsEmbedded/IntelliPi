@@ -8,11 +8,11 @@ start() {
 
 	hciconfig hci0 sspmode 1
 
-	/Atlants/data/data_interface /Atlants/data/config/data_config.xml &
+	/intelli/data/data_interface /intelli/data/config/data_config.xml &
 	sleep 2
-	/Atlants/data/data_preprocessing /Atlants/data/config/preprocess_config.xml &
+	/intelli/data/data_preprocessing /intelli/data/config/preprocess_config.xml &
 	sleep 2
-	/Atlants/app/mindbx_app /Atlants/app/config/application_config.xml &
+	/intelli/app/mindbx_app /intelli/app/config/application_config.xml &
 }
 
 stop() {
@@ -24,10 +24,10 @@ stop() {
 boot() {
 	hciconfig hci0 sspmode 1
 
-	/Atlants/data/data_interface /Atlants/data/config/data_config.xml &
+	/intelli/data/data_interface /intelli/data/config/data_config.xml &
 	sleep 2
-	/Atlants/data/data_preprocessing /Atlants/data/config/preprocess_config.xml &
+	/intelli/data/data_preprocessing /intelli/data/config/preprocess_config.xml &
 	sleep 2
-	/Atlants/app/mindbx_app /Atlants/app/config/application_config.xml &
+	/intelli/app/mindbx_app /intelli/app/config/application_config.xml &
 
 }

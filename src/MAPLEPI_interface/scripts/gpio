@@ -11,7 +11,7 @@ start() {
 		# Setup DS pin for power
 		gpio mode 11 up
 		gpio write 11 1
-        /Atlants/bin/gpio_interface 1 &
+        /intelli/bin/gpio_interface 1 &
 }
 
 stop() {
@@ -25,5 +25,5 @@ boot() {
 		# Setup DS pin for power
 		gpio mode 11 up
 		gpio write 11 1
-        /Atlants/bin/gpio_interface 1 &
+        /intelli/bin/gpio_interface 1 &
 }

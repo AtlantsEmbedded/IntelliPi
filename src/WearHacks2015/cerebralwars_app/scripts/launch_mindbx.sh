@@ -8,11 +8,11 @@ start() {
 
 	hciconfig hci0 sspmode 1
 
-	/atom/data/data_interface /atom/data/config/data_config.xml &
+	/intelli/data/data_interface /intelli/data/config/data_config.xml &
 	sleep 2
-	/atom/data/data_preprocessing /atom/data/config/preprocess_config.xml &
+	/intelli/data/data_preprocessing /intelli/data/config/preprocess_config.xml &
 	sleep 2
-	/atom/app/mindbx_app /atom/app/config/application_config.xml &
+	/intelli/app/mindbx_app /intelli/app/config/application_config.xml &
 }                 
  
 stop() {          
@@ -24,10 +24,10 @@ stop() {
 boot() {
 	hciconfig hci0 sspmode 1
 
-	/atom/data/data_interface /atom/data/config/data_config.xml &
+	/intelli/data/data_interface /intelli/data/config/data_config.xml &
 	sleep 2
-	/atom/data/data_preprocessing /atom/data/config/preprocess_config.xml &
+	/intelli/data/data_preprocessing /intelli/data/config/preprocess_config.xml &
 	sleep 2
-	/atom/app/mindbx_app /atom/app/config/application_config.xml &
+	/intelli/app/mindbx_app /intelli/app/config/application_config.xml &
 	
 }
