@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appConfig>
+  <appAttributes>
+    <debug>TRUE</debug>
+    <feature_source>SHM</feature_source>
+    <feature_vect_size>220</feature_vect_size>
+    <training_set_size>20</training_set_size>
+    <eeg_harware_present>TRUE</eeg_harware_present>
+    <test_duration>60</test_duration>
+    <avg_kernel>10</avg_kernel>
+  </appAttributes>
+ </appConfig>
