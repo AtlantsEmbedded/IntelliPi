@@ -20,9 +20,7 @@
 #define	SOLENOID		3
 #define	COIN_ACCEPTOR	4
 #define	TEST_BUTTON		5
-
-#define FIRST_UNUSED_GPIO 6
-#define TOT_NB_GPIO 8
+#define	DEMO_SELECTOR	6
 
 static char ls_flashing_latch = 0x00; 
 static int ls_flashing_half_period = 0;
@@ -49,10 +47,6 @@ void setup_mindbx(void)
 	  /*setup the wiring pi*/
 	  if (wiringPiSetup () == -1)
 			exit (1) ;
-
-	  /*inform user*/
-	  printf("Wiringpi setup proceeding"); 
-	  fflush(stdout);
 	  
 	  /*define the pins functions*/
 	  pinMode(LED_STRIP_RED, OUTPUT);
@@ -61,20 +55,11 @@ void setup_mindbx(void)
 	  pinMode(SOLENOID, OUTPUT);
 	  pinMode(TEST_BUTTON, INPUT);
 	  pinMode(COIN_ACCEPTOR, INPUT);
+	  pinMode(DEMO_SELECTOR, INPUT);
 	  
 	  /*set default output values*/
 	  digitalWrite (SOLENOID, 0);
 	  set_led_strip_color(OFF);
-
-	  /*set other pins as output*/
-	  for (i=FIRST_UNUSED_GPIO ; i<TOT_NB_GPIO ; i++)
-	  {
-			pinMode (i, OUTPUT);
-			digitalWrite (i, 0);
-	  }
-
-	  /*inform user*/
-	  printf ("Wiringpi setup completed\n");
 }
 
 /**
@@ -111,6 +96,15 @@ void wait_for_test_button(void)
 	  printf("Test button pressed!\n");
 }
 
+char get_selector_state(void){
+	if(digitalRead(DEMO_SELECTOR)==HIGH){
+		return 0x01;
+	}else{
+		return 0x00;
+	}	
+}
+
+
 /**
  * set_led_strip_color(void)
  * @brief sets the value of the PWM driving the led strip
@@ -135,7 +129,6 @@ void open_door(void)
   printf ("Door opened!\n");
   delay(5000);
   digitalWrite(SOLENOID, 0);
-  printf ("Can close door now\n");
 
 }
 

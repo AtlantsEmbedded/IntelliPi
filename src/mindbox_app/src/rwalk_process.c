@@ -1,56 +1,72 @@
-
+/**
+ * @file rwalk_process.c
+ * @author Frederic Simard (fred.simard@atlantsembedded.com) | Atlants Embedded
+ * @brief Random walk process
+ * 		  This file implements a random walk process service. This type of system is used to
+ * 		  generate variability in the responses, because it is a noisy integrator, while allowing
+ *        an easy way to modulate the integration rate.
+ * 
+ * 		  Randomness and difficulty level can be adjusted on initialization
+ */
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
 #include "rwalk_process.h"
 
-double v_decision_value = 0.0;
-rwalk_options_t v_rwalk_options;
-
 double randn();
 
-int init_rwalk_process(rwalk_options_t options){
-	v_rwalk_options = options;
+/**
+ * int init_rwalk_process(rwalk_t *rwalk)
+ * @brief initialize the random walk process
+ * @param rwalk, reference to the random walk process
+ * @return EXIT_SUCCESS
+ */
+int init_rwalk_process(rwalk_t *rwalk){
 	
+	rwalk->decision_value = 0.0;
 	return EXIT_SUCCESS;
 }
 
-int reset_rwalk_process(){
-	v_decision_value = 0.0;
+/**
+ * int reset_rwalk_process(rwalk_t *rwalk)
+ * @brief reset the random walk process
+ * @param rwalk, reference to the random walk process
+ * @return EXIT_SUCCESS
+ */
+int reset_rwalk_process(rwalk_t *rwalk){
 	
+	rwalk->decision_value = 0.0;
 	return EXIT_SUCCESS;
 }
 
-double iterate_rwalk_process(double drift_rate){
+/**
+ * int iterate_rwalk_process(rwalk_t *rwalk, double drift_rate)
+ * @brief This implements a brownian motion that randomly drift in the
+ * 		  direction and at the rate defined by the drift rate
+ * 	      noise is set as an option of the rwalk process
+ * @param rwalk, reference to the random walk process
+ * @param drift_rate, the average drift rate that should be applied to the process
+ * @return EXIT_SUCCESS
+ */
+int iterate_rwalk_process(rwalk_t *rwalk, double drift_rate){
 	
-	/*add a step to the decision value by*/
-	/*getting a normaly distributed random number*/
-	/*with average equal to drift rate and deviation*/
-	/*specified by the options*/
+	/*function itself*/
+	rwalk->decision_value += (randn()*rwalk->drift_rate_std+drift_rate)*rwalk->dt;
 	
-	printf("drift_rate:%f\n",drift_rate);
-	printf("DR_std:%f\n",v_rwalk_options.drift_rate_std);
-	printf("dt:%f\n",v_rwalk_options.dt);
-	
-	v_decision_value += (randn()*v_rwalk_options.drift_rate_std+drift_rate)*v_rwalk_options.dt;
-	
-	printf("v_decision_value:%f\n",v_decision_value);
-	
-	//sleep(1);
-	
-	if(v_decision_value<0.0){
-		v_decision_value = 0;
+	/*keep value positive, since we don't want to get randomly too far from the goal*/
+	if(rwalk->decision_value<0.0){
+		rwalk->decision_value = 0;
 	}
-	
-	return v_decision_value;		
-	
+	return EXIT_SUCCESS;	
 }
 
 
 /**
  * double randn()
  * @brief Utility function to generate a normally distributed number
+ * @return a standard normally distributed number
  */ 
 double randn(){
 	double Twopi = (6.2831853071795864769252867665590057683943387987502); /* 2 * pi */

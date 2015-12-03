@@ -15,9 +15,9 @@
  *        dropping newest...
  */
 
-#define SHM_KEY 7803
+#define SHM_KEY 4786
 
-#define NB_FEATURES 4
+#define NB_FEATURES 220
 #define FEATURE_SIZE 8 
 #define SAMPLE_SIZE NB_FEATURES*FEATURE_SIZE 
 #define BUFFER_DEPTH 2 /*nb of samples in the buffer*/
@@ -28,7 +28,7 @@
  * - DATA_preprocessing
  * - application software
  */
-#define SEM_KEY 1234 /*key to sem array*/
+#define SEM_KEY 1728 /*key to sem array*/
 #define NB_SEM 6
 
 #define INTERFACE_OUT_READY 0 //sem posted when interface has written data
@@ -40,7 +40,8 @@
 /**/
 
 int shm_rd_init(void *param);
-int shm_rd_read_from_buf(void *param);
+int shm_rd_request(void *param);
+int shm_rd_wait_for_request_completed(void *param);
 int shm_rd_cleanup(void *param);
 
 

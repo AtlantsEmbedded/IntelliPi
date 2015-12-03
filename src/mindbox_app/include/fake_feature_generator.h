@@ -9,13 +9,9 @@
 
 #include "feature_input.h"
 
-#define NB_CHANNELS 4 
-
-int fake_feat_gen_init();
-
-int fake_feat_gen_get_sample(void *param);
-
-int fake_feat_gen_cleanup();
-
+int fake_feat_gen_init(void *param);
+int fake_feat_gen_request(void *param);
+int fake_feat_gen_wait_for_request_completed(void *param);
+int fake_feat_gen_cleanup(void *param);
 
 #endif

@@ -6,7 +6,6 @@
  * - DATA_preprocessing
  * - application software
  */
-#define SEM_KEY 1234 /*key to sem array*/
 #define NB_SEM 6
 
 #define INTERFACE_OUT_READY 0 //sem posted when interface has written data
@@ -17,9 +16,17 @@
 #define INTERFACE_CONNECTED 5 //sem posted when interface connection established
 /**/
 
-int ipc_comm_init();
-int ipc_wait_for_harware();
-int ipc_comm_cleanup();
+typedef struct ipc_comm_s{
+	/*to be set before initialization*/
+	int sem_key;
+	/*will be set during initialization*/
+	int semid;
+	struct sembuf *sops;
+}ipc_comm_t;
+
+int ipc_comm_init(ipc_comm_t* ipc_comm);
+int ipc_wait_for_harware(ipc_comm_t* ipc_comm);
+int ipc_comm_cleanup(ipc_comm_t* ipc_comm);
 
 
 

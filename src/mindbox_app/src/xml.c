@@ -77,7 +77,7 @@ static int get_app_attributes(ezxml_t app_attribute, appconfig_t * app_info)
 		printf("appAttributes->feature_source is missing\n");
 		return (-1);
 	}
-	if(strcmp(tmp->txt,"FAKE_FEATURE")==0){
+	if(strcmp(tmp->txt,"FAKE")==0){
 		app_info->feature_source = FAKE_INPUT;
 	}else if(strcmp(tmp->txt,"SHM")==0){
 		app_info->feature_source = SHM_INPUT;

@@ -1,10 +1,23 @@
-
+/**
+ * @file main.c
+ * @author Frederic Simard (fred.simard@atlantsembedded.com), Ron Brash (ron.brash@gmail.com) | Atlants Embedded
+ * @brief Mindbox application
+ * 		  This is the application layer of the Mindbox project. It implements a BCI challenge
+ * 		  with a random walk process. The participant needs to relax and increase the power
+ * 		  in the alpha band to open the mindbox.
+ * 
+ * 		  This file implements the control over the LEDs, hardware, and ios.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 #include <wiringPi.h>
+#include <time.h>
+#include <signal.h>
 
+#include "app_signal.h"
 #include "rwalk_process.h"
 #include "feature_processing.h"
 #include "ipc_status_comm.h"
@@ -16,7 +29,16 @@ appconfig_t* app_config;
 
 #define CONFIG_NAME "config/application_config.xml"
 
-void run_testbench();
+/*local instances, these need to be static, because*/
+/*the cleanup is called from an extern*/
+static rwalk_t rwalk_1;
+static feature_input_t feature_input_1;
+static ipc_comm_t ipc_comm_1;
+static feat_proc_t feature_proc_1;
+
+/*threads that trains and obtain a sample*/
+void* train_player(void* param);
+void* get_sample(void* param);
 
 /**
  * which_config(int argc, char **argv)
@@ -27,7 +49,6 @@ void run_testbench();
  */
 inline char *which_config(int argc, char **argv)
 {
-
 	if (argc == 2) {
 		return argv[1];
 	} else {
@@ -37,62 +58,72 @@ inline char *which_config(int argc, char **argv)
 
 /**
  * main(int argc, char **argv)
- * @brief test the mindbx_lib
+ * @brief main of the mindbox application
  */
 int main(int argc, char **argv){
 	
+	char task_running = 0x00;
 	double decision_var_value = 0.0;
 	double threshold = 0.0;
-	char test_running = 0x00;
-	feat_proc_options_t feat_proc_opts;
-	rwalk_options_t rwalk_opts;
-	feature_t feature_vect;
-	double* feature_array;
-	double fail_safe = 0.5;
+	int player_1_intensity;
+	pthread_t thread;
+	pthread_attr_t attr;
+	clock_t start, end;
+	double cpu_time_used;
+	double fail_safe_counter = 0;
+
+	/*Set up ctrl c signal handler*/
+	/*This is the only way by which the program can exit*/
+	(void)signal(SIGINT, ctrl_c_handler);
+
+	/*prepare thread initialization*/
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	
 	/*read the xml*/
 	app_config = xml_initialize(which_config(argc, argv));
 	
-	/*configure the mind box*/
+	/*configure the mind box i/o's*/
 	setup_mindbx();
 	
-	/*run test over gpios*/
-	run_testbench();
-	
 	/*configure the feature input*/
-	init_feature_input(app_config->feature_source);
+	/*these key are defined in the preprocessing config file*/
+	feature_input_1.shm_key=7804; 
+	feature_input_1.sem_key=1234;
+	init_feature_input(app_config->feature_source, &feature_input_1);
 	
 	/*configure the inter-process communication channel*/
-	ipc_comm_init();
+	ipc_comm_1.sem_key=1234;
+	ipc_comm_init(&ipc_comm_1);
 	
-	/*set LED strip to pairing mode*/
+	/*set LED strip to pairing mode flash*/
 	set_led_strip_flash_state(WHITE, OFF, 1000);
 	
 	/*if required, wait for eeg hardware to be present*/
+	printf("App, waiting for HW\n");
 	if(app_config->eeg_hardware_required){
-		ipc_wait_for_harware();
+		if(!ipc_wait_for_harware(&ipc_comm_1)){
+			exit(0);
+		}
 	}
 	
-	feat_proc_opts.nb_train_samples = app_config->training_set_size;
-	feat_proc_opts.nb_features = app_config->nb_features;
-	init_feat_processing(feat_proc_opts);
+	/*initialize the feature processing core*/
+	feature_proc_1.nb_train_samples = app_config->training_set_size;
+	feature_proc_1.feature_input = &feature_input_1;
+	init_feat_processing(&feature_proc_1);
 	
-	rwalk_opts.drift_rate_std = app_config->noise_std_dev;
-	rwalk_opts.dt = app_config->time_period;
-	init_rwalk_process(rwalk_opts);
+	/*initialize the random walk process*/
+	rwalk_1.drift_rate_std = app_config->noise_std_dev;
+	rwalk_1.dt = app_config->time_period;
+	init_rwalk_process(&rwalk_1);
 	
+	/*set threshold*/
 	threshold = app_config->threshold;
-	feature_vect.nb_features = app_config->nb_features;
-	feature_vect.ptr = (unsigned char*)malloc(sizeof(double)*feature_vect.nb_features);
 	
-	feature_array = (double*)feature_vect.ptr;
-	
+	printf("App, entering app loop\n");
+		
 	/*while application is alive*/
-	while(1){
-	
-		
-		printf("check\n");
-		
+	for(;;){
 	
 		/*set LED strip to wait mode*/
 		set_led_strip_flash_state(PINK, OFF, 500);
@@ -107,14 +138,19 @@ int main(int argc, char **argv){
 		sleep(3);
 		
 		/*build training set*/
-		train_feat_processing();
+		printf("Building training set\n");
+		pthread_create(&thread, &attr, train_player, (void*) &feature_proc_1); 
+		pthread_join(thread,NULL);
+		
+		printf("Training set acquisition, done!\n");
 		
 		/*reset random walk process*/
-		reset_rwalk_process();
-	
-		test_running = 0x01;
+		reset_rwalk_process(&rwalk_1);
+		
+		/*and local variables*/
+		task_running = 0x01;
 		decision_var_value = 0;
-		fail_safe = 0;
+		fail_safe_counter = 0;
 		
 		/*set LED strip to test mode*/
 		set_led_strip_flash_state(BLUE, RED, 1100);
@@ -122,84 +158,90 @@ int main(int argc, char **argv){
 		/*wait 3 seconds*/
 		sleep(3);
 		
+		printf("Task begin!\n");
+		
+		/*start timer*/
+		start = clock();
+		
 		/*run the test*/
-		while(test_running){
+		while(task_running){
 		
 			/*get a normalized sample*/
-			get_normalized_sample(&feature_vect);
+			pthread_create(&thread, &attr, get_sample, (void*) &feature_proc_1); 
+			pthread_join(thread,NULL);
 			
+			/*push it into the noisy integrator*/
+			iterate_rwalk_process(&rwalk_1, feature_proc_1.sample);
 			
-			printf("Drift rate:%f\n",feature_array[1]);
+			/*copy locally, to prevent corruption*/
+			decision_var_value = rwalk_1.decision_value;
 			
-			/*push it to to noisy integrator*/
-			decision_var_value = iterate_rwalk_process(feature_array[1]);
+			/*if selector is set to "cheat mode", add a default increment*/
+			if(get_selector_state()){
+				fail_safe_counter += 0.333;
+				decision_var_value += fail_safe_counter;
+			}
 			
-			fail_safe += (double)rand()/(double)RAND_MAX;
-			decision_var_value += fail_safe;
-			
+			/*show decision value for debug purpose*/
 			printf("DV:%f\n",decision_var_value);
 			
-			/*update flash frequency*/
+			/*update LED flash frequency*/
 			set_led_strip_flash_state(BLUE, RED, ((threshold-decision_var_value)/threshold)*1000+100);
-		
+			
+			/*update timer*/
+			end = clock();
+			cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC * 1000;
+			
 			/*check if one of the stop conditions is met*/
-			if(decision_var_value>threshold){
-				test_running = 0x00;
+			if(decision_var_value>threshold || app_config->test_duration < cpu_time_used){
+				task_running = 0x00;
 			}
 			
 		}
 		
+		/*check if the condition reached was threshold*/
 		if(decision_var_value>threshold){
-			/*if we have a winner*/
+			
+			/*yes, we have a winner*/
 			/*open the door*/
 			open_door();
+			/*flash happily*/
 			set_led_strip_flash_state(BLUE, WHITE, 500);
+			sleep(3);
+		}else{
+			/*no, flash sadly*/
+			set_led_strip_flash_state(RED, WHITE, 500);
 			sleep(3);
 		}
 		
 	}
 	
-	printf("check\n");
-	
-	ipc_comm_cleanup();
-	reset_led_strip_flash_state();
-	set_led_strip_color(OFF);
-	
-	free(feature_vect.ptr);
-	
+	/*shouldn't reach here*/
 	exit(0);
 }
 
-
-
-
-void run_testbench(){
-
-	int i;
+void cleanup_app(void){
 	
-	/*flash the LEDs RED and BLUE*/
-	set_led_strip_flash_state(RED,BLUE,500);
+	/*inform user*/
+	printf("mindbox_app->cleanup\n");
+	fflush(stdout);
 	
-	/*wait for test button*/
-	wait_for_test_button();
+	/*clean up ipc and feature processing*/		
+	ipc_comm_cleanup(&ipc_comm_1);
+	clean_up_feat_processing(&feature_proc_1);
 	
-	/*flash the LEDs GREEN and YELLOW faster*/
-	set_led_strip_flash_state(GREEN,YELLOW,150);
-	
-	/*wait for coin acceptor*/
-	wait_for_coin_insertion();
-	
-	/*turn off led flashing*/
+	/*turn off LEDs*/
 	reset_led_strip_flash_state();
-	
-	/*turn off the LED strip*/
 	set_led_strip_color(OFF);
+	exit(0);
+}
 
-	/*and open the door 5 times*/
-	for(i=0;i<1;i++){
-		open_door();
-		delay(2000);
-	}	
-	
-	printf("GPIO test over");
+/*This thread is used to train a player*/
+void* train_player(void* param){
+	train_feat_processing((feat_proc_t*)param);	
+}
+
+/*This thread is used to get a normalized sample, the training must have been executed before*/
+void* get_sample(void* param){
+	get_normalized_sample((feat_proc_t*)param);
 }
