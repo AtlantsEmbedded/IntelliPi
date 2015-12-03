@@ -30,3 +30,5 @@ To develop you application, we packed in a series of tools to make sure you have
 # We enable - YOU imagine
 Combining over 15 years of software and hardware experience - we removed all of the tricky stuff with hardware, connecting to devices and collecting data so that all you need to do is create an application using our APIs to recieve data.  In 4 steps, just install our software, create your applicaton, build an image and go; It is that simple!
 
+# For more information:
+Before getting started, read over our <a href="https://github.com/AtlantsEmbedded/IntelliPi/wiki"> WIKI for our quickstart guide, architecture information and more</a>.
