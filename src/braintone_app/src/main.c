@@ -27,7 +27,7 @@
 /*defines the frequency scale*/
 #define NB_STEPS 100
 #define NB_PLAYERS 1
-#define FRED 0
+#define PLAYER_1 0
 
 static inline void print_banner();
 inline char *which_config(int argc, char **argv);
@@ -68,20 +68,20 @@ int main(int argc, char *argv[])
 	setup_buzzer_lib();
 	
 	/*configure the feature input*/
-	feature_input[FRED].shm_key=7804;
-	feature_input[FRED].sem_key=1234;
-	init_feature_input(app_config->feature_source, &(feature_input[FRED]));
+	feature_input[PLAYER_1].shm_key=7804;
+	feature_input[PLAYER_1].sem_key=1234;
+	init_feature_input(app_config->feature_source, &(feature_input[PLAYER_1]));
 	
 	/*configure the inter-process communication channel*/
-	ipc_comm[FRED].sem_key=1234;
-	ipc_comm_init(&(ipc_comm[FRED]));
+	ipc_comm[PLAYER_1].sem_key=1234;
+	ipc_comm_init(&(ipc_comm[PLAYER_1]));
 	
 	/*set beep mode*/
 	set_beep_mode(50, 0, 500);
 
 	/*if required, wait for eeg hardware to be present*/
 	if(app_config->eeg_hardware_required){
-		if(!ipc_wait_for_harware(&(ipc_comm[FRED]))){
+		if(!ipc_wait_for_harware(&(ipc_comm[PLAYER_1]))){
 			exit(0);
 		}
 	}
@@ -89,11 +89,11 @@ int main(int argc, char *argv[])
 	/*stop beep mode*/
 	turn_off_beeper();
 	
-	feature_proc[FRED].nb_train_samples = app_config->training_set_size;
-	feature_proc[FRED].feature_input = &(feature_input[FRED]);
-	init_feat_processing(&(feature_proc[FRED]));
+	feature_proc[PLAYER_1].nb_train_samples = app_config->training_set_size;
+	feature_proc[PLAYER_1].feature_input = &(feature_input[PLAYER_1]);
+	init_feat_processing(&(feature_proc[PLAYER_1]));
 		
-	train_feat_processing(&(feature_proc[FRED]));
+	train_feat_processing(&(feature_proc[PLAYER_1]));
 		
 	printf("About to start task\n");
 	fflush(stdout);	
@@ -105,9 +105,9 @@ int main(int argc, char *argv[])
 	while(task_running){
 	
 		/*get a normalized sample*/
-		get_normalized_sample(&(feature_proc[FRED]));
+		get_normalized_sample(&(feature_proc[PLAYER_1]));
 		
-		adjusted_sample = ((float)feature_proc[FRED].sample*100/3.5);
+		adjusted_sample = ((float)feature_proc[PLAYER_1].sample*100/3.5);
 		running_avg += (adjusted_sample-running_avg)/app_config->avg_kernel;
 		
 		set_buzzer_state(running_avg);
@@ -126,8 +126,8 @@ int main(int argc, char *argv[])
 	
 	printf("Finished\n");
 		
-	ipc_comm_cleanup(&(ipc_comm[FRED]));
-	clean_up_feat_processing(&(feature_proc[FRED]));
+	ipc_comm_cleanup(&(ipc_comm[PLAYER_1]));
+	clean_up_feat_processing(&(feature_proc[PLAYER_1]));
 	
 	exit(0);
 }
