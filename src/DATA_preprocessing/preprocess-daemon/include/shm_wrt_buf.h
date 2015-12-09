@@ -11,8 +11,6 @@
  *        (...)
  */
 
-//#define SHM_KEY 7804
-
 #define NB_FEATURES 220
 #define FEATURE_SIZE 8 
 #define SAMPLE_SIZE NB_FEATURES*FEATURE_SIZE 
@@ -24,7 +22,6 @@
  * - DATA_preprocessing
  * - application software
  */
-#define SEM_KEY 1234 /*key to sem array*/
 #define NB_SEM 6/*2 semaphore, one posted for data avail, one posted for data read*/
 
 #define INTERFACE_OUT_READY 0 //sem posted when interface has written data
@@ -35,9 +32,25 @@
 #define INTERFACE_CONNECTED 5 //sem posted when interface connection established
 /**/
 
-int shm_wrt_init(void *param);
-int shm_wrt_write_to_buf(void *param);
-int shm_wrt_cleanup(void *param);
+typedef struct shm_output_options_s{
+	
+	/*IPC keys*/
+	int shm_key;
+	int sem_key;
+	
+	/*feature vect optional content*/
+	unsigned char timeseries;
+	unsigned char fft;
+	unsigned char power_alpha;
+	unsigned char power_beta;
+	unsigned char power_gamma;
+	
+}shm_output_options_t;
+
+
+void* shm_wrt_init(void *options);
+int shm_wrt_write_to_buf(void *feature_buf, void *shm_interface);
+int shm_wrt_cleanup(void* shm_interface);
 
 
 #endif

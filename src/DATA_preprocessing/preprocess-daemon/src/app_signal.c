@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #include "app_signal.h"
-#include "data_input.h"
+#include "main.h"
 
 /**
  * ctrl_c_handler(int signal)
@@ -20,6 +20,6 @@
 void ctrl_c_handler(int signal)
 {
 	fprintf(stdout, "Interrupt caught[NO: %d ]\n", signal);
-	TERMINATE_DATA_INPUT_FC();
+	cleanup_app();
 	exit(0);
 }

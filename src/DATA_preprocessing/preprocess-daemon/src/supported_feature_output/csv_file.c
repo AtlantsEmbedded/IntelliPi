@@ -1,98 +1,100 @@
 /**
  * @file csv_file.c
  * @author Frederic Simard, Atlants Embedded (frederic.simard.1@outlook.com)
- * @brief Handles the CSV file function pointers
+ * @brief feature output interface, initialize a CSV file for feature output.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "feature_output.h"
 #include "data_structure.h"
 #include "csv_file.h"
 
-static FILE* fp;
+/*Define the csv structure*/
+typedef struct csv_output_s{
+	
+	csv_output_options_t options;
+	FILE* fp;
+
+}csv_output_t;
+
 
 /**
- * int csv_init_file(void *param)
- * @brief 
- * @param param (unused)
- * @return if successful, EXIT_SUCCESS, otherwise, EXIT_FAILURE
+ * void* csv_init_file(void *options)
+ * @brief Initialize the CSV output interface
+ * @param options, options defining the interface
+ * @return a pointer to the interface or NULL if invalid
  */
-int csv_init_file(void *param __attribute__ ((unused))){
+void* csv_init_file(void *options){
+	
+	/*allocate memory*/
+	csv_output_t* this_csv = (csv_output_t*)malloc(sizeof(csv_output_t));
+	
+	/*copy the options*/
+	memcpy(&(this_csv->options),options,sizeof(csv_output_options_t));
 	
 	/*open a read/write file*/
-	fp = fopen("feature_output.csv","w+");
+	this_csv->fp = fopen(this_csv->options.filename,"w+");
 	
 	/*check if opened correctly*/
-	if(fp==NULL)
-		return EXIT_FAILURE;
+	if(this_csv->fp==NULL)
+		return NULL;
 		
-	return EXIT_SUCCESS;	
+	/*return the pointer*/
+	return this_csv;	
 }
 
 /**
- * int csv_write_in_file(void *param)
+ * int csv_write_in_file(void *feature_buf, void *csv_interface)
  * @brief Writes the data received in a csv file, skipping a line at the end
- * @param param, must be pointing to a data_t
+ * @param feature_buf, (data_t*) feature buffer to be written
+ * @param csv_interface, (csv_output_t*) pointer to the csv interface
  * @return if successful, EXIT_SUCCESS, otherwise, EXIT_FAILURE
  */
-int csv_write_in_file(void *param){
+int csv_write_in_file(void *feature_buf, void *csv_interface){
 	
 	int i;
-	data_t *data = (data_t *) param;
-	int* uint32_buf;
-	double* double_buf;
-	int line_offset;
+	/*recast pointers*/
+	data_t *data = (data_t *) feature_buf;
+	csv_output_t* this_csv = (csv_output_t*)csv_interface;
+	double* double_buf = (double*)data->ptr;
 	
-	if(fp==NULL)
+	/*check if file valid*/
+	if(this_csv->fp==NULL)
 		return EXIT_FAILURE;
 	
-	/*check which type of data is coming in*/
-	switch(data->type){
-		/*32 bits unsigned integer*/
-		case INT32:
-			/*recast the pointer*/
-			uint32_buf = (int*)data->ptr;
-			for(i=0;i<data->nb_data;i++){
-				fprintf(fp,"%i;",uint32_buf[i]);
-			}
-		break;
-		
-		/*8 bits integer (unsigned char) not used*/
-		case UINT8:
-			/*good to go*/
-			for(i=0;i<data->nb_data;i++){
-				fprintf(fp,"%i;",data->ptr[i]);
-			}
-			
-		/*double*/
-		case DOUBLE:
-			/*recast the pointer*/
-			double_buf = (double*)data->ptr;
-			for(i=0;i<data->nb_data;i++){
-				fprintf(fp,"%f;",double_buf[i]);
-			}
-		break;
+	/*write feature vector to csv file*/
+	for(i=0;i<data->nb_data;i++){
+		fprintf(this_csv->fp,"%f;",double_buf[i]);
 	}
 	
 	/*skip a line*/
-	fprintf(fp,"\n");
+	fprintf(this_csv->fp,"\n");
 	
 	return EXIT_SUCCESS;
 }
 
 /**
- * int csv_close_file(void *param)
+ * int csv_close_file(void *csv_interface)
  * @brief Close the csv file
  * @param param (unused)
  * @return if successful, EXIT_SUCCESS, otherwise, EXIT_FAILURE
  */
-int csv_close_file(void *param __attribute__ ((unused))){
-
-	if(fp==NULL)
+int csv_close_file(void *csv_interface){
+	
+	/*recast the pointer*/
+	csv_output_t* this_csv = (csv_output_t*)csv_interface;
+	
+	/*check if file is valid*/
+	if(this_csv->fp==NULL)
 		return EXIT_FAILURE;
-		
-	fclose(fp);
+	
+	/*close and free the interface memory*/
+	fclose(this_csv->fp);
+	free(this_csv);
+	
+	/*done*/
 	return EXIT_SUCCESS;
 }

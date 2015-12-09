@@ -1,6 +1,6 @@
 /**
  * @file shm_rd_buf.c
- * @author Frederic Simard, Atlants Embedded (frederic.simard.1@outlook.com)
+ * @author Frederic Simard, Atlants Embedded (fred.simard@atlantsembedded.com)
  * @brief This file implements the shared memory data input system.
  *        The shared memory is meant to be shared between at least two processes and
  *        takes the form of a circular buffer with several pages. When one page is done
@@ -20,6 +20,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
+#include <errno.h>
 
 #include "data_structure.h"
 #include "data_input.h"
@@ -43,51 +44,38 @@ data_input_options_t data_input_opts;
  */
 int shm_rd_init(void *param){
 	
-	
+	/*copy options*/
 	memcpy(&data_input_opts,param,sizeof(data_input_opts));
-	
-	
-	printf("\n**************\nInit SHM Input\n**************\n\n");
 	
     /*
      * initialise the shared memory array
      */
-	printf("shmget: setup shared memory space\n");
-    if ((shmid = shmget(data_input_opts.shm_key, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
+	if ((shmid = shmget(data_input_opts.shm_key, SHM_BUF_SIZE, IPC_CREAT | 0666)) < 0) {
         perror("shmget");
         return EXIT_FAILURE;
     }
-    else 
-		printf("shmget succeeded\n\n");
 		
     /*
      * Now we attach it to our data space.
      */
-    printf("\nshmat: attach shared memory space\n");
     if ((shm_buf = shmat(shmid, NULL, 0)) == (char *) -1) {
         perror("shmat");
         return EXIT_FAILURE;
     }
-    else 
-		printf("shmat succeeded\n\n");
     
     /*
      * Access the semaphore array.
      */
-    printf("semget: setting up the semaphore array\n");
 	if ((semid = semget(data_input_opts.sem_key, NB_SEM, IPC_CREAT | 0666)) == -1) {
 		perror("semget failed\n");
 		return EXIT_FAILURE;
     } 
-    else 
-		printf("semget succeeded\n\n");
 	
 	/*allocate the memory for the pointer to semaphore operations*/
 	sops = (struct sembuf *) malloc(sizeof(struct sembuf));
 	
 	current_page = 0;
 
-	printf("\n**************\nSuccess\n**************\n\n");
 	return EXIT_SUCCESS;
 }
 
@@ -105,25 +93,26 @@ int shm_rd_read_from_buf(void *param){
 	int i,j;
 	
 	double* data_buf = (double*)((data_t *)param)->ptr;
+	float* input_buf = (float*)shm_buf;
 					
 	/*wait for data to be ready for preprocessing*/
 	sops->sem_num = INTERFACE_OUT_READY; /*sem that indicates that a page is free to write to*/
 	sops->sem_op = -1; /*decrement semaphore*/
-	sops->sem_flg = SEM_UNDO; /*undo if fails and blocking call*/	
+	sops->sem_flg = 0; /*undo if fails and blocking call*/
 	
 	if(semop(semid, sops, 1) != 0){
 		return EXIT_FAILURE;
 	}
 	
 	/*compute the read location*/
-	read_ptr = SHM_PAGE_SIZE*current_page;
+	read_ptr = data_input_opts.window_width*data_input_opts.nb_channels*current_page;
 	
 	/*read all data in the page*/
-	for(i=0;i<NB_SAMPLES_PER_PAGE;i++){
+	for(i=0;i<data_input_opts.window_width;i++){
 		for(j=0;j<data_input_opts.nb_channels;j++){
 			
 			/*read and convert*/
-			data_buf[i*data_input_opts.nb_channels+j] = (double)shm_buf[read_ptr+DATA_SIZE*j+i*SAMPLE_SIZE];
+			data_buf[i*data_input_opts.nb_channels+j] = input_buf[read_ptr+i*data_input_opts.nb_channels+j];
 			
 		}
 	}
@@ -144,6 +133,9 @@ int shm_rd_cleanup(void *param __attribute__ ((unused))){
 	
 	/* Detach the shared memory segment. */
 	shmdt(shm_buf);
+	
+	/* Deallocate the semaphore array. */
+	semctl(semid, 0, IPC_RMID, 0);
 	
 	return EXIT_SUCCESS;
 }
