@@ -1261,7 +1261,6 @@ CONFIG_PACKAGE_DATA_preprocessing=y
 #
 # Libraries
 #
-CONFIG_PACKAGE_bluez-clone=y
 CONFIG_PACKAGE_wiringPi=y
 
 #
@@ -1874,6 +1873,7 @@ CONFIG_PACKAGE_libblobmsg-json=y
 # CONFIG_PACKAGE_libdb47 is not set
 # CONFIG_PACKAGE_libdb47xx is not set
 CONFIG_PACKAGE_libdbus=y
+CONFIG_PACKAGE_bluez-libs=y
 # CONFIG_PACKAGE_libev is not set
 # CONFIG_PACKAGE_libevent is not set
 # CONFIG_PACKAGE_libevent2 is not set
@@ -2574,6 +2574,8 @@ CONFIG_PACKAGE_wpad-mini=y
 CONFIG_PACKAGE_dbus=y
 # CONFIG_PACKAGE_dbus-utils is not set
 CONFIG_PACKAGE_dmesg=y
+CONFIG_PACKAGE_bluez-hcidump=y
+CONFIG_PACKAGE_bluez-utils=y
 # CONFIG_PACKAGE_dropbearconvert is not set
 # CONFIG_PACKAGE_dump1090 is not set
 # CONFIG_PACKAGE_fbtest is not set
