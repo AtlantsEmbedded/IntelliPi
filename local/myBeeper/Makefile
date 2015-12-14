@@ -1,0 +1,41 @@
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=myBeeper
+PKG_VERSION:=2014-26-14
+PKG_RELEASE:=1
+#PKG_SOURCE_PROTO:=svn
+#PKG_SOURCE_URL:=http://svn.code.sf.net/p/atomproducts/svn/trunk/src/myBeeper
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)
+#PKG_SOURCE_VERSION:=HEAD
+#PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
+
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+include $(INCLUDE_DIR)/package.mk
+
+define Package/myBeeper
+	SECTION:=utils
+	CATEGORY:=Atlants-GPL
+	TITLE:=myBeeper
+	SUBMENU:=Utilities
+	DEPENDS:=wiringPi
+endef
+
+define Package/myBeeper/description
+	This is my first package
+endef
+
+define Build/Prepare
+	cp -R /home/alexjo/Atlants/IntelliPi/src/myBeeper/* $(PKG_BUILD_DIR)
+endef
+
+#define Build/compile
+#	make
+#endef
+
+define Package/myBeeper/install
+	$(INSTALL_DIR) $(1)/usr
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/mybeeper $(1)/usr/bin
+endef
+
+$(eval $(call BuildPackage,myBeeper))

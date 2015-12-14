@@ -11,6 +11,6 @@ src-git oldpackages http://git.openwrt.org/14.07/packages.git
 #src-svn desktop svn://svn.openwrt.org/openwrt/feeds/desktop
 #src-svn xfce svn://svn.openwrt.org/openwrt/feeds/xfce
 #src-svn lxde svn://svn.openwrt.org/openwrt/feeds/lxde
-#src-link custom /usr/src/openwrt/custom-feed
+src-link local /home/alexjo/Atlants/IntelliPi/local
 src-svn nonatlants https://github.com/AtlantsEmbedded/feed-nonatlants.git
 src-svn atlants https://github.com/AtlantsEmbedded/feed-atlants.git
