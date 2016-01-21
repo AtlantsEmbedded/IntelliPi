@@ -142,8 +142,6 @@ int shm_wrt_write_in_buf(void *param){
 	/*if the page is opened*/
 	if(page_opened){
 		
-		printf("writing to data buffer: %i\n",rand());
-		
 		/*compute the write location*/
 		write_ptr = shm_options.page_size*current_page+shm_options.nb_data_channels*samples_count;
 		
