@@ -1,0 +1,29 @@
+#!/bin/sh /etc/rc.common
+# GPIO startup script
+
+START=1
+STOP=2
+
+start() {
+		# Setup AM2302 pin for power
+		gpio mode 5 out
+		gpio write 5 1
+		# Setup DS pin for power
+		gpio mode 11 up
+		gpio write 11 1
+        /intelli/bin/gpio_interface 1 &
+}
+
+stop() {
+        killall gpio_interface
+}
+
+boot() {
+		# Setup AM2302 pin for power
+		gpio mode 5 out
+		gpio write 5 1
+		# Setup DS pin for power
+		gpio mode 11 up
+		gpio write 11 1
+        /intelli/bin/gpio_interface 1 &
+}

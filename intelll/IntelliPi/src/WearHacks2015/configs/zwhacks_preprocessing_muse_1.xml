@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appConfig>
+  <appAttributes>
+    <debug>TRUE</debug>
+    <data_source>SHM</data_source>
+    <nb_channels>4</nb_channels>
+    <window_width>110</window_width>
+    <feature_dest>SHM</feature_dest>
+	<rd_shm_key>5678</rd_shm_key>
+	<wr_shm_key>7804</wr_shm_key>
+	<sem_key>1234</sem_key>
+    <timeseries>FALSE</timeseries>
+    <fft>TRUE</fft>
+    <power_alpha>FALSE</power_alpha>
+    <power_beta>FALSE</power_beta>
+    <power_gamma>FALSE</power_gamma>
+  </appAttributes>
+ </appConfig>
